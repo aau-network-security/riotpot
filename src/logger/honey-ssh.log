@@ -1,1 +1,14 @@
 2020/06/25 14:55:13 starting ssh server on port 2222...
+2020/07/28 15:46:15 starting ssh server on port 2222...
+2020/07/28 15:48:51 starting ssh server on port 2222...
+2020/07/28 15:52:10 SSH-CMD: ifconfig
+2020/07/28 15:52:18 SSH-CMD: ipa
+2020/07/28 15:52:35 SSH-CMD: os
+2020/07/28 15:52:40 SSH-CMD: etc
+2020/07/28 15:52:45 SSH-CMD: cd /etc
+2020/07/28 15:52:47 SSH-CMD: ls
+2020/07/28 15:53:04 SSH-CMD: cd etc
+2020/07/28 15:53:10 SSH-CMD: ls
+2020/07/28 15:53:19 SSH-CMD: car
+2020/07/28 15:53:22 SSH-CMD: cat
+2020/07/28 15:54:42 starting ssh server on port 2222...
