@@ -39,7 +39,7 @@ func logRequest(response http.ResponseWriter, request *http.Request) {
 
 func main() {
 	// Tell the default server multiplexer to map the landing URL to
-	// a function called logRequest
+	// a function called logRequesstal
 	http.HandleFunc("/", logRequest)
 
 	// Kick off the listener using that will run forever
