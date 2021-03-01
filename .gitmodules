@@ -1,0 +1,9 @@
+# Uncomment this line to add the logs from a different repository
+#[submodules "logs"]
+    #path = logs
+    #url = git@github.com:aau-network-security/riotpot-logs.git
+
+# Submodule of the Trudy repo with all the latest changes
+[submodules "trudy"]
+    path = riotpot/emulators/trudy
+    url = git@github.com:praetorian-inc/trudy.git

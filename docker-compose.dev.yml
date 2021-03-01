@@ -1,0 +1,36 @@
+"""
+This Docker Compose file is meant to be used on a development 
+environment for testing.
+This environment includes a fake local network, a local database and
+a volume mounted with the code to see changes on the go.
+"""
+
+version: "3.8"
+services:
+  riotpot:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.dev
+    #command: 
+    restart: always
+    ports:
+      - 22:22
+      - 23:23
+      - 8080:8080
+    volumes:
+      # mount the code on a volume, so it can grab changes on the fly
+      - ./riotpot/:/usr/src/riotpot/
+    env_file:
+    - ./env./env.dev
+    networks:
+      honeypot:
+        # give a static IP to the honeypot so we can find it
+        # and attack it seamelesly
+        ipv4_address: 10.5.0.1
+    stdin_open: true  # docker -i
+    tty: true         # docker -t
+
+networks:
+  default:
+  honeypot:
+    name: honeypot

@@ -1,0 +1,24 @@
+# Dockerfile References: https://docs.docker.com/engine/reference/builder/
+
+# Start from the latest golang base image
+FROM golang:latest
+
+# Add Maintainer Info
+LABEL maintainer="Shreyas Srinivasa <shsr@es.aau.dk>"
+
+# Set the Current Working Directory inside the container
+WORKDIR /usr/src/riotpot
+
+## copy all the files into our new working directory
+COPY ./riotpot .
+COPY ./docker/entrypoint.sh .
+
+# Download all dependencies. Dependencies will be cached if the go.mod and go.sum files are not changed
+RUN go mod download
+
+# Build the Go app
+RUN go build -o main .
+
+# Change the permissions of the entrypoint and use it to run the app
+RUN chmod +x /usr/src/riotpot/entrypoint.sh
+ENTRYPOINT ["/usr/src/riotpot/entrypoint.sh"]
