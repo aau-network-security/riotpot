@@ -17,7 +17,7 @@ COPY ./docker/entrypoint.sh .
 RUN go mod download
 
 # Build the Go app
-RUN go build -o main .
+RUN go build -o main bin/
 
 # Change the permissions of the entrypoint and use it to run the app
 RUN chmod +x /usr/src/riotpot/entrypoint.sh

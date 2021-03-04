@@ -13,12 +13,8 @@ on:
 jobs:
   build:
     name: Build
-    runs-on: ${{ matrix.operating-system }}
-    strategy:
-    matrix:
-      operating-system: [ubuntu-latest, windows-latest]
+    runs-on: [ubuntu-latest, windows-latest]
     steps:
-
     - name: Enter riotpot directory
       run: cd riotpot
 
