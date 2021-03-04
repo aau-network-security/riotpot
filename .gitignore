@@ -25,4 +25,5 @@ workspace*.code-*
 
 # environment files (not example)
 .env
-!.env.example
+!.env.example*
+!*.example

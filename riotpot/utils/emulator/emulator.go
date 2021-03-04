@@ -37,6 +37,13 @@ func Register_emulators(validated_emulators []string) *Emulators {
 			log.Fatal(err)
 		}
 
+		pName, err := p.Lookup("Name")
+		if err != nil {
+			panic(err)
+		}
+
+		log.Printf("Loading emulator: %s\n", *pName.(*string))
+
 		// find the function Register
 		rf, err := p.Lookup("Register")
 		if err != nil {
