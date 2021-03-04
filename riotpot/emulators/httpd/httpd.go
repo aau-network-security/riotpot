@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"common/emulator"
 )
 
 // Correctly formatted function declaration to satisfy the

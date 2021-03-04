@@ -1,18 +1,18 @@
 package echod
 
 import (
-	"net"
 	"bufio"
-	"strconv"
 	"fmt"
+	"net"
+	"strconv"
 )
 
 const PORT = 7
 
 func StartEcho() {
-	server, err := net.Listen("tcp", ":" + strconv.Itoa(PORT))
+	server, err := net.Listen("tcp", ":"+strconv.Itoa(PORT))
 	if server == nil {
-		panic("couldn't start listening: " + err.String())
+		panic("couldn't start listening: " + err.Error())
 	}
 	conns := clientConns(server)
 	for {
@@ -27,7 +27,7 @@ func clientConns(listener net.Listener) chan net.Conn {
 		for {
 			client, err := listener.Accept()
 			if client == nil {
-				fmt.Printf("couldn't accept: " + err.String())
+				fmt.Printf("couldn't accept: " + err.Error())
 				continue
 			}
 			i++

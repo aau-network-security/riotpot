@@ -1,6 +1,5 @@
 package telnetd
 
-
 import (
 	"bufio"
 	"fmt"
@@ -30,7 +29,6 @@ func TelnetServer() {
 		log.Fatal(err)
 	}
 
-
 	//defer to close when you're done with it, not because you think it's idiomatic!
 	defer f.Close()
 	//set output of logs to f
@@ -40,7 +38,7 @@ func TelnetServer() {
 	if server == nil {
 		//fmt.Println(err)
 		panic("couldn't start listening: ")
-		log.Println("couldn't start listening: ")
+		fmt.Println("couldn't start listening: ")
 	}
 	conns := clientConns(server)
 	for {

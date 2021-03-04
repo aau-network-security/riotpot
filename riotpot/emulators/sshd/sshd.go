@@ -62,6 +62,4 @@ func SSHServer() {
 			return pass == "password"
 		}),
 	)
-	
-	return 1
 }

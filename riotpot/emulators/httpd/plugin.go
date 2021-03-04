@@ -1,18 +1,20 @@
-package main
+package httpd
 
-import "common/emulator"
-import "settings/settings"
+import (
+	"riotpot/settings"
+	"riotpot/utils/emulator"
+)
 
-var emulator emulator.Emulator
+var emu emulator.Emulator
 
-func init(){
-	Name = "httpd"
+func init() {
+	Name := "httpd"
 }
 
-func Register(){
-	emulator := emulator.Emulator{
-		name = "httpd"
+func Register() {
+	emu := emulator.Emulator{
+		Name: "httpd",
 	}
 
-	settings.EMULATORS.register(emulator)
+	settings.EMULATORS.Register(emu)
 }
