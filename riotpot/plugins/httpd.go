@@ -1,4 +1,4 @@
-package httpd
+package main
 
 import (
 	"riotpot/settings"
@@ -6,9 +6,10 @@ import (
 )
 
 var emu emulator.Emulator
+var Name string
 
 func init() {
-	Name := "httpd"
+	Name = "httpd"
 }
 
 func Register() {
