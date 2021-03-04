@@ -44,9 +44,9 @@ func Register_emulators(validated_emulators []string) *Emulators {
 		}
 
 		// run the register function
-		rf()
+		rf.(func())()
 	}
 
 	log.Print("All emulators registered successfully")
-	return &Emulators{emulators: emulators}
+	return &Emulators{}
 }
