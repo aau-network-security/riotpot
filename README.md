@@ -16,7 +16,7 @@
 
 
 ## 1. Description
-Riotpot is an interoperable medium interaction honeypot, primarly focused on the emulation IoT and OT protocols, althoug, it is also capable of emulating other services.
+Riotpot is an interoperable medium interaction honeypot, primarly focused on the emulation IoT and OT protocols, although, it is also capable of emulating other services.
 
 This services are loaded in the honeypot in the form of plugins, making Riotpot a modular, and very transportable honeypot. The services are loaded at runtime, meaning that the weight of the honeypot will vary on premisses, and the services loaded e.g. HTTP, will only be used when required.
 
@@ -31,9 +31,11 @@ docker-compose up -d --build
 
 ```bash
 go build -o bin/
+cd build
+./riotpot
 ```
 
 Specific file testing (e.g. plugins):
 ```bash
-go run Path
+go run Path/to/file
 ```
