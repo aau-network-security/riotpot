@@ -47,7 +47,7 @@ jobs:
     # it MAY need secrets! more: https://docs.github.com/en/actions/reference/encrypted-secrets
     - name: Run GoReleaser
       uses: goreleaser/goreleaser-action@2
-      if: success() && startswith(github.ref, 'refs/tags/')
+      #if: success() && startswith(github.ref, 'refs/tags/')
       with:
         version: latest
         args: release --rm-dist
