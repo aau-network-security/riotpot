@@ -35,10 +35,11 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-go-
 
-    - name: Test
-      run: |
-        go mod tidy
-        go test -v ./...
+    #- name: Test
+    #  run: |
+    #    cd riotpot
+    #    go mod tidy
+    #    go test -v ./...
 
     - name: Build
       if:  github.event_name == 'push' && (matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest')
