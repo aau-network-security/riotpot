@@ -52,6 +52,7 @@ jobs:
       #if: success() && startswith(github.ref, 'refs/tags/')
       with:
         version: latest
+        workdir: riotpot/
         args: release --rm-dist
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
