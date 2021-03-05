@@ -14,7 +14,7 @@ jobs:
   build:
     strategy:
       matrix:
-        go-version: [1.14, 1.15, 1.16]
+        go-version: [1.16]
         os: [ubuntu-latest, macos-latest]
     runs-on: ${{ matrix.os }}
     steps:
@@ -47,7 +47,7 @@ jobs:
     # Autoreleaser https://goreleaser.com/ci/actions/
     # it MAY need secrets! more: https://docs.github.com/en/actions/reference/encrypted-secrets
     - name: Run GoReleaser
-      uses: goreleaser/goreleaser-action@2
+      uses: goreleaser/goreleaser-action@v2
       #if: success() && startswith(github.ref, 'refs/tags/')
       with:
         version: latest
