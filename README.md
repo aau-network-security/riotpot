@@ -1,18 +1,23 @@
 
 <div align="center">
   <img src="AAUgraphics/aau_logo.png" height="100">
+  <p align="center">
+    <h2 align="center">RiotPot</h2>
+  </p>
+  <p align="center">
+    <!-- Workflow status -->
+    <a href="https://github.com/aau-network-security/riotpot/actions"><img alt="GitHub Actions status" src="https://github.com/aau-network-security/riotpot/workflows/cyber/badge.svg"></a>
+    <a href="https://GitHub.com/aau-network-security/riotpot/releases/"><img alt="GitHub Actions status" src="https://img.shields.io/github/release/aau-network-security/riotpot"></a>
+    <a href="https://github.com/aau-network-security/riotpot/"><img alt="GitHub Actions status" src="https://img.shields.io/github/go-mod/go-version/aau-network-security/riotpot"></a>
+  </p>
 </div>
 
-# Riotpot
-<a href="https://github.com/aau-network-security/riotpot/actions"><img alt="GitHub Actions status" src="https://github.com/aau-network-security/riotpot/workflows/cyber/badge.svg"></a> 
+___
 
-## Table of Contents
-- [Riotpot](#riotpot)
-  - [Table of Contents](#table-of-contents)
-  - [1. Description](#1-description)
-  - [2. Installation](#2-installation)
-    - [2.1 Docker](#21-docker)
-    - [2.2 Local](#22-local)
+- [1. Description](#1-description)
+- [2. Installation](#2-installation)
+  - [2.1 Docker](#21-docker)
+  - [2.2 Local](#22-local)
 
 
 ## 1. Description
