@@ -20,12 +20,13 @@ This services are loaded in the honeypot in the form of plugins, making Riotpot 
 
 ## 2. Installation
 
-Docker container:
+
+### Docker
 ```bash
 docker-compose up -d --build
 ```
+### Local
 
-Bare metal:
 ```bash
 go build -o bin/
 ```
