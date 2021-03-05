@@ -3,14 +3,16 @@
   <img src="AAUgraphics/aau_logo.png" height="100">
 </div>
 
-# Riotpot <a href="https://github.com/aau-network-security/riotpot/actions"><img alt="GitHub Actions status" src="https://github.com/aau-network-security/riotpot/workflows/cyber/badge.svg"></a> 
-
+# Riotpot
+<a href="https://github.com/aau-network-security/riotpot/actions"><img alt="GitHub Actions status" src="https://github.com/aau-network-security/riotpot/workflows/cyber/badge.svg"></a> 
 
 ## Table of Contents
-- [Riotpot](#riotpot-) <!-- no toc -->
+- [Riotpot](#riotpot)
   - [Table of Contents](#table-of-contents)
   - [1. Description](#1-description)
   - [2. Installation](#2-installation)
+    - [2.1 Docker](#21-docker)
+    - [2.2 Local](#22-local)
 
 
 ## 1. Description
@@ -21,11 +23,11 @@ This services are loaded in the honeypot in the form of plugins, making Riotpot 
 ## 2. Installation
 
 
-### Docker
+### 2.1 Docker
 ```bash
 docker-compose up -d --build
 ```
-### Local
+### 2.2 Local
 
 ```bash
 go build -o bin/
