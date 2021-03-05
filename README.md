@@ -1,6 +1,7 @@
-<div style="text-align:center"> 
+
+<div align="center">
   <img src="AAUgraphics/aau_logo.png" height="100">
-</div> 
+</div>
 
 # Riotpot
 
@@ -37,8 +38,4 @@ Specific file testing (e.g. plugins):
 go run Path
 ```
 
-<style> 
-  body{ 
-    background-image: url("AAUgraphics/aau_waves.png")
-  } 
-</style> 
+<img src="AAUgraphics/aau_waves.png" height="100" width="100%">
