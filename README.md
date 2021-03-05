@@ -1,4 +1,4 @@
-<div style="text-align:center">
+<div style="text-align:center"> 
   <img src="AAUgraphics/aau_logo.png" height="100">
 </div> 
 
@@ -37,8 +37,8 @@ Specific file testing (e.g. plugins):
 go run Path
 ```
 
-<style>
-  body{
+<style> 
+  body{ 
     background-image: url("AAUgraphics/aau_waves.png")
-  }
-</style>
+  } 
+</style> 
