@@ -15,7 +15,7 @@ jobs:
     strategy:
       matrix:
         go-version: [1.16]
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-latest, macos-latest, windows-latest]
     runs-on: ${{ matrix.os }}
     steps:
 
@@ -28,5 +28,6 @@ jobs:
         go-version: ${{ matrix.go-version }}
 
     - name: Build
+      if:  github.event_name == 'push' && (matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest')
       run: cd riotpot && go build -o bin/ -v
         
