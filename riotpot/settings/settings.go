@@ -20,6 +20,14 @@ import (
 var AUTODISCOVER_EMULATORS string = environ.Getenv("AUTODISCOVER_EMULATORS", "")
 var SERVICES string = environ.Getenv("SERVICES", "ALL")
 
+/**
+This variable contains the list of emulators installed in the application.
+This does not mean the emulators will run when starting, but rather the emulators
+available for the application at run time.
+
+Example: If a given emulator is on development phase or does not need to be
+loaded, it can simply be removed from the list.
+*/
 var INSTALLED_EMULATORS = []string{
 	"echod",
 	"fakeshell",
