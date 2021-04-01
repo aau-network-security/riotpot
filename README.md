@@ -24,15 +24,15 @@ ___
 
 ## 1. Description
 
-Riotpot is an interoperable medium interaction honeypot, primarly focused on the emulation IoT and OT protocols, although, it is also capable of emulating other services.
+Riotpot is an interoperable medium interaction honeypot, primarily focused on the emulation IoT and OT protocols, although, it is also capable of emulating other services.
 
-This services are loaded in the honeypot in the form of plugins, making Riotpot a modular, and very transportable honeypot. The services are loaded at runtime, meaning that the weight of the honeypot will vary on premisses, and the services loaded e.g. HTTP, will only be used when required. As consequence, we higly recommend building your own binary customised to your own needs. Refer to the following section, Installation, for more information.
+This services are loaded in the honeypot in the form of plugins, making Riotpot a modular, and very transportable honeypot. The services are loaded at runtime, meaning that the weight of the honeypot will vary on premisses, and the services loaded e.g. HTTP, will only be used when required. As consequence, we highly recommend building your own binary customized to your own needs. Refer to the following section, Installation, for more information.
 
 ## 2. Installation
 
-Although one can donwload the binary containing a set of default running emulators, this guide is mainly focused to those looking for a customized experience.
+Although one can download the binary containing a set of default running emulators, this guide is mainly focused to those looking for a customized experience.
 
-We thrive on the idea of making RiotPot higly transportable, therefore, in this section one can find multiple methods of installation for diverse environments that fit a broad list of requirements and constrains.
+We thrive on the idea of making RiotPot highly transportable, therefore, in this section one can find multiple methods of installation for diverse environments that fit a broad list of requirements and constrains.
 
 We highly recommend running RiotPot in a virtualized self-contained network using `Docker`, for which we included configuration files that run the honeypot both as a closed environment for testing and playing around (similar to a testbed environment), and a production environment that runs on the host machine exposing services to the host main network that can run from the local clone of this repository. 
 
@@ -99,8 +99,8 @@ $ docker-compose down -v
 Build the latest release of RiotPot directly from the image provided in the Docker Hub:
 
 ```bash
-# Grab and run the latest release of the riotpot consummer immage
-# dettached from the console with -d.
+# Grab and run the latest release of the riotpot consumer image
+# detached from the console with -d.
 $ docker run -d riotpot-docker:latest
 ```
 
@@ -128,7 +128,7 @@ $ ./path/to/riotpot
 
 The documentation for RiotPot can be found in [go.pkg.dev](https://pkg.go.dev/), however, sometimes you might be in need to visualize the documentation locally, either because you are developing a part of it, of for any other reason.
 
-The most common way of previsualizing documentation is by using `godoc`, however, this requires an initial setup of the go project. Find more information in the [godoc page](https://pkg.go.dev/golang.org/x/tools/cmd/godoc).
+The most common way of pre-visualizing documentation is by using `godoc`, however, this requires an initial setup of the go project. Find more information in the [godoc page](https://pkg.go.dev/golang.org/x/tools/cmd/godoc).
 
 For simplicity, the riotpot `godoc` documentation can be run as a separated local container from the dockerfile `Dockerfile.documentation`. To use the container simply type:
 
@@ -139,7 +139,7 @@ This will run a container tagged with `riotpot/v1` at `http://localhost:6060/`. 
 
 ## 3. Easy Access
 
-We previously described how to set up the whole project, both installation and documentation, but some of the processes become routinary and lengthy when on the process of developing new features and testing. For this, in the root folder of the repository we have included a `Makefile` containing the most utilized routines with aliases.
+We previously described how to set up the whole project, both installation and documentation, but some of the processes become routinely and lengthy when on the process of developing new features and testing. For this, in the root folder of the repository we have included a `Makefile` containing the most utilized routines with aliases.
 
 The following commands will be run using `make` plus the alias of the command.
 
