@@ -4,6 +4,7 @@ services:
     build:
       context: .
       dockerfile: docker/Dockerfile
+    image: riotpot:latest
     restart: always
     ports:
       - 22:22

@@ -15,4 +15,3 @@ WORKDIR $WORKING_DIR
 ADD riotpot/ .
 
 CMD godoc -http=:6060
-

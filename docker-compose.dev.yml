@@ -9,6 +9,7 @@ services:
     build:
       context: .
       dockerfile: docker/Dockerfile.dev
+    image: riotpot:development
     #command: 
     restart: always
     ports:

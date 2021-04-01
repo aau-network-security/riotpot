@@ -20,6 +20,7 @@ bin/
 # IDE specific folders
 .idea/
 .vscode/
+.DS_Store
 ## VSCode workspace file
 workspace*.code-*
 
