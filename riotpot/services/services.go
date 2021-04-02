@@ -17,25 +17,18 @@ func getServicePlugin(path string) Service {
 	pg, err := plugin.Open(path)
 	errors.Raise(err)
 
+	// check the name of the function that exports the service
+	s, err := pg.Lookup("Name")
+	errors.Raise(err)
+
 	// check if the reference symbol exists in the plugin
-	rf, err := pg.Lookup("NewService")
+	rf, err := pg.Lookup(*s.(*string))
 	errors.Raise(err)
 
 	// Load the service in a variable as the interface Service.
 	newservice := rf.(func() Service)()
 
 	return newservice
-}
-
-// Logger writes to the system log.
-type Logger interface {
-	Error(v ...interface{}) error
-	Warning(v ...interface{}) error
-	Info(v ...interface{}) error
-
-	Errorf(format string, a ...interface{}) error
-	Warningf(format string, a ...interface{}) error
-	Infof(format string, a ...interface{}) error
 }
 
 // Interface used by every service plugin that offers a service. At the very least, every plugin

@@ -18,9 +18,13 @@ import (
 	"riotpot/services"
 )
 
+var Name string
+
 // Place here the name of the function which returns the service interface.
 // This name will be used as a lookup symbol.
-var Name string = "Templated"
+func init() {
+	Name = "Templated"
+}
 
 // The function must be capitalize or exported, and return a `Service`
 // interface compatible struct.
