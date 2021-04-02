@@ -24,7 +24,7 @@ services:
     networks:
       honeypot:
         # give a static IP to the honeypot so we can find it
-        # and attack it seamelesly
+        # and attack it seamlessly
         ipv4_address: 10.5.0.1
     stdin_open: true  # docker -i
     tty: true         # docker -t

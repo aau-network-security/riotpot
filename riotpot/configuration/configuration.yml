@@ -9,7 +9,7 @@ type: template
 secret: 
 
 riotpot:
-  # Boolean which determines if the emulators should be autodiscovered
+  # Boolean which determines if the emulators should be auto-discovered
   # from the RiotPot directory. The emulators must be already built as plugins.
   # If this boolean is set to a falsy value then `start` must be filled with the
   # list of emulators desired to be loaded and run at start.
