@@ -27,33 +27,37 @@ type Settings struct {
 }
 
 // Takes configuration data as string and updates the state of a given configuration based on it.
-func (conf *Settings) Load(path string, filename string) {
+func (conf *Settings) Load(path string, filename string) error {
 	// full path of the file.
-	var filepath = fmt.Sprintf("%s/%s.yaml", path, filename)
+	var filepath = fmt.Sprintf("%s/%s.yml", path, filename)
 
 	// load the data into the memory
 	data, err := os.ReadFile(filepath)
 	errors.Raise(err)
 
 	// unmarshal the data into the configuration settings.
-	err = yaml.Unmarshal([]byte(data), &conf)
+	err = yaml.Unmarshal(data, &conf)
 	errors.Raise(err)
+
+	return err
 }
 
 // Stores the configuration into the given path in `.yml` format.
-func (conf Settings) Save(path string, filename string) {
+func (conf Settings) Save(path string, filename string) error {
 	// marshal the content of the configuration into a `.yaml` document
 	d, err := yaml.Marshal(&conf)
 	errors.Raise(err)
 
 	// full path of the file.
-	var filepath = fmt.Sprintf("%s/%s.yaml", path, filename)
+	var filepath = fmt.Sprintf("%s/%s.yml", path, filename)
 
 	// Save to file.
 	// Mode 640: https://chmodcommand.com/chmod-640/
 	// Note: this truncates the file if it already exists !!!
 	err = os.WriteFile(filepath, d, 0640)
 	errors.Raise(err)
+
+	return err
 }
 
 // This method overwrites the settings with the values from the environment
@@ -87,14 +91,14 @@ func (conf Settings) ResolveEnv() {
 // Provides common identification attributes for each configuration.
 // This structure must be private for each configuration object.
 type ConfigIdentity struct {
-	id   string
-	name string
+	ID   string
+	Name string `yaml:"name"`
 }
 
 // RiotPot configuration structure. It includes all the attributes related to the riotpot framework.
 // Moreover, it defines the emulators that must be loaded, and watches over them during runtime.
 type ConfigRiotpot struct {
-	identity ConfigIdentity
+	Identity ConfigIdentity
 
 	/* Riotpot configuration attributes: */
 	// Defines if the emulators must be loaded directly from the file system.
@@ -134,7 +138,7 @@ func (conf *ConfigRiotpot) Validated() []string {
 
 // Database configuration structure. It gives an interface to load and access specific databases.
 type ConfigDatabase struct {
-	identity ConfigIdentity
+	Identity ConfigIdentity
 
 	/* Database configuration */
 	// engine used in the db e.g. sql, postgres, sqlite

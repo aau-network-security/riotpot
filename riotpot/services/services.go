@@ -3,6 +3,7 @@
 package services
 
 import (
+	"log"
 	"plugin"
 	"riotpot/utils/errors"
 )
@@ -50,7 +51,7 @@ type Service interface {
 	Status() error
 
 	// Interface to print the current logs of the service.
-	Logger(errs chan<- error) (Logger, error)
+	Logger(errs chan<- error) (log.Logger, error)
 }
 
 // Wrapper for the individual services.

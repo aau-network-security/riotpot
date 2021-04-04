@@ -15,13 +15,14 @@ TIP: To create your own plugin...
 package main
 
 import (
+	"log"
 	"riotpot/services"
 )
 
-var Name string
-
 // Place here the name of the function which returns the service interface.
 // This name will be used as a lookup symbol.
+var Name string
+
 func init() {
 	Name = "Templated"
 }
@@ -77,9 +78,9 @@ func (e *Template) Status() error {
 	return err
 }
 
-func (e *Template) Logger(ch chan<- error) (services.Logger, error) {
+func (e *Template) Logger(ch chan<- error) (log.Logger, error) {
 	var (
-		logger services.Logger
+		logger log.Logger
 		err    error
 	)
 	return logger, err

@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"log"
 	"net"
 	"riotpot/services"
 	"riotpot/utils/errors"
@@ -102,7 +103,7 @@ func (e *Echo) handleConn(conn net.Conn) {
 func (e *Echo) save(address net.Addr, msg []byte) {
 	// TODO: add logic here to store the connections made
 	// to the server
-	fmt.Printf("Bip Bop... \nSaving connection:\n> address: %v\n> msg: %v", address, msg)
+	fmt.Printf("Bip Bop... \nSaving connection:\n> address: %v\n> msg: %s", address, msg)
 }
 
 func (e *Echo) Stop() error {
@@ -122,9 +123,9 @@ func (e *Echo) Status() error {
 	return err
 }
 
-func (e *Echo) Logger(ch chan<- error) (services.Logger, error) {
+func (e *Echo) Logger(ch chan<- error) (log.Logger, error) {
 	var (
-		logger services.Logger
+		logger log.Logger
 		err    error
 	)
 	return logger, err
