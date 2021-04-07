@@ -4,6 +4,14 @@
 # a volume mounted with the code to see changes on the go.
 
 version: "3.8"
+
+networks:
+  honeypot:
+    name: riotpot_default
+    ipam:
+      config:
+        - subnet: 10.5.0.0/16
+
 services:
   riotpot:
     build:
@@ -20,16 +28,14 @@ services:
       # mount the code on a volume, so it can grab changes on the fly
       - ./riotpot/:/usr/src/riotpot/
     env_file:
-    - ./env./env.dev
+    - ./env/.env.dev
     networks:
       honeypot:
         # give a static IP to the honeypot so we can find it
         # and attack it seamlessly
-        ipv4_address: 10.5.0.1
+        ipv4_address: 10.5.0.2
+
+
     stdin_open: true  # docker -i
     tty: true         # docker -t
 
-networks:
-  default:
-  honeypot:
-    name: honeypot

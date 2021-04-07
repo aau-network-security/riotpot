@@ -1,7 +1,8 @@
 #!/bin/sh
 
 # create a test of the current project
-go test -c
+# To-Do: create tests  
+# 	go test -c
 
 # run the project
 cd bin
