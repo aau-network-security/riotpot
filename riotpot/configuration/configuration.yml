@@ -1,0 +1,75 @@
+---
+version: 1
+type: template
+# RiotPot configuration file.
+# This file can be used as a template for further implementations and as a record of
+# documentation for internal structure when in doubt on usage.
+
+# 50 characters minimum long RANDOM string used to generate cryptographic signatures.
+secret: 
+
+riotpot:
+  # Boolean which determines if the emulators should be auto-discovered
+  # from the RiotPot directory. The emulators must be already built as plugins.
+  # If this boolean is set to a falsy value then `start` must be filled with the
+  # list of emulators desired to be loaded and run at start.
+  autodiscover: false
+
+  # `start` contains a list of emulator services desired to be started
+  # on-start. For all the services, set `autodiscover` to `true`.
+  start:
+    - http
+
+  # Contains a list of available emulators in the application.
+  # This gives the user the ability to navigate or load
+  # just the emulators that appear in this list, wether or not
+  # the emulator plugin appears in the binary.
+  #
+  # Add here the emulator plugins you have included on the binary.
+  emulators:
+    - ssh
+    - echo
+    - http
+    - shell
+    - telnet
+
+# The `databases` object contains a number of object defined database
+# connection information. As the name indicates, `default` will be the default
+# database used to store logs, binary entries, etc.
+databases:
+  -
+    identity: 
+      # Name of the targeted database
+      name: default
+    # RiotPot only supports postgres currently.
+    engine: postgres
+    # IP or container name in the same network.
+    host: localhost
+    # Connection port to the database host.
+    port: 5432
+    # User and password to access the database.
+    # NOTE: Do not hard-code the values in this file. Please do make
+    # use of `.env` file for this purpose in production.
+    username: superuser
+    password:
+
+---
+# USER +---------------------------+ USER
+# Declare here configuration information regarding the user.
+# The user information is used to create a profile for the current
+# local installation of RiotPot. It is necessary for creating a temporary
+# profile which will held administrative rights to manipulate packets,
+# store binaries. The user per-se is a low level access user, with rights
+# to store files, read riotpot image files, and +rw configuration files.
+user:
+  # ID of the user. Leave it empty if in doubt.
+  # this value might be filled automatically later on, and if so,
+  # do not change it. Otherwise you will be creating a shadow user.
+  id:
+  username: 
+  # Password of the RiotPot user. Please do not place here any hardcoded,
+  # plaintext value, refer instead to `.env` file.
+  password:
+# USER +---------------------------+ USER
+---
+
