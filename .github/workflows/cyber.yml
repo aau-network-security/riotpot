@@ -41,7 +41,7 @@ jobs:
 
     - name: Build
       if:  github.event_name == 'push' && (matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest')
-      run: cd riotpot && go build -o bin/ -v
+      run: cd cmd/riotpot && go build -o bin/ -v
 
     # Autoreleaser https://goreleaser.com/ci/actions/
     # it MAY need secrets! more: https://docs.github.com/en/actions/reference/encrypted-secrets
@@ -50,7 +50,7 @@ jobs:
       #if: success() && startswith(github.ref, 'refs/tags/')
       with:
         version: latest
-        workdir: riotpot/
+        workdir: cmd/riotpot
         args: release --rm-dist
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
