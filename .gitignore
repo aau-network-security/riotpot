@@ -28,3 +28,18 @@ workspace*.code-*
 .env
 !.env.example*
 !*.example
+
+# Vendor folder
+/vendor/
+
+# Plugins
+*.so
+
+# TCPdump
+/tcpdump/
+
+# Keys for the SSH connections
+configs/keys/*
+
+# whatever the rules are, include all the `.md` files
+!*.md

@@ -1,0 +1,17 @@
+# Start from the latest golang base image
+FROM golang:latest
+
+# env setup for reusability
+ENV APP_NAME=riotpot
+ENV WORKING_DIR=$GOPATH/src/github.com/aau/$APP_NAME
+
+# get godoc
+RUN go get golang.org/x/tools/cmd/godoc
+
+# Set the working directory to golang working space
+WORKDIR $WORKING_DIR
+
+# Copy the current directory contents into the container at current directory
+ADD . .
+
+CMD godoc -http=:6060

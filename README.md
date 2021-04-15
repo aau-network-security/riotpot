@@ -1,14 +1,15 @@
 
 <div align="center">
-  <img src="AAUgraphics/aau_logo.png" height="100">
+  <img src="assets/aau_logo.png" height="100">
   <p align="center">
     <h2 align="center">RiotPot</h2>
   </p>
   <p align="center">
     <!-- Workflow status -->
     <a href="https://github.com/aau-network-security/riotpot/actions"><img alt="GitHub Actions status" src="https://github.com/aau-network-security/riotpot/workflows/cyber/badge.svg"></a>
-    <a href="https://GitHub.com/aau-network-security/riotpot/releases/latest/"><img alt="GitHub Actions status" src="https://img.shields.io/github/release/aau-network-security/riotpot/"></a>
-    <a href="https://github.com/aau-network-security/riotpot/"><img alt="GitHub Actions status" src="https://img.shields.io/github/go-mod/go-version/aau-network-security/riotpot/"></a>
+    <a href="https://goreportcard.com/badge/github.com/aau-network-security/riotpot"><img src="https://goreportcard.com/badge/github.com/aau-network-security/riotpot?style=flat-square"></a>
+    <a href="https://pkg.go.dev/riopot"><img src="https://pkg.go.dev/badge/riopot.svg"></a>
+    <a href=""><img src="https://img.shields.io/github/release/riotpot/project-layout.svg?style=flat-square">
   </p>
 </div>
 ___
