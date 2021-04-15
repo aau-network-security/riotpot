@@ -1,0 +1,25 @@
+lines:
+  # Clear the console first
+  - animation: clear
+
+  - str: |
+      8888888b.  8888888     88888888888 8888888b.          888    
+      888   Y88b   888           888     888   Y88b         888    
+      888    888   888           888     888    888         888    
+      888   d88P   888   .d88b.  888     888   d88P .d88b.  888888 
+      8888888P"    888  d88""88b 888     8888888P" d88""88b 888    
+      888 T88b     888  888  888 888     888       888  888 888    
+      888  T88b    888  Y88..88P 888     888       Y88..88P Y88b.  
+      888   T88b 8888888 "Y88P"  888     888        "Y88P"   "Y888 
+    h_align: center
+
+  - str: "An IoT and OT honeypot."
+    h_align: center
+  - str: "~ By Shreyas S."
+    h_align: center
+
+  - animation: delay
+  - animation: clear
+
+  #- input: true
+---

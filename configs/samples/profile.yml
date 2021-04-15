@@ -1,0 +1,11 @@
+profile:
+  # Greeting options passed to the user profile
+  greet:
+    # If not set to false, the first time RiotPot is launch the user will
+    # Receive a short introduction to RiotPot.
+    tutorial: false
+
+  # Terminal options and configuration
+  terminal:
+    # Color of the terminal path and headers
+    color: #eb4034

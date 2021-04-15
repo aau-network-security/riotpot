@@ -1,0 +1,15 @@
+# The walkthrough lines will be rendered in the console as described
+# in the sections of this file like `pages`. Each section is separated by "---"
+# The lines are separated in a sequential list of objects.
+# The objects contain:
+# str, v_align, h_align
+
+lines:
+  - str: "-- DEMO --"
+    h_align: center
+  - str: Hi
+    h_align: center
+---
+lines:
+  - str: "This is the riotpot walkthrough for new-comers"
+    h_align: center
