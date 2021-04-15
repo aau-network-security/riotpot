@@ -1,0 +1,58 @@
+# This Docker Compose file is meant to be used on a development 
+# environment for testing.
+# This environment includes a fake local network, a local database and
+# a volume mounted with the code to see changes on the go.
+version: "3.8"
+
+services:
+
+  # Tcpdump host that stores all the stuff that happens
+  # in the network
+  tcpdump:
+    image: kaazing/tcpdump
+    network_mode: "host"
+    volumes:
+        - ../tcpdump:/tcpdump
+
+  # RIoTPot is the container for the central node
+  riotpot:
+    build:
+      context: ..
+      dockerfile: ./build/docker/Dockerfile
+    image: riotpot:development
+    #command: 
+    restart: always
+    ports:
+      - 22:22
+      - 23:23
+      - 8080:8080
+    env_file:
+    - ../build/env/.env
+    networks:
+      honeypot:
+        # give a static IP to the honeypot so we can find it
+        # and attack it seamlessly
+        ipv4_address: 10.5.0.6
+    stdin_open: true  # docker -i
+    tty: true         # docker -t
+
+  postgres:
+    image: postgres:latest
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    networks:
+      honeypot:
+      
+volumes:
+  postgres_data:
+
+networks:
+  honeypot:
+    name: honeypot
+    ipam:
+      config:
+        - subnet: 10.5.0.0/16
