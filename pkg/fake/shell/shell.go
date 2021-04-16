@@ -24,14 +24,14 @@ type shellface interface {
 }
 
 func New() *shell {
-	comms := [][]interface{}{
+	commands := [][]interface{}{
 		{"enable", c_enable},
 		{"exit", c_exit},
 		{"./", c_exec},
 	}
 
 	return &shell{
-		comm:     comms,
+		comm:     commands,
 		mu:       &sync.Mutex{},
 		User:     "root",
 		Host:     "ubuntu",

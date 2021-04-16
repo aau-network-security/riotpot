@@ -13,7 +13,7 @@ var ser services.Service
 
 func init() {
 	servs := []string{
-		"./echod.so",
+		"../pkg/plugins/echod/plugin.so",
 	}
 
 	services := services.Services{}

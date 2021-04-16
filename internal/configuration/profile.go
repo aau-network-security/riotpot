@@ -31,6 +31,7 @@ type Profile struct {
 	Terminal cli.Terminal
 
 	// indicates the preferred mode to run riotpot
+	// NOTE: currently not in use
 	mode Options
 }
 

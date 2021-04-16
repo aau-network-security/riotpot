@@ -200,9 +200,9 @@ func (se *Services) Get(name string) (s Service) {
 	// Iterate through the services to get the one with the name.
 	// This method is rather slow, but the services won't normally
 	// exceed 10 or 20.
-	for _, serv := range se.services {
-		if n := serv.GetName(); n == name {
-			s = serv
+	for _, service := range se.services {
+		if n := service.GetName(); n == name {
+			s = service
 			return
 		}
 	}
@@ -212,10 +212,10 @@ func (se *Services) Get(name string) (s Service) {
 }
 
 // Get multiple registered services given their name
-func (se *Services) GetMultiple(services ...string) (svrs []Service) {
-	for _, srv := range services {
-		tServ := se.Get(srv)
-		svrs = append(svrs, tServ)
+func (se *Services) GetMultiple(service_names ...string) (services []Service) {
+	for _, service_name := range service_names {
+		tempServ := se.Get(service_name)
+		services = append(services, tempServ)
 	}
 	return
 }

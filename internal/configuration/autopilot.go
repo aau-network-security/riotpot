@@ -40,8 +40,8 @@ func (a *Autopilot) Start() {
 	} else {
 		for _, s := range a.Settings.Riotpot.Start {
 			// get the service and run it
-			serv := a.services.Get(s)
-			go serv.Run()
+			service := a.services.Get(s)
+			go service.Run()
 		}
 	}
 
@@ -52,10 +52,10 @@ func (a *Autopilot) Start() {
 func (a *Autopilot) RegisterServices() {
 	a.services = services.Services{}
 
-	serv_paths := a.services.Autodiscover()
-	serv_paths = a.Settings.ValidateEmulators(serv_paths)
+	service_paths := a.services.Autodiscover()
+	service_paths = a.Settings.ValidateEmulators(service_paths)
 
-	a.services.AutoRegister(serv_paths)
+	a.services.AutoRegister(service_paths)
 	a.services.AddDB(a.DB)
 }
 

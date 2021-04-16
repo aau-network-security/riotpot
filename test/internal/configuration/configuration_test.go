@@ -10,8 +10,7 @@ import (
 
 var (
 	settings = cfg.Settings{}
-	// TODO create this file
-	path = "./configuration_test.yml"
+	path     = "./configuration_test.yml"
 )
 
 // Test loading and saving configuration from a file to another
