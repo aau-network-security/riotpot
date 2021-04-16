@@ -24,7 +24,7 @@ type Autopilot struct {
 // the `Autod` or `Start` variables.
 func (a *Autopilot) Start() {
 	// Say Hi, don't be rude!
-	a.greeting.Greeting()
+	a.Greeting()
 
 	// block the main thread until we kill all the services
 	a.wg = sync.WaitGroup{}
@@ -63,5 +63,8 @@ func (a *Autopilot) RegisterServices() {
 func (a *Autopilot) Greeting() {
 	a.greeting = greeting.Greet{
 		Tutorial: a.Profile.Greet.Tutorial,
+		Initial:  a.Profile.Greet.Initial,
 	}
+
+	a.greeting.Greeting()
 }

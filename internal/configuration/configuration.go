@@ -69,6 +69,8 @@ func (conf *Settings) Save(path string) (err error) {
 // Validates the name of the emulator
 func (conf *Settings) ValidateEmulators(service_paths []string) []string {
 	var val []string
+	fmt.Printf("[+] Allowed plugins: %v\n", conf.Riotpot.Emulators)
+
 	for _, p := range service_paths {
 
 		//        '---path----'    ---plugin-----    -file-
@@ -102,8 +104,10 @@ func (conf *Settings) ResolveEnv() {
 
 	// overwrite Starting emulators configuration setting
 	if value, ok := os.LookupEnv("START"); ok {
-		var emulators = strings.Split(value, ",")
-		conf.Riotpot.Emulators = emulators
+		if value != "" {
+			var emulators = strings.Split(value, ",")
+			conf.Riotpot.Start = emulators
+		}
 	}
 
 	// overwrite the default database to be used

@@ -49,7 +49,9 @@ func (y *YBook) Parse(source []byte) (err error) {
 
 // Structure that contains terminal printing functions
 // to handle the yaml files containing page structures.
-type Terminal struct{}
+type Terminal struct {
+	Color string
+}
 
 // Parses the desired horizontal alignment of a string
 func (t *Terminal) h_align(str string, align string) (s string) {

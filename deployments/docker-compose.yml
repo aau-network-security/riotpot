@@ -33,8 +33,6 @@ services:
         # give a static IP to the honeypot so we can find it
         # and attack it seamlessly
         ipv4_address: 10.5.0.6
-    stdin_open: true  # docker -i
-    tty: true         # docker -t
 
   postgres:
     image: postgres:latest
@@ -44,6 +42,13 @@ services:
       - POSTGRES_DB=db
     volumes:
       - postgres_data:/var/lib/postgresql/data/
+    networks:
+      honeypot:
+
+  ubuntu:
+    image: ubuntu:rolling
+    stdin_open: true  # docker -i
+    tty: true         # docker -t
     networks:
       honeypot:
       

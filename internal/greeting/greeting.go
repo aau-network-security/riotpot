@@ -19,6 +19,7 @@ type Greet struct {
 func (g *Greet) Greeting() {
 	// regardless, show the initial welcome
 	g.initial(g.Initial)
+
 	switch {
 	case g.Tutorial: // Throw a walkthrough and initial greeting
 		// just in case, set the welcome now to false, so the user does not
