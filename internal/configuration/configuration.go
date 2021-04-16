@@ -3,10 +3,12 @@
 package configuration
 
 import (
+	"fmt"
 	"os"
 	"strconv"
 	"strings"
 
+	"github.com/riotpot/tools/arrays"
 	environ "github.com/riotpot/tools/environ"
 	errors "github.com/riotpot/tools/errors"
 
@@ -62,6 +64,30 @@ func (conf *Settings) Save(path string) (err error) {
 	errors.Raise(err)
 
 	return err
+}
+
+// Validates the name of the emulator
+func (conf *Settings) ValidateEmulators(service_paths []string) []string {
+	var val []string
+	for _, p := range service_paths {
+
+		//        '---path----'    ---plugin-----    -file-
+		// split: `*pkg/plugin/` + `<plugin_name>/` + `*`
+		sli := strings.Split(strings.SplitAfter(p, "pkg/plugin/")[1], "/")[0]
+
+		// Transform the name of the plugin to lower case
+		service := strings.ToLower(sli)
+
+		// check if the service is in the allowed emulators slice.
+		ok := arrays.Contains(conf.Riotpot.Emulators, service)
+		if ok {
+			val = append(val, p)
+		} else {
+			fmt.Printf("[-] Plugin %s not allowed, skipping...\n", service)
+		}
+	}
+	// Check if the array of emulators allowed contains the service
+	return val
 }
 
 // This method overwrites the settings with the values from the environment

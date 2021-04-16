@@ -223,15 +223,14 @@ func (se *Services) GetMultiple(services ...string) (svrs []Service) {
 // Method to register all the services in the `pkg/plugin` folder
 // The method looks for the `.so` plugin inside of the folders,
 // doesn't matter the name of the folder.
-func (se *Services) Autodiscover() {
+func (se *Services) Autodiscover() []string {
 	all, err := filepath.Glob("pkg/plugin/*/*.so")
 	if err != nil {
 		panic(err)
 	}
 
 	fmt.Printf("[+] Found %d plugins\n", len(all))
-	// register all the services
-	se.AutoRegister(all)
+	return all
 }
 
 // Simple function that iterates through the registered services and

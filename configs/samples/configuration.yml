@@ -34,8 +34,8 @@ riotpot:
   emulators:
     - httpd
     - echod
-    - telnetd
     - sshd
+    - telnetd
 
 # The `databases` object contains a number of object defined database
 # connection information. As the name indicates, `default` will be the default

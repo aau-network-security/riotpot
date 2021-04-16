@@ -51,7 +51,11 @@ func (a *Autopilot) Start() {
 // Register the services
 func (a *Autopilot) RegisterServices() {
 	a.services = services.Services{}
-	a.services.Autodiscover()
+
+	serv_paths := a.services.Autodiscover()
+	serv_paths = a.Settings.ValidateEmulators(serv_paths)
+
+	a.services.AutoRegister(serv_paths)
 	a.services.AddDB(a.DB)
 }
 

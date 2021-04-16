@@ -5,6 +5,9 @@ profile:
     # Receive a short introduction to RiotPot.
     tutorial: false
 
+    # This boolean `initial` determines if we want to see the initial message.
+    initial : false
+
   # Terminal options and configuration
   terminal:
     # Color of the terminal path and headers
