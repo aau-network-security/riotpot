@@ -135,7 +135,11 @@ func (s *SSH) handleChannels(sshItem SSHConn, chans <-chan ssh.NewChannel) {
 			s.Running <- false
 			return
 		case conn := <-chans:
+			//TODO: this line crashes the app when the connection is lost!!!
+			// Fix it ASAP!
+			// ☟ ☟ ☟
 			go s.handleChannel(sshItem, conn)
+			// ☝ ☝ ☝
 		}
 	}
 }
