@@ -8,7 +8,7 @@ greet:
   # Keep in mind that the initial message contains some waiting time,
   # which is helpful in docker images to give time to the database
   # to be set-up before starting the application!
-  initial : true
+  initial : false
 
 # Terminal options and configuration
 terminal:

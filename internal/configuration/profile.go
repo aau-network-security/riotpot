@@ -6,7 +6,6 @@ used with the riotpot installation.
 package configuration
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/riotpot/internal/cli"
@@ -19,7 +18,6 @@ import (
 func NewProfile() (p Profile, err error) {
 	p = Profile{}
 	err = p.Load("configs/samples/profile.yml")
-	fmt.Print(p)
 	return
 }
 
