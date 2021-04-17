@@ -33,12 +33,6 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-go-
 
-    #- name: Test
-    #  run: |
-    #    cd riotpot
-    #    go mod tidy
-    #    go test -v ./...
-
     - name: Build
       if:  github.event_name == 'push' && (matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest')
       run: cd cmd/riotpot && go build -o bin/ -v
@@ -47,18 +41,9 @@ jobs:
     # it MAY need secrets! more: https://docs.github.com/en/actions/reference/encrypted-secrets
     - name: Run GoReleaser
       uses: goreleaser/goreleaser-action@v2
-      #if: success() && startswith(github.ref, 'refs/tags/')
       with:
         version: latest
         workdir: cmd/riotpot
         args: release --rm-dist
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-    #- name: Docker Login
-    #  uses: docker/login-action@1
-    #  with:
-    #    registry: ghcr.io
-    #    username: ${{ github.repository_owner }}
-    #    password: ${{ secrets.GITHUB_TOKEN }}
-        
