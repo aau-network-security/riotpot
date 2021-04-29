@@ -22,6 +22,8 @@ COPY . .
 
 # Run the command from the Makefile to build all the plugins
 # and build the project
+# -- Comment this line when on development if you know you have a ready to go version built --
+# Disclaimer: if you comment this line, be 100% sure that the binary can be run on linux
 RUN make riotpot-builder
 
 # Run RIoTPot

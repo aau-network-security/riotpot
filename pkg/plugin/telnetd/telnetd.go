@@ -40,7 +40,7 @@ func (t *Telnet) Run() (err error) {
 	// convert the port number to a string that we can use it in the server
 	var port = fmt.Sprintf(":%d", t.Port)
 
-	// start a service in the `echo` port
+	// start a service in the `telnet` port
 	listener, err := net.Listen("tcp", port)
 	errors.Raise(err)
 

@@ -38,6 +38,7 @@ services:
       - 22:22
       - 23:23
       - 8080:8080
+      - 1883:1883
     env_file:
     - ../build/env/.env
     networks:
@@ -57,10 +58,14 @@ services:
     networks:
       honeypot:
 
-  ubuntu:
-    image: ubuntu:rolling
+  attacker:
+    build:
+      context: ..
+      dockerfile: ./build/docker/Dockerfile.attacker
     stdin_open: true  # docker -i
     tty: true         # docker -t
+    volumes:
+      - ../test/pkg/services/mqtt:/riotpot/
     networks:
       honeypot:
       

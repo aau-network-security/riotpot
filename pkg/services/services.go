@@ -80,8 +80,9 @@ type MixinService struct {
 
 	// declare here any other variable relevant for the
 	// service to run. This are merely examples...
-	Port int
-	Host string
+	Protocol string
+	Port     int
+	Host     string
 
 	// Stopping channel, a signal for the program to stop.
 	StopCh chan int

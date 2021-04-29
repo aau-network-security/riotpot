@@ -4,7 +4,9 @@ go 1.16
 
 require (
 	github.com/buger/goterm v1.0.0
+	github.com/google/uuid v1.2.0
 	github.com/jackc/pgx/v4 v4.11.0 // indirect
+	github.com/plgd-dev/go-coap/v2 v2.4.0
 	github.com/stretchr/testify v1.7.0 // indirect
 	github.com/traetox/pty v0.0.0-20141209045113-df6c8cd2e0e6
 	golang.org/x/crypto v0.0.0-20210322153248-0c34fe9e7dc2

@@ -13,9 +13,9 @@ docker-build-doc:
 riotpot-doc: docker-build-doc
 	docker run -p 6060:6060 -it $(APPNAME)/v1
 riotpot-up:
-	docker-compose -f ${DEPLOY}docker-compose.yml up -d --build
+	docker-compose -p riotpot -f ${DEPLOY}docker-compose.yml up -d --build
 riotpot-down:
-	docker-compose -f ${DEPLOY}docker-compose.yml down -v
+	docker-compose -p riotpot -f ${DEPLOY}docker-compose.yml down -v
 riotpot-all:
 	riotpot-doc
 	riotpot-up

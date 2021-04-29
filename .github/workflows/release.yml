@@ -1,4 +1,4 @@
-name: cyber
+name: release
 
 on:
   push:
