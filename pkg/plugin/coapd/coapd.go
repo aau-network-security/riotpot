@@ -9,6 +9,7 @@ import (
 	"bytes"
 	"fmt"
 	"log"
+	"math/rand"
 	"regexp"
 	"strconv"
 	"strings"
@@ -318,16 +319,31 @@ func (c *Coap) msg(topic profiles.Topic) []byte {
 }
 
 func (c *Coap) periodicTransmitter(cc mux.Client, token []byte, topic profiles.Topic) {
-	obs := int64(2)
-	for {
-		msg := c.msg(topic)
-		err := c.get(cc, token, msg, obs)
-		if err != nil {
-			log.Printf("Error on transmitter, stopping: %v", err)
-			return
-		}
 
-		time.Sleep(5 * time.Second)
+	obs := int64(2)
+
+	// create a channel from where we can read that will sleep and then put
+	// a value into the channel.
+	// when the channel is filled, the loop breaks
+	stop := make(chan int, 1)
+	go timeout(60*time.Second, stop) // sleeps for a minute before timeout
+
+	for {
+		select {
+		case <-stop:
+			break
+		default:
+			msg := c.msg(topic)
+			err := c.get(cc, token, msg, obs)
+			if err != nil {
+				log.Printf("Error on transmitter, stopping: %v", err)
+				return
+			}
+
+			// sleep for few seconds before trying to send a message again
+			secs := time.Duration(rand.Intn(60) + 1)
+			time.Sleep(secs * time.Second)
+		}
 	}
 }
 
@@ -358,4 +374,9 @@ func filter(topics []profiles.Topic, path string, flag string, query string) (t 
 	}
 
 	return
+}
+
+func timeout(t time.Duration, stop chan int) {
+	time.Sleep(t)
+	stop <- 1
 }
