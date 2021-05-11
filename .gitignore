@@ -24,11 +24,6 @@ bin/
 ## VSCode workspace file
 workspace*.code-*
 
-# environment files (not example)
-.env
-!.env.example*
-!*.example
-
 # Vendor folder
 /vendor/
 

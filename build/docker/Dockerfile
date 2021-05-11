@@ -16,7 +16,7 @@ COPY go.sum .
 # download all the dependencies
 RUN go mod download
 
-# install netcat
+# install netcat so we can ping the db until it is ready
 RUN apt-get update && apt-get install -y netcat
 
 # Copy everything into the image
@@ -29,8 +29,8 @@ COPY . .
 # Disclaimer: if you comment this line, be 100% sure that the binary can be run on linux
 RUN make riotpot-builder
 
+# give permissions to the entrypoint to run the file
 RUN chmod +x build/docker/entrypoint.sh
 
 # Run RIoTPot
 ENTRYPOINT [ "./build/docker/entrypoint.sh" ]
-#CMD ["./riotpot"]
