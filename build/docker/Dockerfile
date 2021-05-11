@@ -16,6 +16,9 @@ COPY go.sum .
 # download all the dependencies
 RUN go mod download
 
+# install netcat
+RUN apt-get update && apt-get install -y netcat
+
 # Copy everything into the image
 # TODO: this can be optimized to copy just the necessary files!
 COPY . .
@@ -26,5 +29,8 @@ COPY . .
 # Disclaimer: if you comment this line, be 100% sure that the binary can be run on linux
 RUN make riotpot-builder
 
+RUN chmod +x build/docker/entrypoint.sh
+
 # Run RIoTPot
-CMD ["./riotpot"]
+ENTRYPOINT [ "./build/docker/entrypoint.sh" ]
+#CMD ["./riotpot"]
