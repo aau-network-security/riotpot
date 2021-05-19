@@ -23,7 +23,11 @@ riotpot:
   # `start` contains a list of services desired to be run
   # on-start. For all the services, set `autod` to `true`.
   start:
-    - modbusd
+    - httpd
+    - echod
+    - telnetd
+    - mqttd
+    - coapd
 
   # Contains a list of available services in the application.
   # This gives the user the ability to navigate or load
@@ -37,6 +41,7 @@ riotpot:
     - sshd
     - telnetd
     - mqttd
+    - coapd
     - modbusd
 
 # The `databases` object contains a number of object defined database

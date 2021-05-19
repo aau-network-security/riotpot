@@ -2,6 +2,7 @@
 # name of the device
 name: SmartHome
 version: 1.0.1
+banner:
 # topics included
 topics:
   - path: /ps/home/temperature

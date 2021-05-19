@@ -26,6 +26,7 @@ const (
 type Profile struct {
 	Name    string // Name of the device that will be faked
 	Version string // Version of the device
+	Banner  string // Banner of the device
 
 	Topics []Topic // list of topics registered in the profile
 }
