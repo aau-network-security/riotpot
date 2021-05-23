@@ -18,9 +18,10 @@ func init() {
 
 func Echod() services.Service {
 	mixin := services.MixinService{
-		Name:    Name,
-		Port:    7,
-		Running: make(chan bool, 1),
+		Name:     Name,
+		Port:     7,
+		Protocol: "tcp",
+		Running:  make(chan bool, 1),
 	}
 
 	return &Echo{
@@ -41,7 +42,7 @@ func (e *Echo) Run() (err error) {
 	var port = fmt.Sprintf(":%d", e.Port)
 
 	// start a service in the `echo` port
-	listener, err := net.Listen("tcp", port)
+	listener, err := net.Listen(e.Protocol, port)
 	errors.Raise(err)
 
 	// create the channel for stopping the service

@@ -20,9 +20,10 @@ func init() {
 
 func Mqttd() services.Service {
 	mx := services.MixinService{
-		Name:    Name,
-		Port:    1883,
-		Running: make(chan bool, 1),
+		Name:     Name,
+		Port:     1883,
+		Running:  make(chan bool, 1),
+		Protocol: "tcp",
 	}
 
 	return &Mqtt{
@@ -44,7 +45,7 @@ func (m *Mqtt) Run() (err error) {
 	var port = fmt.Sprintf(":%d", m.Port)
 
 	// start a service in the `mqtt` port
-	listener, err := net.Listen("tcp", port)
+	listener, err := net.Listen(m.Protocol, port)
 	errors.Raise(err)
 
 	// create the channel for stopping the service

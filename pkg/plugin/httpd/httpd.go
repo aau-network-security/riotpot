@@ -20,9 +20,10 @@ func init() {
 
 func Httpd() services.Service {
 	mixin := services.MixinService{
-		Name:    Name,
-		Port:    8080,
-		Running: make(chan bool, 1),
+		Name:     Name,
+		Port:     8080,
+		Protocol: "tcp",
+		Running:  make(chan bool, 1),
 	}
 
 	return &Http{

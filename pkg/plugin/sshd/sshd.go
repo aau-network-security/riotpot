@@ -24,9 +24,10 @@ func init() {
 func Sshd() services.Service {
 
 	mixin := services.MixinService{
-		Name:    Name,
-		Port:    22,
-		Running: make(chan bool, 1),
+		Name:     Name,
+		Port:     22,
+		Running:  make(chan bool, 1),
+		Protocol: "tcp",
 	}
 
 	return &SSH{
@@ -56,7 +57,7 @@ func (s *SSH) Run() (err error) {
 	var port = fmt.Sprintf(":%d", s.Port)
 
 	// start a service in the `echo` port
-	listener, err := net.Listen("tcp", port)
+	listener, err := net.Listen(s.Protocol, port)
 	errors.Raise(err)
 	defer listener.Close()
 

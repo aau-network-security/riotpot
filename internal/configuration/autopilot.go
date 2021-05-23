@@ -1,6 +1,8 @@
 package configuration
 
 import (
+	"fmt"
+	"net"
 	"sync"
 
 	"github.com/riotpot/internal/greeting"
@@ -41,11 +43,29 @@ func (a *Autopilot) Start() {
 		for _, s := range a.Settings.Riotpot.Start {
 			// get the service and run it
 			service := a.services.Get(s)
-			go service.Run()
+			fmt.Printf("Starting %s...\n", service.GetName())
+
+			if a.available(service.GetName(), service.GetPort()) {
+				go service.Run()
+			}
 		}
 	}
 
 	a.wg.Wait()
+}
+
+func (a *Autopilot) available(name string, port int) (available bool) {
+	// convert the port to a string
+	sport := fmt.Sprintf("%d", port)
+	ln, err := net.Listen("tcp", ":"+sport)
+
+	if err != nil {
+		fmt.Printf("Port %s unavailable, skipping %s ...\n", sport, name)
+		return false
+	}
+
+	_ = ln.Close()
+	return true
 }
 
 // Register the services

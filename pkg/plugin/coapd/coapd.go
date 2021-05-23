@@ -64,6 +64,8 @@ func (c *Coap) Run() (err error) {
 	// This will cause all the requests to go through this function.
 	r.DefaultHandleFunc(c.observeHandler)
 
+	fmt.Printf("[%s] Started listenning for connections in port %d\n", Name, c.Port)
+
 	// Run the server listening on the given port and using the defined
 	// lvl4 layer protocol.
 	log.Fatal(coap.ListenAndServe(c.Protocol, fmt.Sprintf(":%d", c.Port), r))

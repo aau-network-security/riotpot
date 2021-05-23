@@ -19,9 +19,10 @@ func init() {
 
 func Telnetd() services.Service {
 	mixin := services.MixinService{
-		Name:    Name,
-		Port:    23,
-		Running: make(chan bool, 1),
+		Name:     Name,
+		Port:     23,
+		Running:  make(chan bool, 1),
+		Protocol: "tcp",
 	}
 
 	return &Telnet{
@@ -41,7 +42,7 @@ func (t *Telnet) Run() (err error) {
 	var port = fmt.Sprintf(":%d", t.Port)
 
 	// start a service in the `telnet` port
-	listener, err := net.Listen("tcp", port)
+	listener, err := net.Listen(t.Protocol, port)
 	errors.Raise(err)
 
 	// create the channel for stopping the service

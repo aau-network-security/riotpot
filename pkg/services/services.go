@@ -48,6 +48,8 @@ type Service interface {
 
 	// Gets the name of the service
 	GetName() string
+	GetProtocol() string
+	GetPort() int
 
 	// The `run` method should be the implementation of starting the service.
 	Run() error
@@ -129,6 +131,14 @@ func (mx *MixinService) Restart() (err error) {
 
 func (mx *MixinService) GetName() string {
 	return mx.Name
+}
+
+func (mx *MixinService) GetProtocol() string {
+	return mx.Protocol
+}
+
+func (mx *MixinService) GetPort() int {
+	return mx.Port
 }
 
 // Simple function on the mixin that checks if the service is
