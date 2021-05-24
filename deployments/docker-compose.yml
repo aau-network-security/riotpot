@@ -35,6 +35,8 @@ services:
     #command: 
     restart: always
     ports:
+      # Ports under 60 might see errors when unquoted
+      # https://stackoverflow.com/questions/58810789/quotes-on-docker-compose-yml-ports-make-any-difference
       - "7:7"
       - "22:22"
       - "23:23"
