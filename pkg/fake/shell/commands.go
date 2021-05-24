@@ -16,23 +16,31 @@ func c_default(com string, conn io.Writer) (err error) {
 func c_enable(com string, conn io.Writer) (err error) {
 	// split the string into 2 parts, after the `enable` string
 	sp := strings.SplitAfter(com, "enable ")
-	rsp := ""
+	rsp := fmt.Sprintf("%s\n%s\n%s\n",
+		"cd",
+		"enable",
+		"exit",
+	)
 
-	// check if the arguments are a flag or an actual command
-	// this doesn't go further than just complaining
-	if strings.HasPrefix(sp[1], "-") {
-		rsp = "enable: bad option: %s\n"
-	} else {
-		rsp = "enable: no such hash table element: %s\n"
+	if len(sp) > 1 {
+		// check if the arguments are a flag or an actual command
+		// this doesn't go further than just complaining
+		if strings.HasPrefix(sp[1], "-") {
+			rsp = "enable: bad option: %s\n"
+		} else {
+			rsp = "enable: no such hash table element: %s\n"
+		}
+
+		rsp = fmt.Sprintf(rsp, sp[1])
 	}
 
-	_, err = fmt.Fprintf(conn, rsp, sp[1])
+	_, err = fmt.Fprintf(conn, rsp)
 	return
 }
 
 // Parses the exit command
 func c_exit(com string, conn io.ReadWriteCloser) (err error) {
-	_, err = fmt.Fprintf(conn, "Bye\n")
+	_, err = fmt.Fprintf(conn, "bye\n")
 	conn.Close()
 	return
 }

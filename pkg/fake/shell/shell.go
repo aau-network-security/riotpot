@@ -151,7 +151,7 @@ func (s *shell) command(line string) {
 		args := make([]reflect.Value, 2)
 
 		// Parses the value as an argument
-		args[0] = reflect.ValueOf(command)
+		args[0] = reflect.ValueOf(line)
 		args[1] = reflect.ValueOf(s.stdout)
 
 		// find the captured command that matches the list of commands
