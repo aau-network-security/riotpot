@@ -113,7 +113,7 @@ func (c *Coap) observeHandler(w mux.ResponseWriter, req *mux.Message) {
 			q = matches[qIndex]
 		}
 
-		if q != "" {
+		if q != "" || path == ".well-known/core" {
 			t := matches[r.SubexpIndex("topic")]
 			f := matches[r.SubexpIndex("flag")]
 			err = c.discovery(w.Client(), req.Token, t, f, q)
@@ -181,7 +181,11 @@ func (c *Coap) observeHandler(w mux.ResponseWriter, req *mux.Message) {
 func (c *Coap) discovery(cc mux.Client, token []byte, path string, flag string, query string) error {
 	var body []string
 	topics := c.Profile.Topics
-	topics = filter(topics, path, flag, query)
+
+	// if the path is the `.well-known/core`, use all the topics, otherwise filter them.
+	if path != ".well-known/core" {
+		topics = filter(topics, path, flag, query)
+	}
 
 	// create simple strings following the CoRE Link format
 	// - https://tools.ietf.org/id/draft-ietf-core-link-format-11.html#rfc.section.1.2.1
