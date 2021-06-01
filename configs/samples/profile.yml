@@ -1,0 +1,16 @@
+# Greeting options passed to the user profile
+greet:
+  # If not set to false, the first time RiotPot is launch the user will
+  # Receive a short introduction to RiotPot.
+  tutorial: false
+
+  # This boolean `initial` determines if we want to see the initial message.
+  # Keep in mind that the initial message contains some waiting time,
+  # which is helpful in docker images to give time to the database
+  # to be set-up before starting the application!
+  initial : false
+
+# Terminal options and configuration
+terminal:
+  # Color of the terminal path and headers
+  color: #eb4034

@@ -1,0 +1,32 @@
+---
+# name of the device
+name: SmartHome
+version: 1.0.1
+banner:
+# topics included
+topics:
+  - path: /ps/home/temperature
+    messagetype: number
+    interval: [15, 40]
+
+  - path: /ps/home/fan_speed
+    messagetype: number
+    interval: [0,1]
+  
+  - path: /ps/home/fan_mode
+    messagetype: word
+    words: ["ON", "OFF"]
+
+  - path: /ps/home/lights/switch
+    messagetype: word
+    words: ["true", "false"]
+  
+  - path: /ps/home/lights/brightness
+    messagetype: number
+    interval: [0,1]
+  
+  - path: /ps/home/alexa/status
+    messagetype: word
+    words: ["online", "offline"]
+
+        
