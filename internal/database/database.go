@@ -30,7 +30,7 @@ func (db *Database) connect() (*gorm.DB, error) {
 		db.Config.Host,
 		db.Config.Username,
 		db.Config.Password,
-		db.Config.Identity.Name,
+		db.Config.Engine,
 		db.Config.Port,
 	)
 
