@@ -8,9 +8,10 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/gobuffalo/packr"
 	"github.com/riotpot/tools/arrays"
-	environ "github.com/riotpot/tools/environ"
 	errors "github.com/riotpot/tools/errors"
+	environ "github.com/riotpot/tools/environ"
 
 	"gopkg.in/yaml.v3"
 )
@@ -42,8 +43,8 @@ type Settings struct {
 
 // Load the configuration on the child.
 func (conf *Settings) Load(path string) (err error) {
-	data, err := os.ReadFile(path)
-	errors.Raise(err)
+	box := packr.NewBox("../../configs/samples")
+	data, err := box.Find("configuration.yml")
 
 	err = yaml.Unmarshal(data, &conf)
 	errors.Raise(err)

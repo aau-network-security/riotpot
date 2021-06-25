@@ -5,8 +5,10 @@ go 1.16
 require (
 	github.com/buger/goterm v1.0.0
 	github.com/dsnet/golib/memfile v1.0.0 // indirect
+	github.com/gobuffalo/packr v1.30.1 // indirect
 	github.com/google/uuid v1.2.0
 	github.com/jackc/pgproto3/v2 v2.0.7 // indirect
+	github.com/markbates/grift v1.0.0 // indirect
 	github.com/pion/dtls/v2 v2.0.9 // indirect
 	github.com/plgd-dev/go-coap/v2 v2.4.0
 	github.com/plgd-dev/kit v0.0.0-20210322121129-fa0d31a13679 // indirect

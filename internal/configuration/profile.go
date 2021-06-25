@@ -8,6 +8,7 @@ package configuration
 import (
 	"os"
 
+	"github.com/gobuffalo/packr"
 	"github.com/riotpot/internal/cli"
 	"github.com/riotpot/internal/greeting"
 	errors "github.com/riotpot/tools/errors"
@@ -37,8 +38,8 @@ type Profile struct {
 
 // Load the configuration on the child.
 func (conf *Profile) Load(path string) (err error) {
-	data, err := os.ReadFile(path)
-	errors.Raise(err)
+	box := packr.NewBox("../../configs/samples")
+	data, err := box.Find("profile.yml")
 
 	err = yaml.Unmarshal(data, &conf)
 	errors.Raise(err)

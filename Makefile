@@ -5,6 +5,8 @@ PACKAGE_DIRS=`go list -e ./... | egrep -v "binary_output_dir|.git|mocks"`
 DEPLOY=deployments/
 DOCKER=build/docker/
 PLUGINS_DIR=pkg/plugin
+LCL_GO_PATH=$(shell echo `go env GOPATH`)
+GO_BIN_DIR=$(LCL_GO_PATH)/bin
 
 # docker cmd below
 .PHONY:  docker-build-doc riotpot-doc riotpot-up riotpot-prod-up riotpot-prod-down riotpot-build riotpot-build-plugins riotpot-builder
@@ -29,6 +31,13 @@ riotpot-build-plugins: $(PLUGINS_DIR)/*
 	for folder in $^ ; do \
 		go build -buildmode=plugin -o $${folder}/plugin.so $${folder}/*.go; \
 	done
+riotpot-build-local-plugin: $(PLUGINS_DIR)/*
+	for folder in $^ ; do \
+		go build -buildmode=plugin -o ${GO_BIN_DIR}/$${folder}/plugin.so $${folder}/*.go; \
+	done
 riotpot-builder: \
 	riotpot-build \
 	riotpot-build-plugins
+riotpot-build-local: \
+	riotpot-build \
+	riotpot-build-local-plugin
