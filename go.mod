@@ -14,6 +14,7 @@ require (
 	github.com/plgd-dev/kit v0.0.0-20210322121129-fa0d31a13679 // indirect
 	github.com/traetox/pty v0.0.0-20141209045113-df6c8cd2e0e6
 	github.com/xiegeo/modbusone v0.2.4-0.20200428173500-797d647e237d
+	go.mongodb.org/mongo-driver v1.5.3 // indirect
 	go.uber.org/atomic v1.7.0 // indirect
 	golang.org/x/crypto v0.0.0-20210506145944-38f3c27a63bf
 	golang.org/x/net v0.0.0-20210510120150-4163338589ed // indirect

@@ -44,6 +44,7 @@ services:
       - "8080:8080"
       - "1883:1883"
       - "5683:5683"
+      - "27017:27017"
     env_file:
     - ../build/env/.env
     networks:
@@ -63,6 +64,18 @@ services:
     networks:
       honeypot:
 
+  mongodb:
+    image: mongo
+    container_name: mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: superuser
+      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_DATABASE: mongodb
+    volumes:
+     - mongodb_data:/data/db/
+    networks:
+      honeypot:
+
   attacker:
     build:
       context: ..
@@ -76,6 +89,7 @@ services:
       
 volumes:
   postgres_data:
+  mongodb_data:
 
 networks:
   honeypot:

@@ -10,7 +10,8 @@ import (
 	"strings"
 
 	"github.com/riotpot/tools/errors"
-	"gorm.io/gorm"
+	"go.mongodb.org/mongo-driver/mongo"
+	// "gorm.io/gorm"
 )
 
 // Function to get an stored service plugin.
@@ -65,7 +66,7 @@ type Service interface {
 	Status() string
 
 	// Set the database connection
-	SetDb(conn *gorm.DB)
+	SetDb(conn *mongo.Client)
 }
 
 // Implements a mixin service that can be used as a base for any other service `struct` type.
@@ -74,7 +75,7 @@ type MixinService struct {
 	Service
 
 	// A connection to the database that must be initialized
-	conn *gorm.DB
+	conn *mongo.Client
 
 	// it is recommended to include some kind of identity
 	// for the service.
@@ -158,13 +159,13 @@ func (mx *MixinService) Status() string {
 	}
 }
 
-func (mx *MixinService) SetDb(conn *gorm.DB) {
+func (mx *MixinService) SetDb(conn *mongo.Client) {
 	mx.conn = conn
 }
 
 func (mx *MixinService) Migrate(model interface{}) {
 	if mx.conn != nil {
-		mx.conn.AutoMigrate(model)
+		// mx.conn.AutoMigrate(model)
 	} else {
 		fmt.Print("Database not accessible")
 	}
@@ -172,7 +173,7 @@ func (mx *MixinService) Migrate(model interface{}) {
 
 func (mx *MixinService) Store(model interface{}) {
 	if mx.conn != nil {
-		mx.conn.Create(model)
+		// mx.conn.Create(model)
 	} else {
 		fmt.Print("Database not accessible")
 	}
@@ -264,7 +265,7 @@ func (se *Services) RunAll() {
 }
 
 // Add a database connection to all the services
-func (se *Services) AddDB(conn *gorm.DB) {
+func (se *Services) AddDB(conn *mongo.Client) {
 	for _, s := range se.services {
 		s.SetDb(conn)
 	}

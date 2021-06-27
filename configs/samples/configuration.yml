@@ -52,13 +52,13 @@ riotpot:
 databases:
   - identity: 
     # Name of the targeted database
-    dbname: postgres
+    dbname: mongodb
     # RiotPot only supports `postgres` currently.
-    engine: postgres
+    engine: mongodb
     # IP or container name in the same network.
     host: localhost
     # Connection port to the database host.
-    port: 5432
+    port: 27017
     # User and password to access the database.
     # NOTE: Do not hard-code the values in this file. Please do make
     # use of `.env` file for this purpose in production.

@@ -5,9 +5,10 @@ import (
 	"net"
 	"sync"
 
-	"github.com/riotpot/internal/greeting"
 	"github.com/riotpot/pkg/services"
-	"gorm.io/gorm"
+	"github.com/riotpot/internal/greeting"
+	"go.mongodb.org/mongo-driver/mongo"
+	// "gorm.io/gorm"
 )
 
 type Autopilot struct {
@@ -17,7 +18,7 @@ type Autopilot struct {
 	greeting greeting.Greet
 	services services.Services
 	wg       sync.WaitGroup
-	DB       *gorm.DB
+	DB       *mongo.Client
 }
 
 // Method to start the autopilot.
