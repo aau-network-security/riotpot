@@ -3,6 +3,7 @@
 package services
 
 import (
+	"os"
 	"fmt"
 	"path/filepath"
 	"plugin"
@@ -234,11 +235,20 @@ func (se *Services) GetMultiple(service_names ...string) (services []Service) {
 // Method to register all the services in the `pkg/plugin` folder
 // The method looks for the `.so` plugin inside of the folders,
 // doesn't matter the name of the folder.
-func (se *Services) Autodiscover() []string {
-	all, err := filepath.Glob("pkg/plugin/*/*.so")
+func (se *Services) Autodiscover(build_info string) []string {
+	abs_plugin_path := ""
+	plugin_path := "pkg/plugin/*/*.so"
+	if build_info == "1" {
+		local_go_path := os.Getenv("GOPATH")+"/bin/"
+		abs_plugin_path = local_go_path+plugin_path
+	} else {
+		abs_plugin_path = plugin_path
+	}
+	
+	all, err := filepath.Glob(abs_plugin_path)
 	if err != nil {
 		panic(err)
-	}
+	}	
 
 	fmt.Printf("[+] Found %d plugins\n", len(all))
 	return all

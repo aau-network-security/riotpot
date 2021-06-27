@@ -15,12 +15,13 @@
 ___
 
 - [1. Description](#1-description)
-- [2. Installation](#2-installation)
-  - [2.1 Docker](#21-docker)
-    - [2.1.1 Docker Hub Image](#211-docker-hub-image)
-  - [2.2 Local](#22-local)
-- [3. Documentation](#3-documentation)
-- [3. Easy Access](#3-easy-access)
+- [2. Requirements](#2-requirements) 
+- [3. Installation](#3-installation)
+  - [3.1 Docker](#31-docker)
+    - [3.1.1 Docker Hub Image](#311-docker-hub-image)
+  - [3.2 Local](#32-local)
+- [4. Documentation](#4-documentation)
+- [5. Easy Access](#5-easy-access)
 
 ## 1. Description
 
@@ -28,7 +29,13 @@ RIoTPot is an interoperable medium interaction honeypot, primarily focused on th
 
 This services are loaded in the honeypot in the form of plugins, making RIoTPot a modular, and very transportable honeypot. The services are loaded at runtime, meaning that the weight of the honeypot will vary on premisses, and the services loaded e.g. HTTP, will only be used when required. As consequence, we highly recommend building your own binary customized to your own needs. Refer to the following section, Installation, for more information.
 
-## 2. Installation
+## 2. Requirements
+- Go version go1.16.4 or higher
+- PostgreSQL 12.7 or higher, having a user named as `superuser` and password as `password`
+- Docker version 20.10.2 or higher
+- Docker-compose version 1.29.2 or higher
+
+## 3. Installation
 
 Although one can download the binaries and configuration files containing the set of default running emulators, this guide is mainly focused to those looking for a customized experience.
 
@@ -57,7 +64,7 @@ $ git clone git@github.com:aau-network-security/riotpot.git
 $ cd riotpot
 ```
 
-### 2.1 Docker
+### 3.1 Docker
 
 We assume you have basic knowledge about the Docker ecosystem, otherwise please refer first to the Docker documentation [here](https://docs.docker.com).
 
@@ -86,7 +93,7 @@ $ docker-compose down -v
 
 > **NOTE:** Using the *-v* tag will remove all the mounted volumes, i.e. the database used by riotpot to store information and the volumes mounted to store logs and binaries collected by the honeypot. Remember to make copies before using the *-v* tag, or skip it altogether.
 
-#### 2.1.1 Docker Hub Image
+#### 3.1.1 Docker Hub Image
 
 Build the latest release of RiotPot directly from the image provided in the Docker Hub:
 
@@ -96,27 +103,27 @@ Build the latest release of RiotPot directly from the image provided in the Dock
 $ docker run -d riotpot-docker:latest
 ```
 
-### 2.2 Local
+### 3.2 Local
 
-To build your own binary from source, navigate to the folder where you have stored the repository and use the go CLI to generate it and store it in the *./bin/* folder:
+To build your own binary from source, navigate to the folder where you have stored the repository and run the following command on terminal:
 
 ```bash
-# build the binary in the ./bin folder
-$ go build -o riotpot cmd/riotpot/main.go
+$ make riotpot-build-local
 ```
+Above command will build a riotpot binary file in current directoy also install the binary on your linux system GOPATH binary directory.
 
-Additionally, you could also install the application in the system:
 ```bash
-# installs riotpot at $GOPATH/bin
-$ go install
+# To check the local GOPATH directory
+$ go env GOPATH
 ```
+Make sure that the GOPATH/bin is in your $PATH enviornment variable.
 
-Run the binary as any other application:
+Run the binary as any other application from anywhere since the binary is installed in the GOPATH binary directory:
 ```bash
-$ ./riotpot
+$ riotpot
 ```
 
-## 3. Documentation
+## 4. Documentation
 
 The documentation for RiotPot can be found in [go.pkg.dev](https://pkg.go.dev/), however, sometimes you might be in need to visualize the documentation locally, either because you are developing a part of it, of for any other reason.
 
@@ -129,7 +136,7 @@ $ make riotpot-doc
 ```
 This will run a container tagged with `riotpot/v1` at `http://localhost:6060/`. The documentation of the package can be accessed directly from [http://localhost:6060/pkg/riotpot/](http://localhost:6060/pkg/riotpot/).
 
-## 3. Easy Access
+## 5. Easy Access
 
 We previously described how to set up the whole project, both installation and documentation, but some of the processes become routinely and lengthy when on the process of developing new features and testing. For this, in the root folder of the repository we have included a `Makefile` containing the most utilized routines with aliases.
 

@@ -18,7 +18,7 @@ import (
 
 func NewProfile() (p Profile, err error) {
 	p = Profile{}
-	err = p.Load("configs/samples/profile.yml")
+	err = p.Load()
 	return
 }
 
@@ -37,7 +37,7 @@ type Profile struct {
 }
 
 // Load the configuration on the child.
-func (conf *Profile) Load(path string) (err error) {
+func (conf *Profile) Load() (err error) {
 	box := packr.NewBox("../../configs/samples")
 	data, err := box.Find("profile.yml")
 

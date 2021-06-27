@@ -10,15 +10,15 @@ import (
 
 	"github.com/gobuffalo/packr"
 	"github.com/riotpot/tools/arrays"
-	errors "github.com/riotpot/tools/errors"
 	environ "github.com/riotpot/tools/environ"
+	errors "github.com/riotpot/tools/errors"
 
 	"gopkg.in/yaml.v3"
 )
 
 func NewSettings() (s Settings, err error) {
 	s = Settings{}
-	err = s.Load("configs/samples/configuration.yml")
+	err = s.Load()
 	s.ResolveEnv()
 	return
 }
@@ -42,7 +42,7 @@ type Settings struct {
 }
 
 // Load the configuration on the child.
-func (conf *Settings) Load(path string) (err error) {
+func (conf *Settings) Load() (err error) {
 	box := packr.NewBox("../../configs/samples")
 	data, err := box.Find("configuration.yml")
 
@@ -73,11 +73,9 @@ func (conf *Settings) ValidateEmulators(service_paths []string) []string {
 	fmt.Printf("[+] Allowed plugins: %v\n", conf.Riotpot.Emulators)
 
 	for _, p := range service_paths {
-
 		//        '---path----'    ---plugin-----    -file-
 		// split: `*pkg/plugin/` + `<plugin_name>/` + `*`
 		sli := strings.Split(strings.SplitAfter(p, "pkg/plugin/")[1], "/")[0]
-
 		// Transform the name of the plugin to lower case
 		service := strings.ToLower(sli)
 
@@ -119,10 +117,11 @@ func (conf *Settings) ResolveEnv() {
 		Password: environ.Getenv("DB_PASS", db_cfg.Password),
 		Host:     environ.Getenv("DB_HOST", db_cfg.Host),
 		Port:     environ.Getenv("DB_PORT", db_cfg.Port),
+		Dbname:   environ.Getenv("DB_NAME", db_cfg.Dbname),
 	}
 
 	db_cfg.Identity.Name = environ.Getenv("DB_NAME", db_cfg.Identity.Name)
-
+	
 	conf.Databases[0] = db_cfg
 }
 
@@ -146,6 +145,8 @@ type ConfigRiotpot struct {
 	Emulators []string
 	// List of emulators that must be run at start
 	Start []string
+	// Varoable to check if the run is for local build or not
+	Local_build_on string
 }
 
 // Database configuration structure. It gives an interface to load and access specific databases.
@@ -163,4 +164,6 @@ type ConfigDatabase struct {
 	Host string
 	// port to connect to the database
 	Port string
+	// database name to connect
+	Dbname string
 }

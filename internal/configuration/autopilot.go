@@ -72,7 +72,7 @@ func (a *Autopilot) available(name string, port int) (available bool) {
 func (a *Autopilot) RegisterServices() {
 	a.services = services.Services{}
 
-	service_paths := a.services.Autodiscover()
+	service_paths := a.services.Autodiscover(a.Settings.Riotpot.Local_build_on)
 	service_paths = a.Settings.ValidateEmulators(service_paths)
 
 	a.services.AutoRegister(service_paths)

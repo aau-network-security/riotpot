@@ -55,9 +55,9 @@ services:
   postgres:
     image: postgres:latest
     environment:
-      - POSTGRES_USER=user
+      - POSTGRES_USER=superuser
       - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=db
+      - POSTGRES_DB=postgres
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     networks:
