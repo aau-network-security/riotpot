@@ -15,7 +15,8 @@
 ___
 
 - [1. Description](#1-description)
-- [2. Installation](#2-installation)
+  - [1.1 Architecture](#11-architecture)
+  - [2. Installation](#2-installation)
   - [2.1 Docker](#21-docker)
     - [2.1.1 Docker Hub Image](#211-docker-hub-image)
   - [2.2 Local](#22-local)
@@ -27,6 +28,33 @@ ___
 RIoTPot is an interoperable medium interaction honeypot, primarily focused on the emulation IoT and OT protocols, although, it is also capable of emulating other services.
 
 This services are loaded in the honeypot in the form of plugins, making RIoTPot a modular, and very transportable honeypot. The services are loaded at runtime, meaning that the weight of the honeypot will vary on premisses, and the services loaded e.g. HTTP, will only be used when required. As consequence, we highly recommend building your own binary customized to your own needs. Refer to the following section, Installation, for more information.
+
+### 1.1 Architecture
+
+RIoTPot has a modular architecture that facilitates extensability of the honeypot. The honeypot further offers a hybrid-interaction capability where users can choosed the desired interaction levels for the protocols simulated. The image below shows the high/level architecture of RIoTPot. 
+
+![alt text](architecture.jpg "Architecture")
+
+The architecture contains 6 components. 
+
+__RIoTPot core__
+The core of the honeypot consists of the required modules for configuration, administration and orchestration of the container network.
+
+__Configuration & Orchestration__
+The configuration module provides RIoTPot with all the required parameters at startup. This includes the user preferences for specific protocols and profile simulation and the desired interaction level. The orchestration module is responsible for the network management from the core to the high-interaction protocol services simulated on containers. The received attack traffic is forwarded to the respective container that hosts the protocol on which the attack was targeted. Furthermore, the orchestra tor also facilitates the communication to the containers if they are hosted on a cloud-based environment.  
+
+__Attack Capture and Noise Filter__
+The  attack capture and  noise filter  module filters out the suspicious traffic received from Internet-wide scanners like Shodan and Censys. This helps the administrator to concentrate on attacks that are not from benign sources.
+
+__Hybrid-Interaction (Low and High-Interaction modes)__
+RIoTPot is implemented in Go language \cite{go} and facilitates the modular architecture and development through packages. The packages act as plug-ins that can be added to the honeypot to extend the protocols simulated. RIoTPot offers a hybrid-interaction model with a preference of low- or high-interaction. 
+The low-interaction is achieved through independent packages, with each package simulating a specific protocol. The high-interaction model is realized with a containers with the protocols simulated as services installed. The containers act as high-interaction modules that offer a full implementation of the protocol. Additional protocol services can be added by integration of containers with desired protocol services. The hybrid-interaction model further allows the user to emulate selective protocols on low or high-interaction levels. For example, the user can choose to have SSH in low-interaction mode and MQTT in high-interaction mode thereby operating in a hybrid-interaction mode.
+
+__Attack Database__
+The attack database stores all the attack traffic received on the honeypot. The database is setup as an independent module to ensure data availability even if the honeypot crashes on potential large scale attacks. The database is accessible from the low-interaction and high-interaction modules for attack storage.
+
+
+> **Summary:** To summarize, the design of RIoTPot facilitates modularity  through packages and containers as plugins. Furthermore, the modular architecture helps in achieving a hybrid-interaction model.
 
 ## 2. Installation
 
