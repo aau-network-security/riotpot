@@ -4,10 +4,13 @@ package services
 
 import (
 	"os"
+	"time"
+	"context"
 	"fmt"
 	"path/filepath"
 	"plugin"
 	"strings"
+	"log"
 
 	"github.com/riotpot/tools/errors"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -173,7 +176,14 @@ func (mx *MixinService) Migrate(model interface{}) {
 
 func (mx *MixinService) Store(model interface{}) {
 	if mx.conn != nil {
-		// mx.conn.Create(model)
+		ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
+		db_element := mx.conn.Database("mongodb")
+		collec_element := db_element.Collection("Connection")
+		_, err := collec_element.InsertOne(ctx, model)
+		
+		if err != nil {
+                log.Fatal(err)
+        }
 	} else {
 		fmt.Print("Database not accessible")
 	}
