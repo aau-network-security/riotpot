@@ -16,6 +16,8 @@ ___
 
 - [1. Description](#1-description)
   - [1.1 Architecture](#11-architecture)
+  - [1.2 Noise Filter](#12-Noise-Filter)
+  
   - [2. Installation](#2-installation)
   - [2.1 Docker](#21-docker)
     - [2.1.1 Docker Hub Image](#211-docker-hub-image)
@@ -53,6 +55,31 @@ The low-interaction is achieved through independent packages, with each package 
 __Attack Database__
 The attack database stores all the attack traffic received on the honeypot. The database is setup as an independent module to ensure data availability even if the honeypot crashes on potential large scale attacks. The database is accessible from the low-interaction and high-interaction modules for attack storage.
 
+### 1.2 Noise Filter
+The Noise filter module of RIoTPot filters the attacks from internet scanning engines to reduce alert fatigue.
+With this feature, attacks are labelled as __*benign*__ when they originate from sources like Shodan. The 
+list of scanning services filtered by RIoTPot is below:
+ 1. Shodan (https://www.shodan.io/)
+ 2. Censys (https://censys.io/)
+ 3. Project Sonar (https://www.rapid7.com/research/project-sonar/)
+ 4. LeakIX (https://leakix.net/)
+ 5. ShadowServer (https://www.shadowserver.org/)
+ 6. RWTH Aachen (http://researchscan.comsys.rwth-aachen.de/)
+ 7. Quadmetrics (https://www.quadmetrics.com/)
+ 8. BinaryEdge (https://www.binaryedge.io/})
+ 9. ipip.net (https://en.ipip.net/)
+ 10. Arbor Observatory (https://www.arbor-observatory.com/)
+ 11. CriminalIP (https://security.criminalip.com/)
+ 12. BitSight (https://www.bitsight.com/)
+ 13. InterneTT (http://www.internettl.org/)
+ 14. ONYPHE (https://www.onyphe.io/)
+ 15. Natlas (https://github.com/natlas/natlas)
+ 16. Net Systems Research (https://www.netsystemsresearch.com/)
+ 17. Sharashka (https://sharashka.io/data-feeds)
+ 18. Alpha Strike Labs (https://www.alphastrike.io)
+ 19. Stretchoid http://stretchoid.com/)
+ 
+ Note: the list will be updated on support for additional scanning sources. 
 
 > **Summary:** To summarize, the design of RIoTPot facilitates modularity  through packages and containers as plugins. Furthermore, the modular architecture helps in achieving a hybrid-interaction model.
 
