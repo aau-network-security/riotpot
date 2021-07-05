@@ -77,7 +77,7 @@ list of scanning services filtered by RIoTPot is below:
  16. Net Systems Research (https://www.netsystemsresearch.com/)
  17. Sharashka (https://sharashka.io/data-feeds)
  18. Alpha Strike Labs (https://www.alphastrike.io)
- 19. Stretchoid http://stretchoid.com/)
+ 19. Stretchoid (http://stretchoid.com/)
  
  Note: the list will be updated on support for additional scanning sources. 
 
