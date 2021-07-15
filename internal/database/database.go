@@ -54,8 +54,9 @@ func (db *Database) connect() (*mongo.Client, error) {
     err = client.Connect(ctx)
     
     errors.Raise(err)
-
-    defer client.Disconnect(ctx)
+	
+    // TO-DO: cleanup of the connection may be required in the longer run
+    // defer client.Disconnect(ctx)
     
     // test of the database is reachable or not
     err = client.Ping(ctx, readpref.Primary())
