@@ -45,7 +45,6 @@ func (a *Autopilot) Start() {
 	// loads the services which are available for user to run
 	a.loaded_plugins = a.services.GetServicesNames(a.services.GetServices())
 
-	fmt.Println("\n")
 
 	// set the plugins to run from the config file
 	a.plugins_to_run = a.Settings.Riotpot.Start
@@ -62,6 +61,9 @@ func (a *Autopilot) Start() {
 			a.plugins_to_run = a.GetPluginsFromUser()
 		}
 	}
+
+	fmt.Printf("Plugins to run ")
+	fmt.Println(a.plugins_to_run)
 
 	// Check if the starting must be all the registered
 	// or from the `Start` list.
@@ -159,7 +161,7 @@ func (a *Autopilot) ValidatePlugin(input_plugins []string) (validated bool){
 	for _, plugin := range input_plugins {
 		validated := a.services.ValidatePluginByName(strings.Title(plugin), a.loaded_plugins)
 		if !validated {
-			fmt.Printf("\n[-] Entered plugin \"%s\" doesn't exist, please enter plugins again... ", plugin)
+			fmt.Printf("\n[-] Entered plugin \"%s\" doesn't exist, please enter plugins again... \n", plugin)
 			return false
 		}
 	}

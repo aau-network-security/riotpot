@@ -85,6 +85,7 @@ func (conf *Settings) ValidateEmulators(service_paths []string) []string {
 			val = append(val, p)
 		} else {
 			fmt.Printf("[-] Plugin %s not allowed, skipping...\n", service)
+			conf.Riotpot.Start = arrays.DropItem(conf.Riotpot.Start, service)
 		}
 	}
 	// Check if the array of emulators allowed contains the service
