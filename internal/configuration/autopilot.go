@@ -1,13 +1,17 @@
 package configuration
 
 import (
+	"os"
 	"fmt"
+	"log"
 	"net"
 	"sync"
+	"bufio"
+	"strings"
 
+	"gorm.io/gorm"
 	"github.com/riotpot/internal/greeting"
 	"github.com/riotpot/pkg/services"
-	"gorm.io/gorm"
 )
 
 type Autopilot struct {
@@ -18,6 +22,9 @@ type Autopilot struct {
 	services services.Services
 	wg       sync.WaitGroup
 	DB       *gorm.DB
+
+	loaded_plugins []string
+	plugins_to_run []string
 }
 
 // Method to start the autopilot.
@@ -35,12 +42,33 @@ func (a *Autopilot) Start() {
 	// register all the services
 	a.RegisterServices()
 
+	// loads the services which are available for user to run
+	a.loaded_plugins = a.services.GetServicesNames(a.services.GetServices())
+
+	fmt.Println("\n")
+
+	// set the plugins to run from the config file
+	a.plugins_to_run = a.Settings.Riotpot.Start
+
+	// check if the build is local or containerized
+	if a.Settings.Riotpot.Local_build_on == "1" {
+		// check if user want to run via config file or manually input
+		// plugins to run.
+		running_mode_decision := a.CheckRunningMode()
+
+		// based on the user decision set the plugin running list
+		if !running_mode_decision {
+			// user decided to provide plugins manually
+			a.plugins_to_run = a.GetPluginsFromUser()
+		}
+	}
+
 	// Check if the starting must be all the registered
 	// or from the `Start` list.
 	if a.Settings.Riotpot.Autod {
 		a.services.RunAll()
 	} else {
-		for _, s := range a.Settings.Riotpot.Start {
+		for _, s := range a.plugins_to_run {
 			// get the service and run it
 			service := a.services.Get(s)
 			fmt.Printf("Starting %s...\n", service.GetName())
@@ -76,6 +104,7 @@ func (a *Autopilot) RegisterServices() {
 	service_paths = a.Settings.ValidateEmulators(service_paths)
 
 	a.services.AutoRegister(service_paths)
+
 	a.services.AddDB(a.DB)
 }
 
@@ -87,4 +116,70 @@ func (a *Autopilot) Greeting() {
 	}
 
 	a.greeting.Greeting()
+}
+
+// Converts the text separated by spaces into list items
+func (a *Autopilot) TextToList(in string) (out []string) {
+	out = strings.Fields(in)
+	return out
+}
+
+// Reads the input from the terminal, returns the string
+func (a *Autopilot) ReadInput() (text string) {
+	reader := bufio.NewReader(os.Stdin)
+	text, err := reader.ReadString('\n')
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return text
+}
+
+// Checks if the user wants to provide plugins to run manually
+func (a *Autopilot) CheckRunningMode() (decision bool) {
+	fmt.Print("Run plugins from configuation file? [y/n]")
+
+	for {
+		response := a.ReadInput()
+		response = strings.ToLower(strings.TrimSpace(response))
+
+		if response == "y" || response == "yes" {
+			return true
+		} else if response == "n" || response == "no" {
+			return false
+		} else{
+			fmt.Printf("Please type Yes(y) or No(n) only\n")
+		}
+	}
+}
+
+// Validates if the plugins inputed by the users match the available plugins
+// TODO: print all the invalid plugins not just the first one encountered
+func (a *Autopilot) ValidatePlugin(input_plugins []string) (validated bool){
+	for _, plugin := range input_plugins {
+		validated := a.services.ValidatePluginByName(strings.Title(plugin), a.loaded_plugins)
+		if !validated {
+			fmt.Printf("\n[-] Entered plugin \"%s\" doesn't exist, please enter plugins again... ", plugin)
+			return false
+		}
+	}
+	return true
+}
+
+// Gives which plugins user wants to load in RIoTPot
+func (a *Autopilot) GetPluginsFromUser() (plugins []string) {
+	for {
+		fmt.Printf("\nPlugins available to run ")
+		fmt.Println(a.loaded_plugins)
+		fmt.Print("Enter the plugins to run separated by space: ")
+
+		text := a.ReadInput()
+		plugins = a.TextToList(text)
+		validated := a.ValidatePlugin(plugins)
+		if !validated {
+			continue
+		}
+		break
+	}
+	return plugins
 }
