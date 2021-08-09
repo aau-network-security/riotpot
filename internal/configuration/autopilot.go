@@ -8,10 +8,12 @@ import (
 	"sync"
 	"bufio"
 	"strings"
+	// "os/exec"
 
 	"gorm.io/gorm"
-	"github.com/riotpot/internal/greeting"
 	"github.com/riotpot/pkg/services"
+	"github.com/riotpot/internal/greeting"
+	"github.com/riotpot/tools/environ"
 )
 
 type Autopilot struct {
@@ -53,6 +55,7 @@ func (a *Autopilot) Start() {
 	if a.Settings.Riotpot.Local_build_on == "1" {
 		// check if user want to run via config file or manually input
 		// plugins to run.
+		// _ = a.CheckInteractionMode()
 		running_mode_decision := a.CheckRunningMode()
 
 		// based on the user decision set the plugin running list
@@ -64,6 +67,29 @@ func (a *Autopilot) Start() {
 
 	fmt.Printf("Plugins to run ")
 	fmt.Println(a.plugins_to_run)
+
+	// cmd, err := exec.Command("/bin/sh", "bash.sh").Output()
+	// cmd, err := exec.LookPath("go")	
+	// if err != nil {
+	//     log.Fatalf("[!] Error: %v", err)
+ //    }
+
+ //    output := string(cmd)
+	// fmt.Println(output)
+
+	server := environ.CheckPortBusy("tcp", ":22")
+	if server != true {
+		fmt.Println("Port is busy")
+	}
+	fmt.Println(server)	
+
+	servicePath, exists := environ.GetPath("glider")
+	if exists {
+		_ 	= environ.ExecuteBackgroundCmd(servicePath, "aaa")
+		_ 	= environ.ExecuteCmd(servicePath, "aaa")	
+	} 
+
+	// fmt.Println(demo1)		
 
 	// Check if the starting must be all the registered
 	// or from the `Start` list.
@@ -151,6 +177,26 @@ func (a *Autopilot) CheckRunningMode() (decision bool) {
 			return false
 		} else{
 			fmt.Printf("Please type Yes(y) or No(n) only\n")
+		}
+	}
+}
+
+// Checks in which mode user wants to run RIoTPot
+func (a *Autopilot) CheckInteractionMode() (decision string) {
+	fmt.Print("\nSelect RIoTPot mode, Low-interaction mode, High-interaction mode or Hybrid-mode? [l,h,hy] [low, high, hybrid]")
+
+	for {
+		response := a.ReadInput()
+		response = strings.ToLower(strings.TrimSpace(response))
+
+		if response == "l" || response == "low" {
+			return "low"
+		} else if response == "h" || response == "high" {
+			return "high"
+		} else if response == "hy" || response == "hybrid" {
+			return "hybrid"
+		} else{
+			fmt.Printf("Please type low(l) or high(h) or hybrid(hy) only\n")
 		}
 	}
 }
