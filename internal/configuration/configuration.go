@@ -9,9 +9,9 @@ import (
 	"strings"
 
 	"github.com/gobuffalo/packr"
-	"github.com/riotpot/tools/arrays"
 	environ "github.com/riotpot/tools/environ"
 	errors "github.com/riotpot/tools/errors"
+	arrays "github.com/riotpot/tools/arrays"
 
 	"gopkg.in/yaml.v3"
 )
@@ -50,6 +50,15 @@ func (conf *Settings) Load() (err error) {
 	errors.Raise(err)
 
 	return err
+}
+
+// Retrieve the image name from Images tag
+func (conf *Settings) GetDockerImages() (images []string) {
+	for _, val := range conf.Riotpot.Images {
+		images = append(images, strings.TrimSuffix(arrays.StringToArray(val)[0], ","))
+	}
+
+	return images
 }
 
 // Stores the configuration into the given path in `.yml` format.
@@ -146,8 +155,12 @@ type ConfigRiotpot struct {
 	Emulators []string
 	// List of emulators that must be run at start
 	Start []string
-	// Varoable to check if the run is for local build or not
+	// Variable to check if the run is for local build or not
 	Local_build_on string
+	// Available docker images along with docker name
+	Images []string
+	// Available docker images without docker name
+	Images_to_run []string
 }
 
 // Database configuration structure. It gives an interface to load and access specific databases.

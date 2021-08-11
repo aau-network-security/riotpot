@@ -8,6 +8,8 @@ import (
 	"os/exec"
 	// "os"
 	"log"
+	// "strings"
+	"github.com/riotpot/tools/arrays"
 	// "bytes"
 )
 
@@ -56,13 +58,21 @@ func ExecuteBackgroundCmd(exec1 string, serviceUsed string) string {
 }
 
 // Execute command and return the output, if any
-func ExecuteCmd(Exec string, Service string) (output string) {
-	// var b bytes.Buffer
-	cmd := exec.Command("go", "version")
+func ExecuteCmd(app string, args ...string) (output string) {
+	cmd := exec.Command(app, args...)
     out, err := cmd.CombinedOutput()
     if err != nil {
         log.Fatalf("cmd.Run() failed with %s\n", err)
     }
-    fmt.Println(string(out))
+    // fmt.Println(strings.Fields(string(out)))
+    // fmt.Println(arrays.Contains(arrays.StringToArray(string(out)), "docker-test *"))	
     return string(out)
+}
+
+// Execute command and return the output, if any
+func CheckDockerExists(name string) (bool) {
+	arg := "name="+name
+	cmd := ExecuteCmd("docker", "ps", "-a", "--filter", arg)
+	// Convert the command output to array and check if name exists
+    return arrays.Contains(arrays.StringToArray(cmd), name)
 }

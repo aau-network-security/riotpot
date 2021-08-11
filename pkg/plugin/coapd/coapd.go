@@ -21,6 +21,7 @@ import (
 	"github.com/plgd-dev/go-coap/v2/mux"
 	"github.com/riotpot/pkg/profiles"
 	"github.com/riotpot/pkg/services"
+	"github.com/riotpot/pkg/profiles/ports"
 )
 
 var Name string
@@ -32,7 +33,7 @@ func init() {
 func Coapd() services.Service {
 	mx := services.MixinService{
 		Name:     Name,
-		Port:     5683,
+		Port:     ports.GetPort("coapd"),
 		Running:  make(chan bool, 1),
 		Protocol: "udp",
 	}
