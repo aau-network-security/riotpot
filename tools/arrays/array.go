@@ -1,8 +1,9 @@
 /* Provide a set of tools to interact with arrays and slices */
 package arrays
 
-import "strings"
-
+import (
+	"strings"
+)
 func Contains(in []string, str string) bool {
 	for _, v := range in {
 		if v == str {
@@ -34,3 +35,20 @@ func GetItemPosition(in_array []string, item string) (int) {
 	}
 	return -1
 }
+
+func AddSuffix(in string, suffix string) string {
+	return (in+suffix)
+}
+
+func HasDuplicateItems(array []string) bool {
+	array_map := make(map[string]bool)
+
+	for _, item := range array {
+		if array_map[item] == true {
+			return true
+		}	
+		array_map[item] = true
+	}
+	return false
+}
+

@@ -61,6 +61,21 @@ func (conf *Settings) GetDockerImages() (images []string) {
 	return images
 }
 
+// Retrieve the container uri from Images tag
+func (conf *Settings) GetContainerURI(container string) (uri string) {
+	for _, val := range conf.Riotpot.Images {
+		service := strings.TrimSuffix(arrays.StringToArray(val)[0], ",")
+		if container == service {
+			uri = arrays.StringToArray(val)[1]
+			fmt.Printf("choosen is %q", uri)
+			break
+		}
+	}
+
+	return uri
+}
+
+
 // Stores the configuration into the given path in `.yml` format.
 func (conf *Settings) Save(path string) (err error) {
 	// marshal the content of the configuration into a `.yaml` document

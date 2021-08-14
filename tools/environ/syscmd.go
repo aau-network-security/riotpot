@@ -4,7 +4,7 @@ Package environ provides functions used to interact with the environment
 package environ
 
 import (
-	"fmt"
+	// "fmt"
 	"os/exec"
 	// "os"
 	"log"
@@ -17,19 +17,16 @@ import (
 	Check if the port on the host machine is busy or not
 	this is used for plugins to play on the host
 */
-func GetPath(service string) (servicePath string, exists bool) {
+func GetPath(service string) (servicePath string) {
 	servicePath, err := exec.LookPath(service)
 
 	if err != nil {
-		fmt.Printf("Error in getting service %q not found %q	\n", service, err )
-		exists = false
-		return
+		log.Fatalf("Error in getting service %q with error %q \n", service, err )
 	}
-	exists = true
-	return
+	return servicePath
 }
 
-func ExecuteBackgroundCmd(exec1 string, serviceUsed string) string {
+func ExecuteBackgroundCmd(app string, args ...string) {
 	// executable := &exec.Cmd {
 	// 	Path: Exec,
 	// 	Args: []string{Exec, "version" },
@@ -45,27 +42,55 @@ func ExecuteBackgroundCmd(exec1 string, serviceUsed string) string {
 	// if err != nil {
 	// 	fmt.Printf("Service %q not found	\n", Service)
 	// }
-	cmd := exec.Command("glider", "-config", "demo.config")
+	cmd := exec.Command(app, args...)
 	// cmd.Stdout = os.Stdout
 	// cmd.Stdout = &b
 	err := cmd.Start()
     if err != nil {
-        log.Fatalf("cmd.Run() failed with %s\n", err)
+        log.Fatalf("cmd.Run() for command %q %q failed with %s\n", app, args, err)
     }
-    fmt.Printf("Just ran subprocess %d, exiting\n", cmd.Process.Pid)
+    // fmt.Printf("Just ran subprocess %d, exiting\n", cmd.Process.Pid)
 
-	return ""
+	// return ""
+}
+
+func ExecuteBackgroundCmd1(app string, args ...string) {
+	// executable := &exec.Cmd {
+	// 	Path: Exec,
+	// 	Args: []string{Exec, "version" },
+	// 	Stdout: os.Stdout,
+	// 	Stderr: os.Stdout,
+	// }
+	// var b bytes.Buffer
+	// executable.Stdout = &b
+	// executable.Stderr = &b
+	
+	// err := executable.Run()
+	// fmt.Println(string(b.Bytes()))
+	// if err != nil {
+	// 	fmt.Printf("Service %q not found	\n", Service)
+	// }
+	cmd := exec.Command(app, args...)
+	// cmd.Stdout = os.Stdout
+	// cmd.Stdout = &b
+	err := cmd.Start()
+    if err != nil {
+        log.Fatalf("cmd.Run() for command %q %q failed with %s\n", app, args, err)
+    }
+    // fmt.Printf("Just ran subprocess %d, exiting\n", cmd.Process.Pid)
+
+	// return ""
 }
 
 // Execute command and return the output, if any
 func ExecuteCmd(app string, args ...string) (output string) {
 	cmd := exec.Command(app, args...)
     out, err := cmd.CombinedOutput()
+
     if err != nil {
-        log.Fatalf("cmd.Run() failed with %s\n", err)
+        log.Fatalf("cmd.Run() for command %q %q failed with %s\n", app, args, err)
     }
-    // fmt.Println(strings.Fields(string(out)))
-    // fmt.Println(arrays.Contains(arrays.StringToArray(string(out)), "docker-test *"))	
+
     return string(out)
 }
 

@@ -29,11 +29,12 @@ riotpot:
     - telnetd
     - mqttd
     - coapd
-    - modbusd
+    -   
 
   images:
     - mqtt, eclipse-mosquitto
-    - coap, COAP_IMAGE
+    - modbus, oitc/modbus-server
+    - http, httpd
 
   # Contains a list of available services in the application.
   # This gives the user the ability to navigate or load
