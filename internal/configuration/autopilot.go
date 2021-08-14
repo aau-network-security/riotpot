@@ -9,7 +9,6 @@ import (
 	"bufio"
 	"strconv"
 	"strings"
-	// "os/exec"
 
 	"gorm.io/gorm"
 	"github.com/riotpot/pkg/services"
@@ -56,6 +55,7 @@ func (a *Autopilot) Start() {
 
 	// loads the services which are available for user to run
 	a.loaded_plugins = a.services.GetServicesNames(a.services.GetServices())
+	a.plugins_to_run = a.Settings.Riotpot.Start
 
 	// check if the build is local or containerized
 	if a.Settings.Riotpot.Local_build_on == "1" {
@@ -147,7 +147,6 @@ func (a *Autopilot) Start() {
 			}
 		}
 	}
-
 
 	// Check if the starting must be all the registered
 	// or from the `Start` list.

@@ -94,7 +94,7 @@ func ExecuteCmd(app string, args ...string) (output string) {
     return string(out)
 }
 
-// Execute command and return the output, if any
+// Outputs if docker contianer of the given name exists already
 func CheckDockerExists(name string) (bool) {
 	arg := "name="+name
 	cmd := ExecuteCmd("docker", "ps", "-a", "--filter", arg)
