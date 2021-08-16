@@ -64,16 +64,41 @@ func (conf *Settings) GetDockerImages() (images []string) {
 // Retrieve the container uri from Images tag
 func (conf *Settings) GetContainerURI(container string) (uri string) {
 	for _, val := range conf.Riotpot.Images {
-		service := strings.TrimSuffix(arrays.StringToArray(val)[0], ",")
+		data := strings.Split(val, ",")
+		service := data[0]
 		if container == service {
-			uri = arrays.StringToArray(val)[1]
-			fmt.Printf("choosen is %q", uri)
+			uri = strings.TrimSpace(data[1])
 			break
 		}
 	}
 
 	return uri
 }
+
+// Retrieve the container image IP from Images tag
+func (conf *Settings) GetContainerIP(container string) (ip string) {
+	for _, val := range conf.Riotpot.Images {
+		data := strings.Split(val, ",")
+		image := data[0]
+		if container == image {
+			ip = strings.TrimSpace(data[2])
+			break
+		}
+	}
+
+	return ip
+}
+
+// Retrieve the loaded plugins
+func (conf *Settings) GetLoadedPlugins() (plugins []string) {
+	return conf.Riotpot.Start
+}
+
+// // Retrieve the container uri from Images tag
+// func (conf *Settings) GetRunningMode() (mode string) {
+	
+// 	return conf.Riotpot.Mode
+// }
 
 
 // Stores the configuration into the given path in `.yml` format.
@@ -170,12 +195,16 @@ type ConfigRiotpot struct {
 	Emulators []string
 	// List of emulators that must be run at start
 	Start []string
+	Boot string
 	// Variable to check if the run is for local build or not
 	Local_build_on string
 	// Available docker images along with docker name
 	Images []string
 	// Available docker images without docker name
 	Images_to_run []string
+	// Interaction mode of riotpot used in containazried build
+	Mode string
+	Allowed_modes [] string
 }
 
 // Database configuration structure. It gives an interface to load and access specific databases.

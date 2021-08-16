@@ -1,5 +1,6 @@
 #!/bin/sh
 
+
 # wait for the database to be up
 if [ $DB_HOST ]
 then
