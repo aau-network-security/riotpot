@@ -48,14 +48,14 @@ func (a *Autopilot) Start() {
 	// environ.ExecuteCmd("docker", "")
 	a.wg = sync.WaitGroup{}
 	a.wg.Add(1)
-
+	a.Settings.Riotpot.Start = arrays.StringToArray(a.Settings.Riotpot.Boot)
 	// register all the services plugins
 	a.RegisterPlugins()
 	a.DiscoverImages()
 	// _ = environ.CheckDockerExists("mongodb")
 
 	// loads the services which are available for user to run
-	a.loaded_plugins = a.services.GetServicesNames(a.services.GetServices())
+	a.SetLoadedPlugins()
 	a.plugins_to_run = a.Settings.Riotpot.Start
 
 	// check if the build is local or containerized
@@ -147,6 +147,25 @@ func (a *Autopilot) Start() {
 				a.DeployContainers()
 			}
 		}
+	} else {
+		a.CheckModesFromConfig() 
+		if a.Settings.Riotpot.Mode == "low" {
+			a.plugins_to_run = a.Settings.Riotpot.Start
+			fmt.Printf("\nPlugins to run are ")
+			fmt.Println(a.plugins_to_run)
+		} else if a.Settings.Riotpot.Mode == "high" {
+			fmt.Printf("\nContianers to run are ")
+			fmt.Println(a.Settings.Riotpot.Start_images)
+			a.DeployGlider()
+		} else if a.Settings.Riotpot.Mode == "hybrid" {
+			a.plugins_to_run = a.Settings.Riotpot.Start
+			fmt.Printf("\nPlugins to run are ")
+			fmt.Println(a.plugins_to_run)
+			fmt.Printf("\nContianers to run are ")
+			fmt.Println(a.Settings.Riotpot.Start_images)
+			a.DeployGlider()
+		}
+
 	}
 
 	// Check if the starting must be all the registered
@@ -183,6 +202,20 @@ func (a *Autopilot) available(name string, port int) (available bool) {
 	return true
 }
 
+func (a *Autopilot) CheckModesFromConfig() {
+	mode_received := arrays.StringToArray( a.Settings.Riotpot.Mode)
+
+	if len(mode_received) > 1 {
+		log.Fatalf("\nPlease enter only one mode in Riotpot config mode, i.e. low, high or hybrid\n")
+	} else if len(mode_received) == 0 {
+		log.Fatalf("\nPlease enter atleast one mode in Riotpot config mode, i.e. low, high or hybrid\n")
+	}
+
+	if ! arrays.Contains(a.Settings.Riotpot.Allowed_modes, mode_received[0]) {
+		log.Fatalf("\n %q mode is invalid, only choose low, high or hybrid mode only in Riotpot config\n", mode_received[0])
+	}
+}
+
 // Register the services plugins
 func (a *Autopilot) RegisterPlugins() {
 	a.services = services.Services{}
@@ -191,7 +224,6 @@ func (a *Autopilot) RegisterPlugins() {
 	service_paths = a.Settings.ValidateEmulators(service_paths)
 
 	a.services.AutoRegister(service_paths)
-
 	a.services.AddDB(a.DB)
 }
 
@@ -201,7 +233,11 @@ func (a *Autopilot) DiscoverImages() {
 	fmt.Printf("[+] Found %d docker images \n", len(a.loaded_containers))
 	fmt.Printf("[+] Allowed Docker images ")
 	fmt.Println(a.loaded_containers)
+}
 
+func (a *Autopilot) DiscoverRunningMode() {
+	mode := "[+] Current mode of running is "+ a.Settings.Riotpot.Mode+"\n"
+	fmt.Printf(mode)
 }
 
 // Load the greeting
@@ -244,7 +280,8 @@ func (a *Autopilot) DeployContainers() {
 		port := strconv.Itoa(ports.GetPort(arrays.AddSuffix(container, "d")))
 		port_mapping := port+":"+port
 		app := environ.GetPath("docker")
-		environ.ExecuteBackgroundCmd1(app, "run", "-p", port_mapping, uri )
+		// fmt.Println(app, uri, port )
+		environ.ExecuteBackgroundCmd(app, "run", "-p", port_mapping, uri )
 		fmt.Printf("\nContianer %q, deployed \n", container)
 	}
 }
@@ -255,11 +292,12 @@ func (a *Autopilot) DeployGlider() {
 		port := strconv.Itoa(ports.GetPort(arrays.AddSuffix(container, "d")))
 		protocol := ports.GetProtocol(arrays.AddSuffix(container, "d"))
 		listener := protocol+"://:"+port
-		forwarder := protocol+"://"+ a.remote_host_ip +":"+port
+		remote_ip := a.Settings.GetContainerIP(container)
+		forwarder := protocol+"://"+ remote_ip +":"+port
 		fmt.Println(a.remote_host_ip)
 		
 		app := environ.GetPath("glider")
-		environ.ExecuteCmd(app, "-verbose", "-listen", listener, "-forward", forwarder, "&")
+		environ.ExecuteBackgroundCmd(app, "-verbose", "-listen", listener, "-forward", forwarder, "&")
 	}
 }
 
@@ -326,7 +364,6 @@ func (a *Autopilot) ValidatePlugin(input_plugins []string) (validated bool){
 		fmt.Printf("\n[-] Entered plugins has duplicate entries, please enter again\n")
 		return false
 	}
-
 	for _, plugin := range input_plugins {
 		validated := arrays.Contains(a.loaded_plugins, strings.Title(strings.ToLower(plugin)))
 		if !validated {
@@ -377,6 +414,11 @@ func (a *Autopilot) GetPluginsFromUser() (plugins []string) {
 	}
 
 	return plugins
+}
+
+// Gives which plugins user wants to load in RIoTPot
+func (a *Autopilot) SetLoadedPlugins() {
+	a.loaded_plugins = a.services.GetServicesNames(a.services.GetServices())
 }
 
 // Gives which plugins user wants to load in RIoTPot

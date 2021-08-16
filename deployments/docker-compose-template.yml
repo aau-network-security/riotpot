@@ -83,9 +83,3 @@ services:
       - ../test/pkg/services/mqtt:/riotpot/
     networks:
       honeypot:
-
-  http:
-    image: httpd
-    networks:
-      honeypot:
-        ipv4_address: 10.5.0.12
