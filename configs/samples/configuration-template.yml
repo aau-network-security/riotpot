@@ -44,6 +44,8 @@ riotpot:
     - http, httpd, 10.5.0.12
     # - modbus, oitc/modbus-server, 10.5.0.11
 
+  start_images: mqtt http kota
+
   # Fill the mode, low, high or hybrid, to be used in containerized mode
   mode: low
 

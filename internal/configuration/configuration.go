@@ -205,6 +205,7 @@ type ConfigRiotpot struct {
 	// Interaction mode of riotpot used in containazried build
 	Mode string
 	Allowed_modes [] string
+	Start_images string
 }
 
 // Database configuration structure. It gives an interface to load and access specific databases.

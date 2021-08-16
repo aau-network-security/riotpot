@@ -59,6 +59,8 @@ func main() {
 		fmt.Println(sett.GetDockerImages())
 		fmt.Printf("\n")
 		images := a.GetContainersFromUser()
+		target_change = "s/start_images: "+a.Settings.Riotpot.Start_images+"/start_images: "+strings.Join(images, " ")+"/g"
+		environ.ExecuteCmd("sed","-i", "-e", target_change, "../configs/samples/configuration.yml")
 		FillConfig(images, &a)
 	} else if input_mode == "hybrid" {
 		fmt.Printf("Plugins available to run %q\n", a.Settings.Riotpot.Start)
@@ -72,6 +74,8 @@ func main() {
 		fmt.Println(sett.GetDockerImages())
 		fmt.Printf("\n")
 		images := a.GetContainersFromUser()
+		target_change = "s/start_images: "+a.Settings.Riotpot.Start_images+"/start_images: "+strings.Join(images, " ")+"/g"
+		environ.ExecuteCmd("sed","-i", "-e", target_change, "../configs/samples/configuration.yml")
 		FillConfig(images, &a)
 	}
 	

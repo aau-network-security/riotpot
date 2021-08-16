@@ -155,14 +155,14 @@ func (a *Autopilot) Start() {
 			fmt.Println(a.plugins_to_run)
 		} else if a.Settings.Riotpot.Mode == "high" {
 			fmt.Printf("\nContianers to run are ")
-			fmt.Println(a.containers_to_run)
+			fmt.Println(a.Settings.Riotpot.Start_images)
 			a.DeployGlider()
 		} else if a.Settings.Riotpot.Mode == "hybrid" {
 			a.plugins_to_run = a.Settings.Riotpot.Start
 			fmt.Printf("\nPlugins to run are ")
 			fmt.Println(a.plugins_to_run)
 			fmt.Printf("\nContianers to run are ")
-			fmt.Println(a.containers_to_run)
+			fmt.Println(a.Settings.Riotpot.Start_images)
 			a.DeployGlider()
 		}
 
