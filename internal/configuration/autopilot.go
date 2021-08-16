@@ -154,9 +154,15 @@ func (a *Autopilot) Start() {
 			fmt.Printf("\nPlugins to run are ")
 			fmt.Println(a.plugins_to_run)
 		} else if a.Settings.Riotpot.Mode == "high" {
+			fmt.Printf("\nContianers to run are ")
+			fmt.Println(a.containers_to_run)
 			a.DeployGlider()
 		} else if a.Settings.Riotpot.Mode == "hybrid" {
 			a.plugins_to_run = a.Settings.Riotpot.Start
+			fmt.Printf("\nPlugins to run are ")
+			fmt.Println(a.plugins_to_run)
+			fmt.Printf("\nContianers to run are ")
+			fmt.Println(a.containers_to_run)
 			a.DeployGlider()
 		}
 
@@ -197,7 +203,7 @@ func (a *Autopilot) available(name string, port int) (available bool) {
 }
 
 func (a *Autopilot) CheckModesFromConfig() {
-	mode_received := a.Settings.Riotpot.Mode
+	mode_received := arrays.StringToArray( a.Settings.Riotpot.Mode)
 
 	if len(mode_received) > 1 {
 		log.Fatalf("\nPlease enter only one mode in Riotpot config mode, i.e. low, high or hybrid\n")
@@ -205,7 +211,7 @@ func (a *Autopilot) CheckModesFromConfig() {
 		log.Fatalf("\nPlease enter atleast one mode in Riotpot config mode, i.e. low, high or hybrid\n")
 	}
 
-	if ! arrays.Contains(a.Settings.Riotpot.Allowed_modes, mode_received) {
+	if ! arrays.Contains(a.Settings.Riotpot.Allowed_modes, mode_received[0]) {
 		log.Fatalf("\n %q mode is invalid, only choose low, high or hybrid mode only in Riotpot config\n", mode_received[0])
 	}
 }
@@ -291,7 +297,7 @@ func (a *Autopilot) DeployGlider() {
 		fmt.Println(a.remote_host_ip)
 		
 		app := environ.GetPath("glider")
-		environ.ExecuteCmd(app, "-verbose", "-listen", listener, "-forward", forwarder, "&")
+		environ.ExecuteBackgroundCmd(app, "-verbose", "-listen", listener, "-forward", forwarder, "&")
 	}
 }
 
