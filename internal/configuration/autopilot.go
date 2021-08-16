@@ -154,6 +154,7 @@ func (a *Autopilot) Start() {
 			fmt.Printf("\nPlugins to run are ")
 			fmt.Println(a.plugins_to_run)
 		} else if a.Settings.Riotpot.Mode == "high" {
+			a.plugins_to_run = nil
 			fmt.Printf("\nContianers to run are ")
 			fmt.Println(a.Settings.Riotpot.Start_images)
 			a.DeployGlider()
