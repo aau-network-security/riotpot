@@ -29,7 +29,7 @@ func main() {
 
 	a.Greeting()
 	a.Settings.Riotpot.Start = arrays.StringToArray(a.Settings.Riotpot.Boot_plugins)
-	fmt.Println(a.Settings.Riotpot.Start)
+
 	a.RegisterPlugins()
 	a.DiscoverImages()
 	a.DiscoverRunningMode()
@@ -71,8 +71,9 @@ func main() {
 		environ.ExecuteCmd("sed","-i", "-e", target_change, "../configs/samples/configuration.yml")
 		FillConfig(images, &a)
 	}
-	
-	fmt.Printf("Perfect!, now run the command 'docker-compose -f docker-compose.yml up -d --build'")
+	// Ashi was here, Upon success following will be displayed
+	fmt.Printf("Perfect!, now run the command\n") 
+	fmt.Printf("\tdocker-compose -f docker-compose.yml up -d --build\n")
 }
 
 func FillConfig(images []string, a *configuration.Autopilot) {

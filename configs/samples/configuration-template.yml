@@ -52,9 +52,11 @@ riotpot:
     # - modbus, oitc/modbus-server, 10.5.0.11
 
   # `start` contains a list of services desired to be run
-  # on-start.  
+  # on-start variable used in Riotpot core on runtime only!
   start:
 
+# Following block is setup for the user in case they want to configure which plugin/contianer
+# to run upon starting of Riotpot core bypassing the manual interactive mode
 ##################################################################################################
   #Services which will run at start. For all the services, set `autod` to `true`.
   # enter them separated by space
