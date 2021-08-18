@@ -6,7 +6,6 @@ package environ
 import (
 	"net"
 	"log"
-	// "github.com/riotpot/tools/environ"
 )
 
 /*
@@ -24,6 +23,7 @@ func CheckPortBusy(protocol string, port string) bool {
 	return true
 }
 
+// check if the IP address is valid
 func CheckIPAddress(ip string) bool {
     if net.ParseIP(ip) == nil {
         log.Fatalf("IP Address: %s - Invalid\n", ip)
@@ -33,6 +33,7 @@ func CheckIPAddress(ip string) bool {
     }
 }
 
+// check if IP address is reachable via ping command
 func CheckIPConnection(IP string) {
 	path := GetPath("ping")
 	ExecuteCmd(path, IP, "-c", "2")

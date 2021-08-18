@@ -1,15 +1,13 @@
 package main
 
 import (
-	"fmt"
 	"os"
+	"fmt"
 	"log"
 	"strings"
-	// "gopkg.in/yaml.v3"
-	// "github.com/gobuffalo/packr"
-	errors "github.com/riotpot/tools/errors"
-	"github.com/riotpot/tools/environ"
 	"github.com/riotpot/tools/arrays"
+	"github.com/riotpot/tools/environ"
+	errors "github.com/riotpot/tools/errors"
 	"github.com/riotpot/internal/configuration"
 )
 
@@ -23,25 +21,20 @@ func main() {
 
 	sett, err := configuration.NewSettings()
 	errors.Raise(err)
-	// box := packr.NewBox("../configs/samples")
-	// data, err := box.Find("configuration.yml")
 
-	// err = yaml.Unmarshal(data, &sett)
-
-	// errors.Raise(err)
 	a := configuration.Autopilot{
 		Profile:  profile,
 		Settings: sett,
 	}
 
 	a.Greeting()
-	a.Settings.Riotpot.Start = arrays.StringToArray(a.Settings.Riotpot.Boot)
+	a.Settings.Riotpot.Start = arrays.StringToArray(a.Settings.Riotpot.Boot_plugins)
 	fmt.Println(a.Settings.Riotpot.Start)
 	a.RegisterPlugins()
 	a.DiscoverImages()
 	a.DiscoverRunningMode()
 	a.SetLoadedPlugins()
-	// fmt.Println(a.loaded_plugins)
+
 	input_mode := a.CheckInteractionMode()
 	existing_mode := a.Settings.Riotpot.Mode
 	target_change := "s/mode: "+existing_mode+"/mode: "+input_mode+"/g"
@@ -52,7 +45,7 @@ func main() {
 
 		// user decided to provide plugins manually
 		plugins_selected := a.GetPluginsFromUser()
-		target_change = "s/boot: "+a.Settings.Riotpot.Boot+"/boot: "+strings.Join(plugins_selected, " ")+"/g"
+		target_change = "s/boot_plugins: "+a.Settings.Riotpot.Boot_plugins+"/boot_plugins: "+strings.Join(plugins_selected, " ")+"/g"
 		environ.ExecuteCmd("sed","-i", "-e", target_change, "../configs/samples/configuration.yml")
 	} else if input_mode == "high" {
 		fmt.Printf("\nDocker containers available to run ")
@@ -67,7 +60,7 @@ func main() {
 
 		// user decided to provide plugins manually
 		plugins_selected := a.GetPluginsFromUser()
-		target_change = "s/boot: "+a.Settings.Riotpot.Boot+"/boot: "+strings.Join(plugins_selected, " ")+"/g"
+		target_change = "s/boot_plugins: "+a.Settings.Riotpot.Boot_plugins+"/boot: "+strings.Join(plugins_selected, " ")+"/g"
 		environ.ExecuteCmd("sed","-i", "-e", target_change, "../configs/samples/configuration.yml")
 
 		fmt.Printf("\nDocker containers available to run ")
@@ -109,8 +102,6 @@ func FillConfig(images []string, a *configuration.Autopilot) {
 		_, err = file.WriteString(ip_addr_tag)
 	}
 
-
-	// _, err = file.WriteString("The Go language was conceived in September 2007 by Robert Griesemer, Rob Pike, and Ken Thompson at Google.")
 	if err != nil {
 		log.Fatalf("failed writing to file: %s", err)
 	}

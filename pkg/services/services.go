@@ -5,13 +5,13 @@ package services
 import (
 	"os"
 	"fmt"
-	"path/filepath"
 	"plugin"
 	"strings"
 
+	"gorm.io/gorm"
+	"path/filepath"
 	"github.com/riotpot/tools/errors"
 	"github.com/riotpot/tools/arrays"
-	"gorm.io/gorm"
 )
 
 // Function to get an stored service plugin.

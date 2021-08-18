@@ -15,6 +15,7 @@ riotpot:
   autod: false
   local_build_on: 1
 
+
   # The name of the services is the name of the folder in which the plugin
   # is stored, inside the `pkg/` folder.
   # Example:
@@ -26,28 +27,6 @@ riotpot:
     - low
     - high
     - hybrid
-
-
-  #Services which will run at start. For all the services, set `autod` to `true`.
-  # enter them separated by space
-  boot: httpd echod telnetd mqttd coapd modbusd
-  
-  # `start` contains a list of services desired to be run
-  # on-start.  
-  start:
-
-  # enter the name of the image comma seprated by it's docker registry name
-  # seprated by it's ip address, IP addresses should be in range 10.5.0.10-10.5.0.20
-  # and unique for each contianer image name
-  images:
-    - mqtt, eclipse-mosquitto, 10.5.0.10
-    - http, httpd, 10.5.0.12
-    # - modbus, oitc/modbus-server, 10.5.0.11
-
-  start_images: mqtt http kota
-
-  # Fill the mode, low, high or hybrid, to be used in containerized mode
-  mode: low
 
   # Contains a list of available services in the application.
   # This gives the user the ability to navigate or load
@@ -63,6 +42,30 @@ riotpot:
     - mqttd
     - coapd
     - modbusd
+
+  # enter the name of the image comma separated by it's docker registry name
+  # seprated by it's ip address, IP addresses should be in range 10.5.0.10-10.5.0.20
+  # and unique for each container image name
+  images:
+    - mqtt, eclipse-mosquitto, 10.5.0.10
+    - http, httpd, 10.5.0.12
+    # - modbus, oitc/modbus-server, 10.5.0.11
+
+  # `start` contains a list of services desired to be run
+  # on-start.  
+  start:
+
+##################################################################################################
+  #Services which will run at start. For all the services, set `autod` to `true`.
+  # enter them separated by space
+  boot_plugins: httpd echod telnetd mqttd coapd modbusd
+  
+  # enter the name of the docker images which need to run at Riotpot
+  start_images: mqtt http
+
+  # Fill the mode, low, high or hybrid, to be used in containerized mode only
+  mode: low
+##################################################################################################
 
 # The `databases` object contains a number of object defined database
 # connection information. As the name indicates, `default` will be the default

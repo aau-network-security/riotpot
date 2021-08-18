@@ -8,12 +8,12 @@ import (
 	"strconv"
 	"strings"
 
+	"gopkg.in/yaml.v3"
 	"github.com/gobuffalo/packr"
-	environ "github.com/riotpot/tools/environ"
 	errors "github.com/riotpot/tools/errors"
 	arrays "github.com/riotpot/tools/arrays"
+	environ "github.com/riotpot/tools/environ"
 
-	"gopkg.in/yaml.v3"
 )
 
 func NewSettings() (s Settings, err error) {
@@ -52,7 +52,7 @@ func (conf *Settings) Load() (err error) {
 	return err
 }
 
-// Retrieve the image name from Images tag
+// Retrieve the image name from Images tag in configuration file
 func (conf *Settings) GetDockerImages() (images []string) {
 	for _, val := range conf.Riotpot.Images {
 		images = append(images, strings.TrimSuffix(arrays.StringToArray(val)[0], ","))
@@ -61,7 +61,16 @@ func (conf *Settings) GetDockerImages() (images []string) {
 	return images
 }
 
-// Retrieve the container uri from Images tag
+// Retrieve the image name from Start_images tag in configuration file
+func (conf *Settings) GetDockerImagesToRun() ([]string) {
+	// for _, val := range conf.Riotpot.Start_images {
+	// 	images = append(images, strings.TrimSuffix(arrays.StringToArray(val)[0], ","))
+	// }
+
+	return arrays.StringToArray(conf.Riotpot.Start_images)
+}
+
+// Retrieve the container uri from Images tag in configuration file
 func (conf *Settings) GetContainerURI(container string) (uri string) {
 	for _, val := range conf.Riotpot.Images {
 		data := strings.Split(val, ",")
@@ -75,7 +84,7 @@ func (conf *Settings) GetContainerURI(container string) (uri string) {
 	return uri
 }
 
-// Retrieve the container image IP from Images tag
+// Retrieve the container image IP from Images tag in configuration file
 func (conf *Settings) GetContainerIP(container string) (ip string) {
 	for _, val := range conf.Riotpot.Images {
 		data := strings.Split(val, ",")
@@ -89,17 +98,10 @@ func (conf *Settings) GetContainerIP(container string) (ip string) {
 	return ip
 }
 
-// Retrieve the loaded plugins
+// Retrieve the loaded plugins, i.e. plugins which are loaded in the system
 func (conf *Settings) GetLoadedPlugins() (plugins []string) {
 	return conf.Riotpot.Start
 }
-
-// // Retrieve the container uri from Images tag
-// func (conf *Settings) GetRunningMode() (mode string) {
-	
-// 	return conf.Riotpot.Mode
-// }
-
 
 // Stores the configuration into the given path in `.yml` format.
 func (conf *Settings) Save(path string) (err error) {
@@ -193,18 +195,19 @@ type ConfigRiotpot struct {
 	// List of emulators that the application can access to.
 	// This list will be evaluated against the `/emulators/` dir content.
 	Emulators []string
-	// List of emulators that must be run at start
+	// List of plugins used for Riotpot to manage runtime plugins
 	Start []string
-	Boot string
+	// Plugins which are booted in the system to run, supplied by user
+	Boot_plugins string
 	// Variable to check if the run is for local build or not
 	Local_build_on string
-	// Available docker images along with docker name
+	// Available docker images along with docker registry name and ip address(for contianerized runs)
 	Images []string
-	// Available docker images without docker name
-	Images_to_run []string
-	// Interaction mode of riotpot used in containazried build
+	// Interaction mode of Riotpot, used in containazried build
 	Mode string
+	// Modes of operation which are currently supported by Riotpot 
 	Allowed_modes [] string
+	// Container images which are finalized to run in the Riotpot run
 	Start_images string
 }
 

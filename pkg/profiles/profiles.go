@@ -6,16 +6,16 @@
 package profiles
 
 import (
-	"fmt"
-	"math/rand"
 	"os"
-	"strconv"
-	"strings"
+	"fmt"
 	"time"
+	"strings"
+	"strconv"
+	"math/rand"
 
+	"gopkg.in/yaml.v3"
 	"github.com/google/uuid"
 	"github.com/riotpot/tools/errors"
-	"gopkg.in/yaml.v3"
 )
 
 const (

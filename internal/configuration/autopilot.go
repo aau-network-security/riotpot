@@ -11,12 +11,12 @@ import (
 	"strings"
 
 	"gorm.io/gorm"
-	"github.com/riotpot/pkg/services"
 	
-	"github.com/riotpot/pkg/profiles/ports"
+	"github.com/riotpot/pkg/services"
 	"github.com/riotpot/tools/arrays"
 	"github.com/riotpot/tools/environ"
 	"github.com/riotpot/internal/greeting"
+	"github.com/riotpot/pkg/profiles/ports"
 )
 
 type Autopilot struct {
@@ -48,7 +48,7 @@ func (a *Autopilot) Start() {
 	// environ.ExecuteCmd("docker", "")
 	a.wg = sync.WaitGroup{}
 	a.wg.Add(1)
-	a.Settings.Riotpot.Start = arrays.StringToArray(a.Settings.Riotpot.Boot)
+	a.Settings.Riotpot.Start = arrays.StringToArray(a.Settings.Riotpot.Boot_plugins)
 	// register all the services plugins
 	a.RegisterPlugins()
 	a.DiscoverImages()
@@ -59,63 +59,63 @@ func (a *Autopilot) Start() {
 	a.plugins_to_run = a.Settings.Riotpot.Start
 
 	// check if the build is local or containerized
-	if a.Settings.Riotpot.Local_build_on == "1" {
+	if a.Settings.Riotpot.Local_build_on == "1" { // User is running the Riotpot in local build mode
+		
+		// check if user want to run via config file or manually input
 		a.interaction_mode = a.CheckInteractionMode()
 
 		if a.interaction_mode == "low" {
-			// check if user want to run via config file or manually input
-			// plugins to run.
+			// check if user want to run plugins via config file or manual input
 			running_mode_decision := a.CheckRunningMode()
 
-			// based on the user decision set the plugin running list
-			if running_mode_decision == "manual" {
+			if running_mode_decision == "manual" { // User has decided to provide plugins to run in interactive/manual way
+				
+				// user needs to choose which plugins to choose from this list 
 				fmt.Printf("Plugins available to run ")
 				fmt.Println(a.loaded_plugins)
 
-				// user decided to provide plugins manually
+				// user inputs the plugins to run
 				a.plugins_to_run = a.GetPluginsFromUser()
+				fmt.Println(a.plugins_to_run)
 			} else {
 				a.plugins_to_run = a.Settings.Riotpot.Start
 				fmt.Printf("\nPlugins to run are ")
 				fmt.Println(a.plugins_to_run)
 				if !a.ValidatePlugin(a.plugins_to_run) {
-					log.Fatalf("\nPlease check the config file\n")
+					log.Fatalf("\nPlease check the config file, and try again\n")
 				}
 			}
 		} else if a.interaction_mode == "high" {
 			// reset the plugins since in high interaction mode local plugins are not to run
 			a.plugins_to_run = nil
-			running_mode_decision := a.CheckContainersRunMode()
+			// check if user wants to provide containers to run via config file or input them manually
+			running_mode_decision := a.CheckRunningMode()
+
 			if running_mode_decision == "manual" {
 				fmt.Printf("\nDocker containers available to run ")
 				fmt.Println(a.loaded_containers)
 				fmt.Printf("\n")
 
-				// User decided to provide containers manually
+				// User decided to provide containers manually, internally checks if the containers provided are valid or not
 				a.containers_to_run = a.GetContainersFromUser()
 				a.CheckContainerPort()
-				// fmt.Printf("\nInput the remote host IP address and docker context name, separated by spaces ")
-				// response := a.ReadInput()
-				// response = strings.ToLower(strings.TrimSpace(response))
-				// response_array := arrays.StringToArray(response)
-				// environ.CheckIPConnection(response_array[0])
-				// a.remote_host_ip = response_array[0]
-				// a.ValidateDefaultDockerContext(response_array[1])
 				a.DeployContainers()
 			} else {
-				a.containers_to_run = a.Settings.GetDockerImages()
-				fmt.Printf("\nContianers to run are ")
+				a.containers_to_run = a.Settings.GetDockerImagesToRun()
+				fmt.Printf("\nContainers to run are ")
 				fmt.Println(a.containers_to_run)
+
 				if !a.ValidateContainers(a.containers_to_run) {
-					log.Fatalf("\nPlease check the config file\n")
+					log.Fatalf("\nPlease check the config file, and try again\n")
 				}
 
+				// check if the port which containers require to run is free on host machine  
 				a.CheckContainerPort()
 				a.DeployContainers()
 			}
 		} else {
 			// Hybrid mode
-			running_mode_decision := a.CheckContainersRunMode()
+			running_mode_decision := a.CheckRunningMode()
 			if running_mode_decision == "manual" {
 				fmt.Printf("\nPlugins available to run ")
 				fmt.Println(a.loaded_plugins)
@@ -130,48 +130,65 @@ func (a *Autopilot) Start() {
 				a.DeployContainers()
 			} else {
 				a.plugins_to_run = a.Settings.Riotpot.Start
-				a.containers_to_run = a.Settings.GetDockerImages()
+				a.containers_to_run = a.Settings.GetDockerImagesToRun()
 
 				fmt.Printf("\nPlugins to run are ")
 				fmt.Println(a.plugins_to_run)
-				fmt.Printf("\nContianers to run are ")
+				fmt.Printf("\nConainers to run are ")
 				fmt.Println(a.containers_to_run)
 
 				if !a.ValidatePlugin(a.plugins_to_run) {
-					log.Fatalf("\nPlease check the config file\n")
+					log.Fatalf("\nPlease check the config file, and try again\n")
 				}
 				if !a.ValidateContainers(a.containers_to_run) {
-					log.Fatalf("\nPlease check the config file\n")
+					log.Fatalf("\nPlease check the config file, and try again\n")
 				}
 				a.CheckContainerPort()
 				a.DeployContainers()
 			}
 		}
 	} else {
-		a.CheckModesFromConfig() 
+		// check which mode of run is set by user
+		a.CheckModesFromConfig()
+
 		if a.Settings.Riotpot.Mode == "low" {
 			a.plugins_to_run = a.Settings.Riotpot.Start
 			fmt.Printf("\nPlugins to run are ")
 			fmt.Println(a.plugins_to_run)
+
+			if !a.ValidatePlugin(a.plugins_to_run) {
+					log.Fatalf("\nPlease check the config file, and try again\n")
+			}
 		} else if a.Settings.Riotpot.Mode == "high" {
 			a.plugins_to_run = nil
-			fmt.Printf("\nContianers to run are ")
+			fmt.Printf("\nContainers to run are ")
 			fmt.Println(a.Settings.Riotpot.Start_images)
+
+			if !a.ValidateContainers(a.containers_to_run) {
+					log.Fatalf("\nPlease check the config file, and try again\n")
+			}
+
+			// glider forwards all the traffic on specific port to the respective service container
 			a.DeployGlider()
 		} else if a.Settings.Riotpot.Mode == "hybrid" {
 			a.plugins_to_run = a.Settings.Riotpot.Start
 			fmt.Printf("\nPlugins to run are ")
 			fmt.Println(a.plugins_to_run)
-			fmt.Printf("\nContianers to run are ")
+			fmt.Printf("\nContainers to run are ")
 			fmt.Println(a.Settings.Riotpot.Start_images)
+
+			if !a.ValidatePlugin(a.plugins_to_run) {
+					log.Fatalf("\nPlease check the config file, and try again\n")
+			}
+
+			if !a.ValidateContainers(a.containers_to_run) {
+					log.Fatalf("\nPlease check the config file, and try again\n")
+			}
 			a.DeployGlider()
 		}
-
 	}
 
-	// Check if the starting must be all the registered
-	// or from the `Start` list.
-	
+	// runs the Riotpot core
 	if a.Settings.Riotpot.Autod {
 		a.services.RunAll()
 	} else {
@@ -203,8 +220,9 @@ func (a *Autopilot) available(name string, port int) (available bool) {
 	return true
 }
 
+// check which interaction mode in supplied by the user from config file 
 func (a *Autopilot) CheckModesFromConfig() {
-	mode_received := arrays.StringToArray( a.Settings.Riotpot.Mode)
+	mode_received := arrays.StringToArray(a.Settings.Riotpot.Mode)
 
 	if len(mode_received) > 1 {
 		log.Fatalf("\nPlease enter only one mode in Riotpot config mode, i.e. low, high or hybrid\n")
@@ -228,7 +246,7 @@ func (a *Autopilot) RegisterPlugins() {
 	a.services.AddDB(a.DB)
 }
 
-// Discover the docker images available
+// Discover the available docker images
 func (a *Autopilot) DiscoverImages() {
 	a.loaded_containers = a.Settings.GetDockerImages()
 	fmt.Printf("[+] Found %d docker images \n", len(a.loaded_containers))
@@ -236,6 +254,7 @@ func (a *Autopilot) DiscoverImages() {
 	fmt.Println(a.loaded_containers)
 }
 
+// Displays which is the current Riotpot running mode, i.e. low, high or hybrid
 func (a *Autopilot) DiscoverRunningMode() {
 	mode := "[+] Current mode of running is "+ a.Settings.Riotpot.Mode+"\n"
 	fmt.Printf(mode)
@@ -251,7 +270,7 @@ func (a *Autopilot) Greeting() {
 	a.greeting.Greeting()
 }
 
-// Reads the input from the terminal, returns the string
+// Reads the input from the terminal, returns string
 func (a *Autopilot) ReadInput() (text string) {
 	reader := bufio.NewReader(os.Stdin)
 	text, err := reader.ReadString('\n')
@@ -267,23 +286,23 @@ func (a *Autopilot) ReadInput() (text string) {
 func (a *Autopilot) CheckContainerPort() {
 	for _, container := range a.containers_to_run {
 		port := ports.GetPort(arrays.AddSuffix(container, "d"))
-		// Change the Port from int to string
+		// Convert the Port from int to string
 		if environ.CheckPortBusy(ports.GetProtocol(arrays.AddSuffix(container, "d")) , strconv.Itoa(port)) == false {
 			log.Fatalf("[-] Port %d of Container %q is already busy on host, please free it first!", port, container)
 		}
 	}
 }
 
-// Deploy containers on docker host
+// Deploy containers on host machine
 func (a *Autopilot) DeployContainers() {
 	for _, container := range a.containers_to_run {
 		uri := a.Settings.GetContainerURI(container)
+		// get the port number of a given container, currently all container must have an entry in ports file
 		port := strconv.Itoa(ports.GetPort(arrays.AddSuffix(container, "d")))
 		port_mapping := port+":"+port
 		app := environ.GetPath("docker")
-		// fmt.Println(app, uri, port )
 		environ.ExecuteBackgroundCmd(app, "run", "-p", port_mapping, uri )
-		fmt.Printf("\nContianer %q, deployed \n", container)
+		fmt.Printf("\nContainer %q, deployed \n", container)
 	}
 }
 
@@ -302,27 +321,9 @@ func (a *Autopilot) DeployGlider() {
 	}
 }
 
-// Checks if the user wants to provide plugins to run manually
+// Interactively checks if the user wants to provide plugins to run manually
 func (a *Autopilot) CheckRunningMode() (string) {
 	fmt.Print("Run plugins from configuation file? [y/n]")
-
-	for {
-		response := a.ReadInput()
-		response = strings.ToLower(strings.TrimSpace(response))
-
-		if response == "y" || response == "yes" {
-			return "config"
-		} else if response == "n" || response == "no" {
-			return "manual"
-		} else{
-			fmt.Printf("Please type Yes(y) or No(n) only\n")
-		}
-	}
-}
-
-// Checks if the user wants to run containers manually
-func (a *Autopilot) CheckContainersRunMode() (string) {
-	fmt.Print("Run containers from configuation file? [y/n]")
 
 	for {
 		response := a.ReadInput()
@@ -358,14 +359,14 @@ func (a *Autopilot) CheckInteractionMode() (decision string) {
 	}
 }
 
-// Validates if the plugins inputed by the user matches the available plugins
+// Validates if the plugins to run matches the available plugins
 // TODO: print all the invalid plugins not just the first one encountered
-func (a *Autopilot) ValidatePlugin(input_plugins []string) (validated bool){
-	if arrays.HasDuplicateItems(input_plugins){
+func (a *Autopilot) ValidatePlugin(in_plugins []string) (validated bool){
+	if arrays.HasDuplicateItems(in_plugins){
 		fmt.Printf("\n[-] Entered plugins has duplicate entries, please enter again\n")
 		return false
 	}
-	for _, plugin := range input_plugins {
+	for _, plugin := range in_plugins {
 		validated := arrays.Contains(a.loaded_plugins, strings.Title(strings.ToLower(plugin)))
 		if !validated {
 			fmt.Printf("\n[-] Entered plugin \"%s\" doesn't exist, please enter plugins again... \n", plugin)
@@ -376,15 +377,15 @@ func (a *Autopilot) ValidatePlugin(input_plugins []string) (validated bool){
 	return true
 }
 
-// Validates if the containers inputed by the users match the loaded containers
+// Validates if the containers to run matches the loaded containers
 // TODO: print all the invalid containers not just the first one encountered
-func (a *Autopilot) ValidateContainers(input_containers []string) (validated bool){
-	if arrays.HasDuplicateItems(input_containers){
+func (a *Autopilot) ValidateContainers(in_containers []string) (validated bool){
+	if arrays.HasDuplicateItems(in_containers){
 		fmt.Printf("\n[-] Entered containers has duplicate entries, please enter again\n")
 		return false
 	}
 
-	for _, container := range input_containers {
+	for _, container := range in_containers {
 		validated := arrays.Contains( a.loaded_containers, strings.ToLower(container))
 		if !validated {
 			fmt.Printf("\n[-] Entered container \"%s\" doesn't exist, please enter plugins again... \n", container)
@@ -399,7 +400,7 @@ func (a *Autopilot) ValidateContainers(input_containers []string) (validated boo
 	return true
 }
 
-// Gives which plugins user wants to load in RIoTPot
+// Interactively gets which plugins user wants to load in RIoTPot
 func (a *Autopilot) GetPluginsFromUser() (plugins []string) {
 	for {
 		fmt.Print("Enter the plugins to run separated by space: ")
@@ -417,12 +418,7 @@ func (a *Autopilot) GetPluginsFromUser() (plugins []string) {
 	return plugins
 }
 
-// Gives which plugins user wants to load in RIoTPot
-func (a *Autopilot) SetLoadedPlugins() {
-	a.loaded_plugins = a.services.GetServicesNames(a.services.GetServices())
-}
-
-// Gives which plugins user wants to load in RIoTPot
+// Interactively gets which container user wants to load in RIoTPot
 func (a *Autopilot) GetContainersFromUser() (containers []string) {
 	for {
 		fmt.Print("Enter the containers to run separated by space: ")
@@ -439,8 +435,12 @@ func (a *Autopilot) GetContainersFromUser() (containers []string) {
 	return containers
 }
 
+// Gives which plugins user wants to load in RIoTPot
+func (a *Autopilot) SetLoadedPlugins() {
+	a.loaded_plugins = a.services.GetServicesNames(a.services.GetServices())
+}
 
-// Validates if the given docker context exists and set to default
+// Validates if the given docker context exists and if it is set to default
 func (a *Autopilot) ValidateDefaultDockerContext(to_check string)  {
 	path := environ.GetPath("docker")
 	cmd_output	:= environ.ExecuteCmd(path, "context" , "ls")

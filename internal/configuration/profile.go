@@ -8,12 +8,12 @@ package configuration
 import (
 	"os"
 
+	"gopkg.in/yaml.v3"
 	"github.com/gobuffalo/packr"
 	"github.com/riotpot/internal/cli"
 	"github.com/riotpot/internal/greeting"
 	errors "github.com/riotpot/tools/errors"
 
-	"gopkg.in/yaml.v3"
 )
 
 func NewProfile() (p Profile, err error) {
