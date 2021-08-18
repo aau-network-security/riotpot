@@ -58,13 +58,13 @@ riotpot:
 ##################################################################################################
   #Services which will run at start. For all the services, set `autod` to `true`.
   # enter them separated by space
-  boot: coapd telnetd modbusd
+  boot_plugins: httpd echod telnetd mqttd coapd modbusd
   
   # enter the name of the docker images which need to run at Riotpot
   start_images: mqtt http
 
   # Fill the mode, low, high or hybrid, to be used in containerized mode only
-  mode: hybrid
+  mode: low
 ##################################################################################################
 
 # The `databases` object contains a number of object defined database

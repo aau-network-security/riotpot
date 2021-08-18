@@ -83,15 +83,3 @@ services:
       - ../test/pkg/services/mqtt:/riotpot/
     networks:
       honeypot:
-
-  mqtt:
-    image: eclipse-mosquitto
-    networks:
-      honeypot:
-        ipv4_address: 10.5.0.10
-
-  http:
-    image: httpd
-    networks:
-      honeypot:
-        ipv4_address: 10.5.0.12
