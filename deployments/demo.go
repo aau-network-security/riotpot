@@ -60,7 +60,7 @@ func main() {
 
 		// user decided to provide plugins manually
 		plugins_selected := a.GetPluginsFromUser()
-		target_change = "s/boot_plugins: "+a.Settings.Riotpot.Boot_plugins+"/boot: "+strings.Join(plugins_selected, " ")+"/g"
+		target_change = "s/boot_plugins: "+a.Settings.Riotpot.Boot_plugins+"/boot_plugins: "+strings.Join(plugins_selected, " ")+"/g"
 		environ.ExecuteCmd("sed","-i", "-e", target_change, "../configs/samples/configuration.yml")
 
 		fmt.Printf("\nDocker containers available to run ")

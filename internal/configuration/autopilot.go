@@ -45,14 +45,13 @@ func (a *Autopilot) Start() {
 	// Say Hi, don't be rude!
 	a.Greeting()
 
-	// environ.ExecuteCmd("docker", "")
 	a.wg = sync.WaitGroup{}
 	a.wg.Add(1)
 	a.Settings.Riotpot.Start = arrays.StringToArray(a.Settings.Riotpot.Boot_plugins)
+
 	// register all the services plugins
 	a.RegisterPlugins()
 	a.DiscoverImages()
-	// _ = environ.CheckDockerExists("mongodb")
 
 	// loads the services which are available for user to run
 	a.SetLoadedPlugins()
