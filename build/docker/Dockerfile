@@ -16,6 +16,11 @@ COPY go.sum .
 # download all the dependencies
 RUN go mod download
 
+# download and install glider
+RUN wget https://github.com/nadoo/glider/releases/download/v0.15.0/glider_0.15.0_linux_amd64.tar.gz
+
+RUN tar -xzf glider_0.15.0_linux_amd64.tar.gz && cd glider_0.15.0_linux_amd64 && cp glider /usr/bin/
+
 # install netcat so we can ping the db until it is ready
 RUN apt-get update && apt-get install -y netcat
 

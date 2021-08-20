@@ -160,6 +160,7 @@ func (a *Autopilot) Start() {
 			}
 		} else if a.Settings.Riotpot.Mode == "high" {
 			a.plugins_to_run = nil
+			a.containers_to_run = a.Settings.GetDockerImagesToRun()
 			fmt.Printf("\nContainers to run are ")
 			fmt.Println(a.Settings.Riotpot.Start_images)
 
@@ -169,6 +170,7 @@ func (a *Autopilot) Start() {
 
 			// glider forwards all the traffic on specific port to the respective service container
 			a.DeployGlider()
+
 		} else if a.Settings.Riotpot.Mode == "hybrid" {
 			a.plugins_to_run = a.Settings.Riotpot.Start
 			fmt.Printf("\nPlugins to run are ")
@@ -316,7 +318,8 @@ func (a *Autopilot) DeployGlider() {
 		fmt.Println(a.remote_host_ip)
 		
 		app := environ.GetPath("glider")
-		environ.ExecuteBackgroundCmd(app, "-verbose", "-listen", listener, "-forward", forwarder, "&")
+		
+		environ.ExecuteBackgroundCmd(app, "-verbose", "-listen", listener, "-forward", forwarder)
 	}
 }
 
