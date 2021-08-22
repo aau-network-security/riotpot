@@ -2,9 +2,9 @@
 package main
 
 import (
-	"github.com/riotpot/internal/configuration"
-	"github.com/riotpot/internal/database"
 	"github.com/riotpot/tools/errors"
+	"github.com/riotpot/internal/database"
+	"github.com/riotpot/internal/configuration"
 )
 
 // `main` starts all the submodules containing the emulator services.
