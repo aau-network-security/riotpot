@@ -17,19 +17,24 @@ ___
 - [1. Description](#1-description)
 - [2. Requirements](#2-requirements) 
 - [3. Installation](#3-installation)
-  - [3.1 Docker](#31-docker)
-    - [3.1.1 Docker Hub Image](#311-docker-hub-image)
-  - [3.2 Local](#32-local)
+  - [3.1 Local Build](#31-local-build)
+  - [3.2 Containerized Build](#32-containerized-build)
+  - [3.3 Via Docker Hub Image](#33-via-docker-hub-image)
 - [4. Documentation](#4-documentation)
 - [5. Easy Access](#5-easy-access)
 
 ## 1. Description
 
-RIoTPot is an interoperable medium interaction honeypot, primarily focused on the emulation IoT and OT protocols, although, it is also capable of emulating other services.
+RIoTPot is an interoperable high interaction honeypot, primarily focused on the emulation IoT and OT protocols, although, it is also capable of emulating other services. Alongside, it also supports low and hybrid interaction modes.
 
-This services are loaded in the honeypot in the form of plugins, making RIoTPot a modular, and very transportable honeypot. The services are loaded at runtime, meaning that the weight of the honeypot will vary on premisses, and the services loaded e.g. HTTP, will only be used when required. As consequence, we highly recommend building your own binary customized to your own needs. Refer to the following section, Installation, for more information.
+Services are loaded in the honeypot in form of plugins and containers making RIoTPot a modular, and very transportable honeypot. The services are loaded at runtime, meaning that the weight of the honeypot will vary on premisses, and the services loaded e.g. HTTP, will only be used when required. As consequence, we highly recommend building your own binary customized to your own needs. Refer to the following section, Installation, for more information. Plugins are locally emulated binaries which mimic the protocol behavior. On the other hand, docker containers of a particular service acts as a sandboxed plugin. 
 
 ## 2. Requirements
+Make sure that you abide by the following software and platform requirements before running the riotpot,
+
+- Ubuntu 18.04 or higher 
+- gcc 9.3.0 or higher
+- GNU make 4.2.1 or higher
 - Go version go1.16.4 or higher
 - PostgreSQL 12.7 or higher, having a user named as `superuser` and password as `password`
 - Docker version 20.10.2 or higher
@@ -41,86 +46,116 @@ Although one can download the binaries and configuration files containing the se
 
 We thrive on the idea of making RIoTPot highly transportable, therefore, in this section one can find multiple methods of installation for diverse environments that fit a broad list of requirements and constrains.
 
-We highly recommend running RiotPot in a virtualized self-contained network using `Docker`, for which we included configuration files that run the honeypot as a closed environment for testing and playing around (similar to a testbed environment).
+There are multiple ways to run Riotpot, one can choose to go for local build mode or containerized mode. In local build mode the Riotpot core runs on host machine and has options to run IoT, OT or other protocols both in local plugins or as a separate containerized service. Running RiotPot in a virtualized/containerized self-contained network mode using `Docker` is highly reommended.
 
-> **NOTE:** The production image can be pulled from Docker Hub. If you choose this method you may directly jump to [2.1 Docker](#21-docker).
-<!-- Not implemented yet, include section for the Docker Image pulling and building -->
+<!-- > **NOTE:** The production image can be pulled from Docker Hub. If you choose this method you may directly jump to [2.1 Docker](#21-docker).
+ -->
 
-RIoTPot is written in Golang, therefore, you will need to have [go](https://golang.org) installed first if you plan to make any changes, otherwise you can skip steps 1 and 2 if you rather not installing go. 
-
-Regardless, you will need to copy RIoTPot to local:
+Follow the steps to get the Riotpot project first:
 
 ```bash
-# 1. Make the folder in where the repository will be stored.
-$ mkdir -p $GOPATH/src/github.com
-
-# 2. Navigate to the folder in where you store your repositories
-$ mkdir -p $GOPATH/src/github.com
-
-# 3. Clone the repository
+# 1. Clone the repository
 $ git clone git@github.com:aau-network-security/riotpot.git
 
-# 4. Navigate to the newly created folder with the repository
+# 2. Navigate to the newly created directory with the repository
 $ cd riotpot
 ```
+### 3.1 Local Build
 
-### 3.1 Docker
+To build Riotpot locally, follow the steps:
 
-We assume you have basic knowledge about the Docker ecosystem, otherwise please refer first to the Docker documentation [here](https://docs.docker.com).
-
-At the deployments folder of RToTPot there is one **docker-compose** files:
 ```bash
-$ cd ~/riotpot/deployments | ls -al
-...
--rw-r--r--  docker-compose.yml
-...
+# Running the following command from riotpot directory will compile the necessary plugins and binaries
+# and put it in the standard go path as well as in current directory.
+$ make riotpot-build-local
+
+# Command will run the Riotpot locally
+$ ./riotpot
+```
+![Local Build](https://github.com/aau-network-security/riotpot/blob/master/internal/media/local_build.gif?raw=true)
+
+Upon running, user needs to select the mode of interaction, in Low mode, all plugins run locally as binaries, in High mode, the selected services run in separate container, and, in Hybrid mode, mix of Low and High i.e. some services locally and some inside containers.
+
+In every mode, there is an option to run the services directly from reading the configuration file located at `config/samples/configuration.yml`
+
+![Config file](https://github.com/aau-network-security/riotpot/blob/master/internal/media/configuration_file.png?raw=true)
+
+By editing the ``boot_plugins`` tag, services to run as binaries inside can be provided, see ``emulators`` tag in the same configuration file to input allowed service plugins only
+
+By editing the ``start_images`` tag, services to run inside a container can be provided, see ``images`` tag in the same configuration file to input allowed container images only
+
+> **Not for Local build**, by editing ``mode`` tag, the riotpot running mode can be provided  
+
+To exit the Riotpot in it's running state at any time press ``Ctrl + C``
+
+### 3.2 Containerized Build
+
+In containerized build, Riotpot core is also deployed inside a container and forwards traffic to the other services.
+
+To build inside containers, follow the steps:
+
+```bash
+# Assuming user is at root directory of the Riotpot github repository
+$ cd riotpot/deployments
+
+# Run the command to enter the interactive mode to choose services to run
+$ go run interactive_deployer.go
 ```
 
-This file correspond to the respective software development environment *development*.
+![Containerized Build](https://github.com/aau-network-security/riotpot/blob/master/internal/media/containerized_build.gif?raw=true)
 
-**Development.**
-`docker-compose.yml` builds the project in a private virtual network in which there are three hosts: *riotpot*, *postgres*,and *tcpdump*. **Postgres** contains a postgres database, **tcpdump** contains a packet capturer, and **riotpot** the app itself. They can only communicate with the each other. Use this setup for **development** and **testing locally** by typing in your a terminal:
+Upon choosing modes and services correctly, following message will be displayed:
+```
+Perfect!, now run the command
+  docker-compose -f docker-compose.yml up -d --build
+
+```
 
 ```bash
+# This will setup the container environment and run the services along
+# with database and other useful containers
 $ docker-compose -f docker-compose.yml up -d --build
 ```
 
-Once you are done with the honeypot, you can put down the containers using the *down* command. 
+To check if the containers are correctly setup, check with the following command and see,
+if ``riotpot:development`` and other selected services containers are up and running.
 
-```bash
+#### Alternatively
+
+One can also setup the Containerized Riotpot through config file located at, `config/samples/configuration.yml`
+
+![Config file](https://github.com/aau-network-security/riotpot/blob/master/internal/media/configuration_file.png?raw=true)
+
+By editing the ``boot_plugins`` tag, services to run as binaries inside can be provided, see ``emulators`` tag in the same configuration file to input allowed service plugins only
+
+By editing the ``start_images`` tag, services to run inside a contaianer can be provided, see ``images`` tag in the same configuration file to input allowed container images only
+
+By editing ``mode`` tag, the riotpot running mode can be provided, see ``allowed_modes`` tag in the same configuration file to input allowed modes only
+
+To stop the Riotpot in Containerized mode use the following command:
+
+``` bash
 $ docker-compose down -v
-```
+``` 
 
 > **NOTE:** Using the *-v* tag will remove all the mounted volumes, i.e. the database used by riotpot to store information and the volumes mounted to store logs and binaries collected by the honeypot. Remember to make copies before using the *-v* tag, or skip it altogether.
 
-#### 3.1.1 Docker Hub Image
+### 3.3 Via Docker Hub Image
 
 Build the latest release of RiotPot directly from the image provided in the Docker Hub:
+
+```bash
+# Command will compile the necessary plugins and binaries and put it in the standard go path as well as in current directory.
+$ make riotpot-build-local
+
+# Command will run the Riotpot locally
+$ ./riotpot
+```
 
 ```bash
 # Grab and run the latest release of the riotpot consumer image
 # detached from the console with -d.
 $ docker run -d riotpot-docker:latest
-```
-
-### 3.2 Local
-
-To build your own binary from source, navigate to the folder where you have stored the repository and run the following command on terminal:
-
-```bash
-$ make riotpot-build-local
-```
-Above command will build a riotpot binary file in current directoy also install the binary on your linux system GOPATH binary directory.
-
-```bash
-# To check the local GOPATH directory
-$ go env GOPATH
-```
-Make sure that the GOPATH/bin is in your $PATH enviornment variable.
-
-Run the binary as any other application from anywhere since the binary is installed in the GOPATH binary directory:
-```bash
-$ riotpot
 ```
 
 ## 4. Documentation

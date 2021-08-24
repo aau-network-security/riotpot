@@ -4,6 +4,16 @@
 # a volume mounted with the code to see changes on the go.
 version: "3.8"
 
+volumes:
+  postgres_data:
+
+networks:
+  honeypot:
+    name: honeypot
+    ipam:
+      config:
+        - subnet: 10.5.0.0/16
+        
 services:
 
   # Tcpdump host that stores all the stuff that happens
@@ -38,14 +48,12 @@ services:
       # Ports under 60 might see errors when unquoted
       # https://stackoverflow.com/questions/58810789/quotes-on-docker-compose-yml-ports-make-any-difference
       - "7:7"
-      # TODO: causes problems with existing ssh connections
       # - "22:22"
       - "23:23"
       - "502:502"
       - "8080:8080"
       - "1883:1883"
       - "5683:5683"
-      - "27017:27017"
     env_file:
     - ../build/env/.env
     networks:
@@ -65,18 +73,6 @@ services:
     networks:
       honeypot:
 
-  mongodb:
-    image: mongo
-    container_name: mongodb
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: superuser
-      MONGO_INITDB_ROOT_PASSWORD: password
-      MONGO_INITDB_DATABASE: mongodb
-    volumes:
-     - mongodb_data:/data/db/
-    networks:
-      honeypot:
-
   attacker:
     build:
       context: ..
@@ -87,14 +83,3 @@ services:
       - ../test/pkg/services/mqtt:/riotpot/
     networks:
       honeypot:
-      
-volumes:
-  postgres_data:
-  mongodb_data:
-
-networks:
-  honeypot:
-    name: honeypot
-    ipam:
-      config:
-        - subnet: 10.5.0.0/16

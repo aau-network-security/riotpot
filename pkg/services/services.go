@@ -7,14 +7,14 @@ import (
 	"time"
 	"context"
 	"fmt"
-	"path/filepath"
 	"plugin"
 	"strings"
 	"log"
 
 	"github.com/riotpot/tools/errors"
 	"go.mongodb.org/mongo-driver/mongo"
-	// "gorm.io/gorm"
+	"path/filepath"
+	"github.com/riotpot/tools/arrays"
 )
 
 // Function to get an stored service plugin.
@@ -249,6 +249,9 @@ func (se *Services) GetMultiple(service_names ...string) (services []Service) {
 func (se *Services) Autodiscover(build_info string) []string {
 	abs_plugin_path := ""
 	plugin_path := "pkg/plugin/*/*.so"
+	// check if the current run is local build or containerized build
+	// Keep the plugin binaries accordingly, this path can be customized
+	// for different os types in the following code
 	if build_info == "1" {
 		local_go_path := os.Getenv("GOPATH")+"/bin/"
 		abs_plugin_path = local_go_path+plugin_path
@@ -279,4 +282,26 @@ func (se *Services) AddDB(conn *mongo.Client) {
 	for _, s := range se.services {
 		s.SetDb(conn)
 	}
+}
+
+// Retrieve the registered services list 
+func (se *Services) GetServices() (services []Service) {
+	return se.services
+}
+
+// Retrieve the names of services from list of services
+func (se *Services) GetServicesNames(services []Service) (services_list []string) {
+	for _, service := range services {
+		services_list = append(services_list, service.GetName())
+	}
+
+	return services_list
+}
+
+func (se *Services) ValidatePluginByName(input_plugin string, available_plugins []string ) (validated bool) {
+
+	if !arrays.Contains(available_plugins, input_plugin){
+		return false
+	}
+	return true
 }

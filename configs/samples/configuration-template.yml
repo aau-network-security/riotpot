@@ -15,6 +15,7 @@ riotpot:
   autod: false
   local_build_on: 1
 
+
   # The name of the services is the name of the folder in which the plugin
   # is stored, inside the `pkg/` folder.
   # Example:
@@ -74,13 +75,13 @@ riotpot:
 databases:
   - identity: 
     # Name of the targeted database
-    dbname: mongodb
+    dbname: postgres
     # RiotPot only supports `postgres` currently.
-    engine: mongodb
+    engine: postgres
     # IP or container name in the same network.
     host: localhost
     # Connection port to the database host.
-    port: 27017
+    port: 5432
     # User and password to access the database.
     # NOTE: Do not hard-code the values in this file. Please do make
     # use of `.env` file for this purpose in production.
