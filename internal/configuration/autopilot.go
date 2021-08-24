@@ -55,6 +55,7 @@ func (a *Autopilot) Start() {
 
 	// loads the services which are available for user to run
 	a.SetLoadedPlugins()
+
 	a.plugins_to_run = a.Settings.Riotpot.Start
 
 	// check if the build is local or containerized
@@ -70,12 +71,11 @@ func (a *Autopilot) Start() {
 			if running_mode_decision == "manual" { // User has decided to provide plugins to run in interactive/manual way
 				
 				// user needs to choose which plugins to choose from this list 
-				fmt.Printf("Plugins available to run ")
+				fmt.Printf("Plugins available to run are ")
 				fmt.Println(a.loaded_plugins)
 
 				// user inputs the plugins to run
 				a.plugins_to_run = a.GetPluginsFromUser()
-				fmt.Println(a.plugins_to_run)
 			} else {
 				a.plugins_to_run = a.Settings.Riotpot.Start
 				fmt.Printf("\nPlugins to run are ")
@@ -91,7 +91,7 @@ func (a *Autopilot) Start() {
 			running_mode_decision := a.CheckRunningMode()
 
 			if running_mode_decision == "manual" {
-				fmt.Printf("\nDocker containers available to run ")
+				fmt.Printf("\nDocker containers available to run are ")
 				fmt.Println(a.loaded_containers)
 				fmt.Printf("\n")
 
@@ -116,12 +116,12 @@ func (a *Autopilot) Start() {
 			// Hybrid mode
 			running_mode_decision := a.CheckRunningMode()
 			if running_mode_decision == "manual" {
-				fmt.Printf("\nPlugins available to run ")
+				fmt.Printf("\nPlugins available to run are ")
 				fmt.Println(a.loaded_plugins)
 				fmt.Printf("\n")
 				a.plugins_to_run = a.GetPluginsFromUser()
 				
-				fmt.Printf("\nDocker containers available to run ")
+				fmt.Printf("\nDocker containers available to run are ")
 				fmt.Println(a.loaded_containers)
 				fmt.Printf("\n")
 				a.containers_to_run = a.GetContainersFromUser()
@@ -155,6 +155,8 @@ func (a *Autopilot) Start() {
 			fmt.Printf("\nPlugins to run are ")
 			fmt.Println(a.plugins_to_run)
 
+			a.plugins_to_run = arrays.StringToArray(strings.ToLower(arrays.ArrayToString(a.plugins_to_run)))
+
 			if !a.ValidatePlugin(a.plugins_to_run) {
 					log.Fatalf("\nPlease check the config file, and try again\n")
 			}
@@ -167,7 +169,7 @@ func (a *Autopilot) Start() {
 			if !a.ValidateContainers(a.containers_to_run) {
 					log.Fatalf("\nPlease check the config file, and try again\n")
 			}
-
+			a.containers_to_run = arrays.StringToArray(strings.ToLower(arrays.ArrayToString(a.containers_to_run)))
 			// glider forwards all the traffic on specific port to the respective service container
 			a.DeployGlider()
 
@@ -181,10 +183,14 @@ func (a *Autopilot) Start() {
 			if !a.ValidatePlugin(a.plugins_to_run) {
 					log.Fatalf("\nPlease check the config file, and try again\n")
 			}
+			a.plugins_to_run = arrays.StringToArray(strings.ToLower(arrays.ArrayToString(a.plugins_to_run)))
 
 			if !a.ValidateContainers(a.containers_to_run) {
 					log.Fatalf("\nPlease check the config file, and try again\n")
 			}
+
+			a.containers_to_run = arrays.StringToArray(strings.ToLower(arrays.ArrayToString(a.containers_to_run)))
+			
 			a.DeployGlider()
 		}
 	}
@@ -251,7 +257,7 @@ func (a *Autopilot) RegisterPlugins() {
 func (a *Autopilot) DiscoverImages() {
 	a.loaded_containers = a.Settings.GetDockerImages()
 	fmt.Printf("[+] Found %d docker images \n", len(a.loaded_containers))
-	fmt.Printf("[+] Allowed Docker images ")
+	fmt.Printf("[+] Available Docker images are ")
 	fmt.Println(a.loaded_containers)
 }
 
@@ -364,12 +370,14 @@ func (a *Autopilot) CheckInteractionMode() (decision string) {
 // Validates if the plugins to run matches the available plugins
 // TODO: print all the invalid plugins not just the first one encountered
 func (a *Autopilot) ValidatePlugin(in_plugins []string) (validated bool){
-	if arrays.HasDuplicateItems(in_plugins){
+	if arrays.HaveDuplicateItems(in_plugins){
 		fmt.Printf("\n[-] Entered plugins has duplicate entries, please enter again\n")
 		return false
 	}
+
 	for _, plugin := range in_plugins {
-		validated := arrays.Contains(a.loaded_plugins, strings.Title(strings.ToLower(plugin)))
+		validated = arrays.Contains(a.loaded_plugins, plugin)
+
 		if !validated {
 			fmt.Printf("\n[-] Entered plugin \"%s\" doesn't exist, please enter plugins again... \n", plugin)
 			return false
@@ -382,13 +390,13 @@ func (a *Autopilot) ValidatePlugin(in_plugins []string) (validated bool){
 // Validates if the containers to run matches the loaded containers
 // TODO: print all the invalid containers not just the first one encountered
 func (a *Autopilot) ValidateContainers(in_containers []string) (validated bool){
-	if arrays.HasDuplicateItems(in_containers){
+	if arrays.HaveDuplicateItems(in_containers){
 		fmt.Printf("\n[-] Entered containers has duplicate entries, please enter again\n")
 		return false
 	}
 
 	for _, container := range in_containers {
-		validated := arrays.Contains( a.loaded_containers, strings.ToLower(container))
+		validated := arrays.Contains( a.loaded_containers, container)
 		if !validated {
 			fmt.Printf("\n[-] Entered container \"%s\" doesn't exist, please enter plugins again... \n", container)
 			return false
@@ -407,7 +415,7 @@ func (a *Autopilot) GetPluginsFromUser() (plugins []string) {
 	for {
 		fmt.Print("Enter the plugins to run separated by space: ")
 
-		input := a.ReadInput()
+		input := strings.ToLower(a.ReadInput())
 		plugins = arrays.StringToArray(input)
 
 		validated := a.ValidatePlugin(plugins)
@@ -424,7 +432,7 @@ func (a *Autopilot) GetPluginsFromUser() (plugins []string) {
 func (a *Autopilot) GetContainersFromUser() (containers []string) {
 	for {
 		fmt.Print("Enter the containers to run separated by space: ")
-		input := a.ReadInput()
+		input := strings.ToLower(a.ReadInput())
 		containers = arrays.StringToArray(input)
 		validated := a.ValidateContainers(containers)
 
@@ -439,7 +447,11 @@ func (a *Autopilot) GetContainersFromUser() (containers []string) {
 
 // Gives which plugins user wants to load in RIoTPot
 func (a *Autopilot) SetLoadedPlugins() {
-	a.loaded_plugins = a.services.GetServicesNames(a.services.GetServices())
+	if a.Settings.Riotpot.Local_build_on == "1" {
+		a.loaded_plugins = a.services.GetServicesNames(a.services.GetServices())
+	} else {
+		a.loaded_plugins = arrays.StringToArray(a.Settings.Riotpot.Boot_plugins)
+	}
 }
 
 // Validates if the given docker context exists and if it is set to default

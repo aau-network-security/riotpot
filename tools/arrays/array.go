@@ -6,7 +6,7 @@ import (
 )
 func Contains(in []string, str string) bool {
 	for _, v := range in {
-		if v == str {
+		if strings.ToLower(v) == strings.ToLower(str) {
 			return true
 		}
 	}
@@ -40,7 +40,7 @@ func AddSuffix(in string, suffix string) string {
 	return (in+suffix)
 }
 
-func HasDuplicateItems(array []string) bool {
+func HaveDuplicateItems(array []string) bool {
 	array_map := make(map[string]bool)
 
 	for _, item := range array {
@@ -52,3 +52,6 @@ func HasDuplicateItems(array []string) bool {
 	return false
 }
 
+func ArrayToString(array []string) (string) {
+	return strings.Join(array, " ")
+}
