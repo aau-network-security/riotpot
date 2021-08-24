@@ -64,6 +64,7 @@ func main() {
 		plugins_selected := a.GetPluginsFromUser()
 		target_change = "s/boot_plugins: "+a.Settings.Riotpot.Boot_plugins+"/boot_plugins: "+strings.Join(plugins_selected, " ")+"/g"
 		environ.ExecuteCmd("sed","-i", "-e", target_change, "../configs/samples/configuration.yml")
+		a.SetPluginsToRun(plugins_selected)
 
 		fmt.Printf("\nDocker containers available to run are")
 		fmt.Println(sett.GetDockerImages())

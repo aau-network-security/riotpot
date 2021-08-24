@@ -277,6 +277,11 @@ func (a *Autopilot) Greeting() {
 	a.greeting.Greeting()
 }
 
+// Load the greeting
+func (a *Autopilot) SetPluginsToRun(plugins []string) {
+	a.plugins_to_run = plugins
+}
+
 // Reads the input from the terminal, returns string
 func (a *Autopilot) ReadInput() (text string) {
 	reader := bufio.NewReader(os.Stdin)
