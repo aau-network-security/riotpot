@@ -30,7 +30,9 @@ func main() {
 	a.Greeting()
 	a.Settings.Riotpot.Start = arrays.StringToArray(a.Settings.Riotpot.Boot_plugins)
 
-	a.RegisterPlugins()
+	supported_plugins := arrays.StringToArray(a.Settings.Riotpot.Boot_plugins)
+	fmt.Printf("[+] Plugins available to run ")
+	fmt.Println(supported_plugins)
 	a.DiscoverImages()
 	a.DiscoverRunningMode()
 	a.SetLoadedPlugins()
@@ -48,7 +50,7 @@ func main() {
 		target_change = "s/boot_plugins: "+a.Settings.Riotpot.Boot_plugins+"/boot_plugins: "+strings.Join(plugins_selected, " ")+"/g"
 		environ.ExecuteCmd("sed","-i", "-e", target_change, "../configs/samples/configuration.yml")
 	} else if input_mode == "high" {
-		fmt.Printf("\nDocker containers available to run ")
+		fmt.Printf("\nDocker containers available to run are ")
 		fmt.Println(sett.GetDockerImages())
 		fmt.Printf("\n")
 		images := a.GetContainersFromUser()
@@ -56,14 +58,15 @@ func main() {
 		environ.ExecuteCmd("sed","-i", "-e", target_change, "../configs/samples/configuration.yml")
 		FillConfig(images, &a)
 	} else if input_mode == "hybrid" {
-		fmt.Printf("Plugins available to run %q\n", a.Settings.Riotpot.Start)
+		fmt.Printf("Plugins available to run are %q\n", a.Settings.Riotpot.Start)
 
 		// user decided to provide plugins manually
 		plugins_selected := a.GetPluginsFromUser()
 		target_change = "s/boot_plugins: "+a.Settings.Riotpot.Boot_plugins+"/boot_plugins: "+strings.Join(plugins_selected, " ")+"/g"
 		environ.ExecuteCmd("sed","-i", "-e", target_change, "../configs/samples/configuration.yml")
+		a.SetPluginsToRun(plugins_selected)
 
-		fmt.Printf("\nDocker containers available to run ")
+		fmt.Printf("\nDocker containers available to run are")
 		fmt.Println(sett.GetDockerImages())
 		fmt.Printf("\n")
 		images := a.GetContainersFromUser()

@@ -13,7 +13,6 @@ riotpot:
   # list of services desired to be loaded and run at start, and `emulators` with
   # the list of available services to the app.
   autod: false
-  local_build_on: 1
 
   # The name of the services is the name of the folder in which the plugin
   # is stored, inside the `pkg/` folder.
@@ -66,6 +65,10 @@ riotpot:
 
   # Fill the mode, low, high or hybrid, to be used in containerized mode only
   mode: low
+
+  # Fill the value manually if running the Riotpot dorectly from configuration files,
+  # otherwise it will be updated automatically
+  local_build_on: 0
 ##################################################################################################
 
 # The `databases` object contains a number of object defined database

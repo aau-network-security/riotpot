@@ -11,6 +11,8 @@ LOCAL_BUILD_ENABLED=False
 
 # docker cmd below
 .PHONY:  docker-build-doc riotpot-doc riotpot-up riotpot-prod-up riotpot-prod-down riotpot-build riotpot-build-plugins riotpot-builder riotpot-build-local set_container_build set_local_build go_install
+prepare_configurations:
+	cp configs/samples/configuration-template.yml configs/samples/configuration.yml
 set_local_build:
 	@sed -i -e 's/local_build_on: 0/local_build_on: 1/g' configs/samples/configuration.yml
 set_container_build:
@@ -48,6 +50,7 @@ riotpot-builder: \
 	riotpot-build \
 	riotpot-build-plugins
 riotpot-build-local: \
+	prepare_configurations \
 	set_local_build \
 	riotpot-build \
 	riotpot-build-local-plugin \
