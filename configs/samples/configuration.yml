@@ -75,7 +75,7 @@ databases:
   - identity: 
     # Name of the targeted database
     dbname: mongodb
-    # RiotPot only supports `postgres` currently.
+    # RiotPot only supports `mongodb` currently.
     engine: mongodb
     # IP or container name in the same network.
     host: localhost
