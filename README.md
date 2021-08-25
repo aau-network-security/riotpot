@@ -36,7 +36,7 @@ Make sure that you abide by the following software and platform requirements bef
 - gcc 9.3.0 or higher
 - GNU make 4.2.1 or higher
 - Go version go1.16.4 or higher
-- PostgreSQL 12.7 or higher, having a user named as `superuser` and password as `password`
+- MongoDB v4.4.8 or higher, having a username as `superuser` and password as `password`
 - Docker version 20.10.2 or higher
 - Docker-compose version 1.29.2 or higher
 
