@@ -21,6 +21,7 @@ require (
 	github.com/traetox/pty v0.0.0-20141209045113-df6c8cd2e0e6
 	github.com/u-root/uio v0.0.0-20210528151154-e40b768296a7 // indirect
 	github.com/xiegeo/modbusone v0.2.4-0.20200428173500-797d647e237d
+	go.mongodb.org/mongo-driver v1.5.3 // indirect
 	go.uber.org/atomic v1.7.0 // indirect
 	golang.org/x/crypto v0.0.0-20210711020723-a769d52b0f97
 	golang.org/x/net v0.0.0-20210726213435-c6fcb2dbf985 // indirect

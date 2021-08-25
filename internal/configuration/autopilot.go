@@ -10,12 +10,12 @@ import (
 	"strconv"
 	"strings"
 
-	"gorm.io/gorm"
-	
+
 	"github.com/riotpot/pkg/services"
+	"github.com/riotpot/internal/greeting"
+	"go.mongodb.org/mongo-driver/mongo"
 	"github.com/riotpot/tools/arrays"
 	"github.com/riotpot/tools/environ"
-	"github.com/riotpot/internal/greeting"
 	"github.com/riotpot/pkg/profiles/ports"
 )
 
@@ -26,8 +26,7 @@ type Autopilot struct {
 	greeting greeting.Greet
 	services services.Services
 	wg       sync.WaitGroup
-	DB       *gorm.DB
-
+	DB       *mongo.Client
 	loaded_plugins []string
 	loaded_containers []string
 	plugins_to_run []string
