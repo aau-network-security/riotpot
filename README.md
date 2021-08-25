@@ -46,12 +46,12 @@ Although one can download the binaries and configuration files containing the se
 
 We thrive on the idea of making RIoTPot highly transportable, therefore, in this section one can find multiple methods of installation for diverse environments that fit a broad list of requirements and constrains.
 
-There are multiple ways to run Riotpot, one can choose to go for local build mode or containerized mode. In local build mode the Riotpot core runs on host machine and has options to run IoT, OT or other protocols both in local plugins or as a separate containerized service. Running RiotPot in a virtualized/containerized self-contained network mode using `Docker` is highly reommended.
+There are multiple ways to run RIoTPot, one can choose to go for local build mode or containerized mode. In local build mode the RIoTPot core runs on host machine and has options to run IoT, OT or other protocols both in local plugins or as a separate containerized service. Running RIoTPot in a virtualized/containerized self-contained network mode using `Docker` is highly reommended.
 
 <!-- > **NOTE:** The production image can be pulled from Docker Hub. If you choose this method you may directly jump to [2.1 Docker](#21-docker).
  -->
 
-Follow the steps to get the Riotpot project first:
+Follow the steps to get the RIoTPot project first:
 
 ```bash
 # 1. Clone the repository
@@ -62,14 +62,16 @@ $ cd riotpot
 ```
 ### 3.1 Local Build
 
-To build Riotpot locally, follow the steps:
+Make sure user meets the dependency requirements before running the RIotPot, specially MongoDB instance, User can follow this [guide for quick MongoDB setup](https://abresting.github.io/posts/2021/MongoDB-QuickSetup/): 
+
+To build RIoTPot locally, follow the steps:
 
 ```bash
-# Running the following command from riotpot directory will compile the necessary plugins and binaries
+# Running the following command from RIoTPot directory will compile the necessary plugins and binaries
 # and put it in the standard go path as well as in current directory.
 $ make riotpot-build-local
 
-# Command will run the Riotpot locally
+# Command will run the RIoTPot locally
 $ ./riotpot
 ```
 ![Local Build](https://github.com/aau-network-security/riotpot/blob/master/internal/media/local_build.gif?raw=true)
@@ -84,18 +86,18 @@ By editing the ``boot_plugins`` tag, services to run as binaries inside can be p
 
 By editing the ``start_images`` tag, services to run inside a container can be provided, see ``images`` tag in the same configuration file to input allowed container images only
 
-> **Not for Local build**, by editing ``mode`` tag, the riotpot running mode can be provided  
+> **Not for Local build**, by editing ``mode`` tag, the RIoTPot running mode can be provided  
 
-To exit the Riotpot in it's running state at any time press ``Ctrl + C``
+To exit the RIoTPot in it's running state at any time press ``Ctrl + C``
 
 ### 3.2 Containerized Build
 
-In containerized build, Riotpot core is also deployed inside a container and forwards traffic to the other services.
+In containerized build, RIoTPot core is also deployed inside a container and forwards traffic to the other services.
 
 To build inside containers, follow the steps:
 
 ```bash
-# Assuming user is at root directory of the Riotpot github repository
+# Assuming user is at root directory of the RIoTPot github repository
 $ cd riotpot/deployments
 
 # Run the command to enter the interactive mode to choose services to run
@@ -126,7 +128,7 @@ $ docker ps
 
 #### Alternatively
 
-One can also setup the Containerized Riotpot through config file located at, `config/samples/configuration.yml`
+One can also setup the Containerized RIoTPot through config file located at, `config/samples/configuration.yml`
 
 ![Config file](https://github.com/aau-network-security/riotpot/blob/master/internal/media/configuration_file.png?raw=true)
 
@@ -134,41 +136,41 @@ By editing the ``boot_plugins`` tag, services to run as binaries inside can be p
 
 By editing the ``start_images`` tag, services to run inside a contaianer can be provided, see ``images`` tag in the same configuration file to input allowed container images only
 
-By editing ``mode`` tag, the riotpot running mode can be provided, see ``allowed_modes`` tag in the same configuration file to input allowed modes only
+By editing ``mode`` tag, the RIoTPot running mode can be provided, see ``allowed_modes`` tag in the same configuration file to input allowed modes only
 
-To stop the Riotpot in Containerized mode use the following command:
+To stop the RIoTPot in Containerized mode use the following command:
 
 ``` bash
 $ docker-compose down -v
 ``` 
 
-> **NOTE:** Using the *-v* tag will remove all the mounted volumes, i.e. the database used by riotpot to store information and the volumes mounted to store logs and binaries collected by the honeypot. Remember to make copies before using the *-v* tag, or skip it altogether.
+> **NOTE:** Using the *-v* tag will remove all the mounted volumes, i.e. the database used by RIoTPot to store information and the volumes mounted to store logs and binaries collected by the honeypot. Remember to make copies before using the *-v* tag, or skip it altogether.
 
 ### 3.3 Via Docker Hub Image
 
-Build the latest release of RiotPot directly from the image provided in the Docker Hub:
+Build the latest release of RIoTPot directly from the image provided in the Docker Hub:
 
 ```bash
 # Command will compile the necessary plugins and binaries and put it in the standard go path as well as in current directory.
 $ make riotpot-build-local
 
-# Command will run the Riotpot locally
+# Command will run the RIoTPot locally
 $ ./riotpot
 ```
 
 ```bash
-# Grab and run the latest release of the riotpot consumer image
+# Grab and run the latest release of the RIoTPot consumer image
 # detached from the console with -d.
 $ docker run -d riotpot-docker:latest
 ```
 
 ## 4. Documentation
 
-The documentation for RiotPot can be found in [go.pkg.dev](https://pkg.go.dev/), however, sometimes you might be in need to visualize the documentation locally, either because you are developing a part of it, of for any other reason.
+The documentation for RIoTPot can be found in [go.pkg.dev](https://pkg.go.dev/), however, sometimes you might be in need to visualize the documentation locally, either because you are developing a part of it, of for any other reason.
 
 The most common way of pre-visualizing documentation is by using `godoc`, however, this requires an initial setup of the go project. Find more information in the [godoc page](https://pkg.go.dev/golang.org/x/tools/cmd/godoc).
 
-For simplicity, the riotpot `godoc` documentation can be run as a separated local container from the dockerfile `Dockerfile.documentation`. To use the container simply type:
+For simplicity, the RIoTPot `godoc` documentation can be run as a separated local container from the dockerfile `Dockerfile.documentation`. To use the container simply type:
 
 ```bash
 $ make riotpot-doc
