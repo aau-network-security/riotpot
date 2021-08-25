@@ -118,7 +118,11 @@ $ docker-compose -f docker-compose.yml up -d --build
 ```
 
 To check if the containers are correctly setup, check with the following command and see,
-if ``riotpot:development`` and other selected services containers are up and running.
+if ``riotpot:development`` and other selected service containers are up and running.
+
+```bash
+$ docker ps
+```
 
 #### Alternatively
 
