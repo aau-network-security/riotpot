@@ -8,9 +8,6 @@ import (
 	"github.com/riotpot/internal/configuration"
 	"github.com/riotpot/tools/errors"
 
-	// "gorm.io/driver/postgres"
-	// "gorm.io/gorm"
-	// "go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
