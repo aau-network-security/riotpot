@@ -15,8 +15,8 @@ import (
 // Keep in mind this function requires the role `superuser` and the `superuser` db
 // to previously exists!
 // Example:
-//  $ # create the user as a superuser and password as password
-//  $ db.createUser( { user: "superuser", pwd: "password", roles: ["readWriteAnyDatabase" ] } )
+//  $ # create the user as a superuser and password as password under admin db
+//  $ db.createUser( { user: "superuser", pwd: "password", roles: ["root" ] } )
 
 func TestDatabaseConnection(t *testing.T) {
 
@@ -48,6 +48,7 @@ func TestDatabaseConnection(t *testing.T) {
 	if conn == nil{
 		t.Error("Error connecting database")
 	}
+	defer conn.Disconnect(context.TODO())
 }
 
 func TestDatabaseInsert(t *testing.T) {
@@ -126,6 +127,7 @@ func TestDatabaseInsert(t *testing.T) {
 		}
 
 		defer cancel()
+		defer conn.Disconnect(context.TODO())
 	} else {
 		t.Error("Database not accessible")
 	}
