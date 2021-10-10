@@ -35,7 +35,7 @@ This services are loaded in the honeypot in the form of plugins, making RIoTPot 
 
 RIoTPot has a modular architecture that facilitates extensability of the honeypot. The honeypot further offers a hybrid-interaction capability where users can choosed the desired interaction levels for the protocols simulated. The image below shows the high/level architecture of RIoTPot. 
 
-![alt text](architecture.jpg "Architecture")
+![alt text](assets/architecture.jpg "Architecture")
 
 The architecture contains 6 components. 
 
@@ -192,11 +192,9 @@ The following commands will be run using `make` plus the alias of the command. T
 
 Command|Container Name|Description
 :---|:---:|---:
-riotpot-up|riotpot:development| Puts up RIoTPot in **development** mode.
-riotpot-down|riotpot:development| Puts down RIoTPot.
-riotpot-doc|riotpot/v1| Puts up a container with the local documentation.
-riotpot-all|riotpot/v1, riotpot| Puts the documentation and RIoTPot **development** mode up.
-riotpot-builder|| Builds the binary and the plugins.
+up, down|riotpot:development| Puts up/down RIoTPot in **development** mode.
+prod-up, prod-down|riotpot:production| Puts up/down RIoTPot in **Production** mode.
+builder|| Builds the binary and the plugins locally.
 
 **Example usage:**
 ```bash

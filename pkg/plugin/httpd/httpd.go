@@ -21,7 +21,7 @@ func init() {
 func Httpd() services.Service {
 	mixin := services.MixinService{
 		Name:     Name,
-		Port:     8080,
+		Port:     80,
 		Protocol: "tcp",
 		Running:  make(chan bool, 1),
 	}
@@ -87,11 +87,6 @@ func (h *Http) valid(w http.ResponseWriter, req *http.Request) {
 		<!-- Meta tags -->
 		<meta charset="UTF-8">
 		<meta id ="viewport" name="viewport" content="width=device-width, initial-scale=1">
-
-		<!-- CSS -->
-		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" 
-		rel="stylesheet" integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6" 
-		crossorigin="anonymous">
 	</head>
 	<body>
 		<h1>Login</h1><br>
