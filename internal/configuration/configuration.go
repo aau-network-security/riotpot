@@ -8,12 +8,11 @@ import (
 	"strconv"
 	"strings"
 
-	"gopkg.in/yaml.v3"
 	"github.com/gobuffalo/packr"
-	errors "github.com/riotpot/tools/errors"
 	arrays "github.com/riotpot/tools/arrays"
 	environ "github.com/riotpot/tools/environ"
-
+	errors "github.com/riotpot/tools/errors"
+	"gopkg.in/yaml.v3"
 )
 
 func NewSettings() (s Settings, err error) {
@@ -44,7 +43,7 @@ type Settings struct {
 // Load the configuration on the child.
 func (conf *Settings) Load() (err error) {
 	box := packr.NewBox("../../configs/samples")
-	data, err := box.Find("configuration.yml")
+	data, _ := box.Find("configuration.yml")
 
 	err = yaml.Unmarshal(data, &conf)
 	errors.Raise(err)
@@ -62,7 +61,7 @@ func (conf *Settings) GetDockerImages() (images []string) {
 }
 
 // Retrieve the image name from Start_images tag in configuration file
-func (conf *Settings) GetDockerImagesToRun() ([]string) {
+func (conf *Settings) GetDockerImagesToRun() []string {
 	// for _, val := range conf.Riotpot.Start_images {
 	// 	images = append(images, strings.TrimSuffix(arrays.StringToArray(val)[0], ","))
 	// }
@@ -173,7 +172,7 @@ func (conf *Settings) ResolveEnv() {
 	}
 
 	db_cfg.Identity.Name = environ.Getenv("DB_NAME", db_cfg.Identity.Name)
-	
+
 	conf.Databases[0] = db_cfg
 }
 
@@ -205,8 +204,8 @@ type ConfigRiotpot struct {
 	Images []string
 	// Interaction mode of Riotpot, used in containazried build
 	Mode string
-	// Modes of operation which are currently supported by Riotpot 
-	Allowed_modes [] string
+	// Modes of operation which are currently supported by Riotpot
+	Allowed_modes []string
 	// Container images which are finalized to run in the Riotpot run
 	Start_images string
 }

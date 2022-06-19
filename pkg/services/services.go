@@ -3,19 +3,22 @@
 package services
 
 import (
-	"os"
-	"time"
 	"context"
 	"fmt"
+	"log"
+	"os"
 	"plugin"
 	"strings"
-	"log"
+	"time"
 
+	"path/filepath"
+
+	"github.com/riotpot/tools/arrays"
 	"github.com/riotpot/tools/errors"
 	"go.mongodb.org/mongo-driver/mongo"
-	"path/filepath"
-	"github.com/riotpot/tools/arrays"
 )
+
+// TODO: add documentation to the functions that do not even have a description
 
 // Function to get an stored service plugin.
 // Note: the symbol used to get the plugin is "NewService", which must be present in
@@ -175,15 +178,23 @@ func (mx *MixinService) Migrate(model interface{}) {
 }
 
 func (mx *MixinService) Store(model interface{}) {
+
+	// If there is a connection, attempt to insert the isntance
 	if mx.conn != nil {
-		ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
+		// Get the context of the database
+		ctx, err_timeout := context.WithTimeout(context.Background(), 5*time.Second)
+		if err_timeout != nil {
+			log.Fatal(err_timeout)
+		}
+
+		// Get the connection to the database
+		// TODO: hardcoded connection, please change this
 		db_element := mx.conn.Database("mongodb")
 		collec_element := db_element.Collection("Connection")
 		_, err := collec_element.InsertOne(ctx, model)
-		
 		if err != nil {
-                log.Fatal(err)
-        }
+			log.Fatal(err)
+		}
 	} else {
 		fmt.Print("Database not accessible")
 	}
@@ -253,16 +264,16 @@ func (se *Services) Autodiscover(build_info string) []string {
 	// Keep the plugin binaries accordingly, this path can be customized
 	// for different os types in the following code
 	if build_info == "1" {
-		local_go_path := os.Getenv("GOPATH")+"/bin/"
-		abs_plugin_path = local_go_path+plugin_path
+		local_go_path := os.Getenv("GOPATH") + "/bin/"
+		abs_plugin_path = local_go_path + plugin_path
 	} else {
 		abs_plugin_path = plugin_path
 	}
-	
+
 	all, err := filepath.Glob(abs_plugin_path)
 	if err != nil {
 		panic(err)
-	}	
+	}
 
 	fmt.Printf("[+] Found %d plugins\n", len(all))
 	return all
@@ -284,7 +295,7 @@ func (se *Services) AddDB(conn *mongo.Client) {
 	}
 }
 
-// Retrieve the registered services list 
+// Retrieve the registered services list
 func (se *Services) GetServices() (services []Service) {
 	return se.services
 }
@@ -298,10 +309,8 @@ func (se *Services) GetServicesNames(services []Service) (services_list []string
 	return services_list
 }
 
-func (se *Services) ValidatePluginByName(input_plugin string, available_plugins []string ) (validated bool) {
-
-	if !arrays.Contains(available_plugins, input_plugin){
-		return false
-	}
-	return true
+// Check if the available plugins contains the plugin
+// TODO remove this function, it is a oneliner that does not include any new logic
+func (se *Services) ValidatePluginByName(input_plugin string, available_plugins []string) (validated bool) {
+	return arrays.Contains(available_plugins, input_plugin)
 }

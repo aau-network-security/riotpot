@@ -1,39 +1,38 @@
 package configuration
 
 import (
-	"os"
+	"bufio"
 	"fmt"
 	"log"
 	"net"
-	"sync"
-	"bufio"
+	"os"
 	"strconv"
 	"strings"
+	"sync"
 
-
-	"github.com/riotpot/pkg/services"
 	"github.com/riotpot/internal/greeting"
-	"go.mongodb.org/mongo-driver/mongo"
+	"github.com/riotpot/pkg/profiles/ports"
+	"github.com/riotpot/pkg/services"
 	"github.com/riotpot/tools/arrays"
 	"github.com/riotpot/tools/environ"
-	"github.com/riotpot/pkg/profiles/ports"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type Autopilot struct {
 	Settings Settings
 	Profile  Profile
 
-	greeting greeting.Greet
-	services services.Services
-	wg       sync.WaitGroup
-	DB       *mongo.Client
-	loaded_plugins []string
+	greeting          greeting.Greet
+	services          services.Services
+	wg                sync.WaitGroup
+	DB                *mongo.Client
+	loaded_plugins    []string
 	loaded_containers []string
-	plugins_to_run []string
-	containers_to_run [] string
-	interaction_mode string
-	remote_host_ip string
-	docker_context_name string
+	plugins_to_run    []string
+	containers_to_run []string
+	interaction_mode  string
+	remote_host_ip    string
+	//docker_context_name string
 }
 
 // Method to start the autopilot.
@@ -59,7 +58,7 @@ func (a *Autopilot) Start() {
 
 	// check if the build is local or containerized
 	if a.Settings.Riotpot.Local_build_on == "1" { // User is running the Riotpot in local build mode
-		
+
 		// check if user want to run via config file or manually input
 		a.interaction_mode = a.CheckInteractionMode()
 
@@ -68,8 +67,8 @@ func (a *Autopilot) Start() {
 			running_mode_decision := a.CheckRunningMode()
 
 			if running_mode_decision == "manual" { // User has decided to provide plugins to run in interactive/manual way
-				
-				// user needs to choose which plugins to choose from this list 
+
+				// user needs to choose which plugins to choose from this list
 				fmt.Printf("Plugins available to run are ")
 				fmt.Println(a.loaded_plugins)
 
@@ -107,7 +106,7 @@ func (a *Autopilot) Start() {
 					log.Fatalf("\nPlease check the config file, and try again\n")
 				}
 
-				// check if the port which containers require to run is free on host machine  
+				// check if the port which containers require to run is free on host machine
 				a.CheckContainerPort()
 				a.DeployContainers()
 			}
@@ -119,7 +118,7 @@ func (a *Autopilot) Start() {
 				fmt.Println(a.loaded_plugins)
 				fmt.Printf("\n")
 				a.plugins_to_run = a.GetPluginsFromUser()
-				
+
 				fmt.Printf("\nDocker containers available to run are ")
 				fmt.Println(a.loaded_containers)
 				fmt.Printf("\n")
@@ -157,7 +156,7 @@ func (a *Autopilot) Start() {
 			a.plugins_to_run = arrays.StringToArray(strings.ToLower(arrays.ArrayToString(a.plugins_to_run)))
 
 			if !a.ValidatePlugin(a.plugins_to_run) {
-					log.Fatalf("\nPlease check the config file, and try again\n")
+				log.Fatalf("\nPlease check the config file, and try again\n")
 			}
 		} else if a.Settings.Riotpot.Mode == "high" {
 			a.plugins_to_run = nil
@@ -166,7 +165,7 @@ func (a *Autopilot) Start() {
 			fmt.Println(a.Settings.Riotpot.Start_images)
 
 			if !a.ValidateContainers(a.containers_to_run) {
-					log.Fatalf("\nPlease check the config file, and try again\n")
+				log.Fatalf("\nPlease check the config file, and try again\n")
 			}
 			a.containers_to_run = arrays.StringToArray(strings.ToLower(arrays.ArrayToString(a.containers_to_run)))
 			// glider forwards all the traffic on specific port to the respective service container
@@ -180,16 +179,16 @@ func (a *Autopilot) Start() {
 			fmt.Println(a.Settings.Riotpot.Start_images)
 
 			if !a.ValidatePlugin(a.plugins_to_run) {
-					log.Fatalf("\nPlease check the config file, and try again\n")
+				log.Fatalf("\nPlease check the config file, and try again\n")
 			}
 			a.plugins_to_run = arrays.StringToArray(strings.ToLower(arrays.ArrayToString(a.plugins_to_run)))
 
 			if !a.ValidateContainers(a.containers_to_run) {
-					log.Fatalf("\nPlease check the config file, and try again\n")
+				log.Fatalf("\nPlease check the config file, and try again\n")
 			}
 
 			a.containers_to_run = arrays.StringToArray(strings.ToLower(arrays.ArrayToString(a.containers_to_run)))
-			
+
 			a.DeployGlider()
 		}
 	}
@@ -226,7 +225,7 @@ func (a *Autopilot) available(name string, port int) (available bool) {
 	return true
 }
 
-// check which interaction mode in supplied by the user from config file 
+// check which interaction mode in supplied by the user from config file
 func (a *Autopilot) CheckModesFromConfig() {
 	mode_received := arrays.StringToArray(a.Settings.Riotpot.Mode)
 
@@ -236,7 +235,7 @@ func (a *Autopilot) CheckModesFromConfig() {
 		log.Fatalf("\nPlease enter atleast one mode in Riotpot config mode, i.e. low, high or hybrid\n")
 	}
 
-	if ! arrays.Contains(a.Settings.Riotpot.Allowed_modes, mode_received[0]) {
+	if !arrays.Contains(a.Settings.Riotpot.Allowed_modes, mode_received[0]) {
 		log.Fatalf("\n %q mode is invalid, only choose low, high or hybrid mode only in Riotpot config\n", mode_received[0])
 	}
 }
@@ -262,8 +261,9 @@ func (a *Autopilot) DiscoverImages() {
 
 // Displays which is the current Riotpot running mode, i.e. low, high or hybrid
 func (a *Autopilot) DiscoverRunningMode() {
-	mode := "[+] Current mode of running is "+ a.Settings.Riotpot.Mode+"\n"
-	fmt.Printf(mode)
+	str_mode := "[+] Current mode of running is %s"
+	mode := a.Settings.Riotpot.Mode
+	fmt.Printf(str_mode, mode)
 }
 
 // Load the greeting
@@ -292,14 +292,20 @@ func (a *Autopilot) ReadInput() (text string) {
 	return text
 }
 
-// Check if the port of container to run is available for listening 
-// TO-DO: print all the invalid containers not just the first one encountered
+// Check if the port of container to run is available for listening
 func (a *Autopilot) CheckContainerPort() {
 	for _, container := range a.containers_to_run {
+
+		// Get the port and the protocol of the container
 		port := ports.GetPort(arrays.AddSuffix(container, "d"))
-		// Convert the Port from int to string
-		if environ.CheckPortBusy(ports.GetProtocol(arrays.AddSuffix(container, "d")) , strconv.Itoa(port)) == false {
-			log.Fatalf("[-] Port %d of Container %q is already busy on host, please free it first!", port, container)
+		// Convert the port to a string
+		port_st := strconv.Itoa(port)
+		protocol := ports.GetProtocol(arrays.AddSuffix(container, "d"))
+
+		// Check if the protocol in the machine in that port is busy
+		isbusy := environ.CheckPortBusy(protocol, port_st)
+		if isbusy {
+			log.Fatalf("[-] Port %s of Container %q is already busy on host, please free it first!", port_st, container)
 		}
 	}
 }
@@ -310,31 +316,31 @@ func (a *Autopilot) DeployContainers() {
 		uri := a.Settings.GetContainerURI(container)
 		// get the port number of a given container, currently all container must have an entry in ports file
 		port := strconv.Itoa(ports.GetPort(arrays.AddSuffix(container, "d")))
-		port_mapping := port+":"+port
+		port_mapping := port + ":" + port
 		app := environ.GetPath("docker")
-		environ.ExecuteBackgroundCmd(app, "run", "-p", port_mapping, uri )
+		environ.ExecuteBackgroundCmd(app, "run", "-p", port_mapping, uri)
 		fmt.Printf("\nContainer %q, deployed \n", container)
 	}
 }
 
-// Port forwarding using glider for container ports 
+// Port forwarding using glider for container ports
 func (a *Autopilot) DeployGlider() {
 	for _, container := range a.containers_to_run {
 		port := strconv.Itoa(ports.GetPort(arrays.AddSuffix(container, "d")))
 		protocol := ports.GetProtocol(arrays.AddSuffix(container, "d"))
-		listener := protocol+"://:"+port
+		listener := protocol + "://:" + port
 		remote_ip := a.Settings.GetContainerIP(container)
-		forwarder := protocol+"://"+ remote_ip +":"+port
+		forwarder := protocol + "://" + remote_ip + ":" + port
 		fmt.Println(a.remote_host_ip)
-		
+
 		app := environ.GetPath("glider")
-		
+
 		environ.ExecuteBackgroundCmd(app, "-verbose", "-listen", listener, "-forward", forwarder)
 	}
 }
 
 // Interactively checks if the user wants to provide plugins to run manually
-func (a *Autopilot) CheckRunningMode() (string) {
+func (a *Autopilot) CheckRunningMode() string {
 	fmt.Print("Run plugins from configuation file? [y/n]")
 
 	for {
@@ -345,7 +351,7 @@ func (a *Autopilot) CheckRunningMode() (string) {
 			return "config"
 		} else if response == "n" || response == "no" {
 			return "manual"
-		} else{
+		} else {
 			fmt.Printf("Please type Yes(y) or No(n) only\n")
 		}
 	}
@@ -365,7 +371,7 @@ func (a *Autopilot) CheckInteractionMode() (decision string) {
 			return "high"
 		} else if response == "hy" || response == "hybrid" {
 			return "hybrid"
-		} else{
+		} else {
 			fmt.Printf("Please type low(l) or high(h) or hybrid(hy) only\n")
 		}
 	}
@@ -373,8 +379,8 @@ func (a *Autopilot) CheckInteractionMode() (decision string) {
 
 // Validates if the plugins to run matches the available plugins
 // TODO: print all the invalid plugins not just the first one encountered
-func (a *Autopilot) ValidatePlugin(in_plugins []string) (validated bool){
-	if arrays.HaveDuplicateItems(in_plugins){
+func (a *Autopilot) ValidatePlugin(in_plugins []string) (validated bool) {
+	if arrays.HaveDuplicateItems(in_plugins) {
 		fmt.Printf("\n[-] Entered plugins has duplicate entries, please enter again\n")
 		return false
 	}
@@ -393,14 +399,14 @@ func (a *Autopilot) ValidatePlugin(in_plugins []string) (validated bool){
 
 // Validates if the containers to run matches the loaded containers
 // TODO: print all the invalid containers not just the first one encountered
-func (a *Autopilot) ValidateContainers(in_containers []string) (validated bool){
-	if arrays.HaveDuplicateItems(in_containers){
+func (a *Autopilot) ValidateContainers(in_containers []string) (validated bool) {
+	if arrays.HaveDuplicateItems(in_containers) {
 		fmt.Printf("\n[-] Entered containers has duplicate entries, please enter again\n")
 		return false
 	}
 
 	for _, container := range in_containers {
-		validated := arrays.Contains( a.loaded_containers, container)
+		validated := arrays.Contains(a.loaded_containers, container)
 		if !validated {
 			fmt.Printf("\n[-] Entered container \"%s\" doesn't exist, please enter plugins again... \n", container)
 			return false
@@ -459,13 +465,13 @@ func (a *Autopilot) SetLoadedPlugins() {
 }
 
 // Validates if the given docker context exists and if it is set to default
-func (a *Autopilot) ValidateDefaultDockerContext(to_check string)  {
+func (a *Autopilot) ValidateDefaultDockerContext(to_check string) {
 	path := environ.GetPath("docker")
-	cmd_output	:= environ.ExecuteCmd(path, "context" , "ls")
+	cmd_output := environ.ExecuteCmd(path, "context", "ls")
 	cmd_out_slice := arrays.StringToArray(cmd_output)
 	val_position := arrays.GetItemPosition(cmd_out_slice, to_check)
 
-	if val_position== -1 {
+	if val_position == -1 {
 		log.Fatalf("Docker context %q, not found", to_check)
 	}
 

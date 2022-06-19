@@ -132,13 +132,13 @@ $ make RIoTPot-build-local
 $ ./RIoTPot
 ```
 
-![Local Build](https://github.com/aau-network-security/RIoTPot/blob/master/internal/media/local_build.gif?raw=true)
+![Local Build](assets/local_build.gif)
 
 Upon running, user needs to select the mode of interaction, in Low mode, all plugins run locally as binaries, in High mode, the selected services run in separate container, and, in Hybrid mode, mix of Low and High i.e. some services locally and some inside containers.
 
 In every mode, there is an option to run the services directly from reading the configuration file located at `config/samples/configuration.yml`
 
-![Config file](https://github.com/aau-network-security/RIoTPot/blob/master/internal/media/configuration_file.png?raw=true)
+![Config file](assets/configuration_file.png)
 
 By editing the `boot_plugins` tag, services to run as binaries inside can be provided, see `emulators` tag in the same configuration file to input allowed service plugins only
 
@@ -162,7 +162,7 @@ $ cd RIoTPot/deployments
 $ go run interactive_deployer.go
 ```
 
-![Containerized Build](https://github.com/aau-network-security/RIoTPot/blob/master/internal/media/containerized_build.gif?raw=true)
+![Containerized Build](assets/containerized_build.gif)
 
 Upon choosing modes and services correctly, following message will be displayed:
 
@@ -189,7 +189,7 @@ $ docker ps
 
 One can also setup the Containerized RIoTPot through config file located at, `config/samples/configuration.yml`
 
-![Config file](https://github.com/aau-network-security/RIoTPot/blob/master/internal/media/configuration_file.png?raw=true)
+![Config file](assets/configuration_file.png)
 
 By editing the `boot_plugins` tag, services to run as binaries inside can be provided, see `emulators` tag in the same configuration file to input allowed service plugins only
 
@@ -225,7 +225,7 @@ $ docker run -d RIoTPot-docker:latest
 
 ## 4. Documentation
 
-The documentation for RIoTPot can be found in [go.pkg.dev](https://pkg.go.dev/), however, sometimes you might be in need to visualize the documentation locally, either because you are developing a part of it, of for any other reason.
+The documentation for RIoTPot can be found in [go.pkg.dev](https://pkg.go.dev/), however, sometimes you might be in need to visualize the documentation locally, either because you are developing a part of it, or for any other reason.
 
 The most common way of pre-visualizing documentation is by using `godoc`, however, this requires an initial setup of the go project. Find more information in the [godoc page](https://pkg.go.dev/golang.org/x/tools/cmd/godoc).
 

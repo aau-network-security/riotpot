@@ -1,21 +1,21 @@
 // Package that implements the creation of profiles that resemble real devices,
 // including topics that clients can subscribe to, and generate random values.
 //
-// TODO include a method to load profile topics and determine wether the returning
+// TODO include a method to load profile topics and determine whether the returning
 // value should be a number in a range, a string or something else.
 package profiles
 
 import (
-	"os"
 	"fmt"
-	"time"
-	"strings"
-	"strconv"
 	"math/rand"
+	"os"
+	"strconv"
+	"strings"
+	"time"
 
-	"gopkg.in/yaml.v3"
 	"github.com/google/uuid"
 	"github.com/riotpot/tools/errors"
+	"gopkg.in/yaml.v3"
 )
 
 const (
