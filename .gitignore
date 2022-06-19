@@ -41,3 +41,6 @@ configs/keys/*
 
 # Remove the riotpot binary
 riotpot
+
+# Remove the local samples
+local

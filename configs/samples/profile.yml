@@ -8,9 +8,9 @@ greet:
   # Keep in mind that the initial message contains some waiting time,
   # which is helpful in docker images to give time to the database
   # to be set-up before starting the application!
-  initial : false
+  initial: false
 
 # Terminal options and configuration
 terminal:
   # Color of the terminal path and headers
-  color: #eb4034
+  color: "#eb4034"

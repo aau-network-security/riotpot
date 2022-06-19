@@ -25,17 +25,23 @@ RUN tar -xzf glider_0.15.0_linux_amd64.tar.gz && cd glider_0.15.0_linux_amd64 &&
 RUN apt-get update && apt-get install -y netcat
 
 # Copy everything into the image
-# TODO: this can be optimized to copy just the necessary files!
-COPY . .
+# Copy only the app files in the image
+COPY internal internal/
+COPY tools tools/
+COPY pkg pkg/
+COPY cmd cmd/
+COPY configs configs/
+COPY build/docker/entrypoint.sh ./
 
 # Run the command from the Makefile to build all the plugins
 # and build the project
 # -- Comment this line when on development if you know you have a ready to go version built --
 # Disclaimer: if you comment this line, be 100% sure that the binary can be run on linux
-RUN make riotpot-builder
+COPY Makefile .
+RUN make builder
 
 # give permissions to the entrypoint to run the file
-RUN chmod +x build/docker/entrypoint.sh
+RUN chmod +x ./entrypoint.sh
 
 # Run RIoTPot
-ENTRYPOINT [ "./build/docker/entrypoint.sh" ]
+ENTRYPOINT [ "./entrypoint.sh" ]
