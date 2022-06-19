@@ -216,7 +216,7 @@ func (se *Services) Register(service Service) {
 // This function utilizes a list of starting services
 // to create and register new services.
 //
-//	Note: This function does not discern between new and already running services!
+// NOTE: This function does not discern between new and already running services!
 func (se *Services) AutoRegister(service_paths []string) {
 	// iterate through the slice of services
 	for _, emu := range service_paths {

@@ -1,5 +1,5 @@
 # Start from the latest golang base image
-FROM golang:1.16
+FROM golang:1.18
 LABEL maintainer="Shreyas Srinivasa <shsr@es.aau.dk>"
 
 ENV GO111MODULE=on
