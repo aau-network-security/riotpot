@@ -14,6 +14,7 @@ var (
 )
 
 // Test loading and saving configuration from a file to another
+// TODO: Since the test is broken the real function has not been tested. Change this.
 func TestLoadAndSaveConf(t *testing.T) {
 	// load the configuration
 	err := settings.Load(path)

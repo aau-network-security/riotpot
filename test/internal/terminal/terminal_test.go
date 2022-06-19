@@ -8,7 +8,6 @@ import (
 )
 
 var (
-	// TODO add this file
 	path = "./greeting_test.yml"
 )
 
