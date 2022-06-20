@@ -8,12 +8,11 @@ package configuration
 import (
 	"os"
 
-	"gopkg.in/yaml.v3"
 	"github.com/gobuffalo/packr"
 	"github.com/riotpot/internal/cli"
 	"github.com/riotpot/internal/greeting"
 	errors "github.com/riotpot/tools/errors"
-
+	"gopkg.in/yaml.v3"
 )
 
 func NewProfile() (p Profile, err error) {
@@ -39,7 +38,7 @@ type Profile struct {
 // Load the configuration on the child.
 func (conf *Profile) Load() (err error) {
 	box := packr.NewBox("../../configs/samples")
-	data, err := box.Find("profile.yml")
+	data, _ := box.Find("profile.yml")
 
 	err = yaml.Unmarshal(data, &conf)
 	errors.Raise(err)

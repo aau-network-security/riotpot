@@ -5,10 +5,12 @@ package models
 
 import "time"
 
+// TODO: This should be in the database package
+
 // schema for test cases
 type Test_model struct {
 	Timestamp string
-	Payload string
+	Payload   string
 }
 
 // Schema for a typical connection
@@ -40,6 +42,6 @@ func TestConnection(item string) Test_model {
 	return Test_model{
 		// prepare the timestamp
 		Timestamp: (time.Now()).String(),
-		Payload: item,
+		Payload:   item,
 	}
 }

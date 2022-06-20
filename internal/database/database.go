@@ -2,8 +2,8 @@ package database
 
 import (
 	// "fmt"
-	"time"
 	"context"
+	"time"
 
 	"github.com/riotpot/internal/configuration"
 	"github.com/riotpot/tools/errors"
@@ -39,25 +39,25 @@ func (db *Database) connect() (*mongo.Client, error) {
 
 	// build the credential for the database authentication
 	credential := options.Credential{
-                Username: db.Config.Username,
-                Password: db.Config.Password,
-        }
+		Username: db.Config.Username,
+		Password: db.Config.Password,
+	}
 
-	client, err := mongo.NewClient(options.Client().ApplyURI("mongodb://"+db.Config.Host+":"+db.Config.Port).SetAuth(credential))
+	client, err := mongo.NewClient(options.Client().ApplyURI("mongodb://" + db.Config.Host + ":" + db.Config.Port).SetAuth(credential))
 	errors.Raise(err)
 
 	//set the command timeout
 	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
-    err = client.Connect(ctx)
-    
-    errors.Raise(err)
-	
-    // TO-DO: cleanup of the connection may be required in the longer run
-    // defer client.Disconnect(ctx)
-    
-    // test of the database is reachable or not
-    err = client.Ping(ctx, readpref.Primary())
-    errors.Raise(err)
+	err = client.Connect(ctx)
+
+	errors.Raise(err)
+
+	// TO-DO: cleanup of the connection may be required in the longer run
+	// defer client.Disconnect(ctx)
+
+	// test of the database is reachable or not
+	err = client.Ping(ctx, readpref.Primary())
+	errors.Raise(err)
 
 	db.conn = client
 
