@@ -9,6 +9,8 @@ import (
 	"github.com/riotpot/internal/cli"
 )
 
+// TODO: Walktrhough is no longer something needed. The greeting should be something small and fast.
+
 type Greet struct {
 	// Indicates if this is the first time riotpot has been launched
 	Tutorial bool
@@ -30,6 +32,7 @@ func (g *Greet) Greeting() {
 }
 
 // Gives a walkthrough RiotPot
+
 func (g *Greet) walkthrough() {}
 
 // Throws a regular salute

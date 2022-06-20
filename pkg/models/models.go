@@ -5,6 +5,8 @@ package models
 
 import "time"
 
+// TODO: This should be in the database package
+
 // schema for test cases
 type Test_model struct {
 	Timestamp string
