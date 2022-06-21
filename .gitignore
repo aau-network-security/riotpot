@@ -33,9 +33,6 @@ workspace*.code-*
 # TCPdump
 /tcpdump/
 
-# Keys for the SSH connections
-configs/keys/*
-
 # whatever the rules are, include all the `.md` files
 !*.md
 
