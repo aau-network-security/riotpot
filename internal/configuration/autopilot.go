@@ -10,7 +10,6 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/riotpot/internal/greeting"
 	"github.com/riotpot/pkg/profiles/ports"
 	"github.com/riotpot/pkg/services"
 	"github.com/riotpot/tools/arrays"
@@ -19,10 +18,8 @@ import (
 )
 
 type Autopilot struct {
-	Settings Settings
-	Profile  Profile
+	Configuration Configuration
 
-	greeting          greeting.Greet
 	services          services.Services
 	wg                sync.WaitGroup
 	DB                *mongo.Client
@@ -39,13 +36,14 @@ type Autopilot struct {
 // It gets the list of emulators services available in the file system,
 // and then it starts the given in the configuration file, given by either
 // the `Autod` or `Start` variables.
+//TODO: This does WAY too many things. Break it!
 func (a *Autopilot) Start() {
 	// Say Hi, don't be rude!
-	a.Greeting()
+	fmt.Println("░▒▓███ RIoIPot ███▓▒░")
 
 	a.wg = sync.WaitGroup{}
 	a.wg.Add(1)
-	a.Settings.Riotpot.Start = arrays.StringToArray(a.Settings.Riotpot.Boot_plugins)
+	a.Configuration.Riotpot.Start = arrays.StringToArray(a.Configuration.Riotpot.Boot_plugins)
 
 	// register all the services plugins
 	a.RegisterPlugins()
@@ -54,10 +52,10 @@ func (a *Autopilot) Start() {
 	// loads the services which are available for user to run
 	a.SetLoadedPlugins()
 
-	a.plugins_to_run = a.Settings.Riotpot.Start
+	a.plugins_to_run = a.Configuration.Riotpot.Start
 
 	// check if the build is local or containerized
-	if a.Settings.Riotpot.Local_build_on == "1" { // User is running the Riotpot in local build mode
+	if a.Configuration.Riotpot.Local_build_on == "1" { // User is running the Riotpot in local build mode
 
 		// check if user want to run via config file or manually input
 		a.interaction_mode = a.CheckInteractionMode()
@@ -75,7 +73,7 @@ func (a *Autopilot) Start() {
 				// user inputs the plugins to run
 				a.plugins_to_run = a.GetPluginsFromUser()
 			} else {
-				a.plugins_to_run = a.Settings.Riotpot.Start
+				a.plugins_to_run = a.Configuration.Riotpot.Start
 				fmt.Printf("\nPlugins to run are ")
 				fmt.Println(a.plugins_to_run)
 				if !a.ValidatePlugin(a.plugins_to_run) {
@@ -98,7 +96,7 @@ func (a *Autopilot) Start() {
 				a.CheckContainerPort()
 				a.DeployContainers()
 			} else {
-				a.containers_to_run = a.Settings.GetDockerImagesToRun()
+				a.containers_to_run = a.Configuration.GetDockerImagesToRun()
 				fmt.Printf("\nContainers to run are ")
 				fmt.Println(a.containers_to_run)
 
@@ -126,8 +124,8 @@ func (a *Autopilot) Start() {
 				a.CheckContainerPort()
 				a.DeployContainers()
 			} else {
-				a.plugins_to_run = a.Settings.Riotpot.Start
-				a.containers_to_run = a.Settings.GetDockerImagesToRun()
+				a.plugins_to_run = a.Configuration.Riotpot.Start
+				a.containers_to_run = a.Configuration.GetDockerImagesToRun()
 
 				fmt.Printf("\nPlugins to run are ")
 				fmt.Println(a.plugins_to_run)
@@ -148,8 +146,8 @@ func (a *Autopilot) Start() {
 		// check which mode of run is set by user
 		a.CheckModesFromConfig()
 
-		if a.Settings.Riotpot.Mode == "low" {
-			a.plugins_to_run = a.Settings.Riotpot.Start
+		if a.Configuration.Riotpot.Mode == "low" {
+			a.plugins_to_run = a.Configuration.Riotpot.Start
 			fmt.Printf("\nPlugins to run are ")
 			fmt.Println(a.plugins_to_run)
 
@@ -158,11 +156,11 @@ func (a *Autopilot) Start() {
 			if !a.ValidatePlugin(a.plugins_to_run) {
 				log.Fatalf("\nPlease check the config file, and try again\n")
 			}
-		} else if a.Settings.Riotpot.Mode == "high" {
+		} else if a.Configuration.Riotpot.Mode == "high" {
 			a.plugins_to_run = nil
-			a.containers_to_run = a.Settings.GetDockerImagesToRun()
+			a.containers_to_run = a.Configuration.GetDockerImagesToRun()
 			fmt.Printf("\nContainers to run are ")
-			fmt.Println(a.Settings.Riotpot.Start_images)
+			fmt.Println(a.Configuration.Riotpot.Start_images)
 
 			if !a.ValidateContainers(a.containers_to_run) {
 				log.Fatalf("\nPlease check the config file, and try again\n")
@@ -171,12 +169,12 @@ func (a *Autopilot) Start() {
 			// glider forwards all the traffic on specific port to the respective service container
 			a.DeployGlider()
 
-		} else if a.Settings.Riotpot.Mode == "hybrid" {
-			a.plugins_to_run = a.Settings.Riotpot.Start
+		} else if a.Configuration.Riotpot.Mode == "hybrid" {
+			a.plugins_to_run = a.Configuration.Riotpot.Start
 			fmt.Printf("\nPlugins to run are ")
 			fmt.Println(a.plugins_to_run)
 			fmt.Printf("\nContainers to run are ")
-			fmt.Println(a.Settings.Riotpot.Start_images)
+			fmt.Println(a.Configuration.Riotpot.Start_images)
 
 			if !a.ValidatePlugin(a.plugins_to_run) {
 				log.Fatalf("\nPlease check the config file, and try again\n")
@@ -194,7 +192,7 @@ func (a *Autopilot) Start() {
 	}
 
 	// runs the Riotpot core
-	if a.Settings.Riotpot.Autod {
+	if a.Configuration.Riotpot.Autod {
 		a.services.RunAll()
 	} else {
 		for _, s := range a.plugins_to_run {
@@ -227,7 +225,7 @@ func (a *Autopilot) available(name string, port int) (available bool) {
 
 // check which interaction mode in supplied by the user from config file
 func (a *Autopilot) CheckModesFromConfig() {
-	mode_received := arrays.StringToArray(a.Settings.Riotpot.Mode)
+	mode_received := arrays.StringToArray(a.Configuration.Riotpot.Mode)
 
 	if len(mode_received) > 1 {
 		log.Fatalf("\nPlease enter only one mode in Riotpot config mode, i.e. low, high or hybrid\n")
@@ -235,7 +233,7 @@ func (a *Autopilot) CheckModesFromConfig() {
 		log.Fatalf("\nPlease enter atleast one mode in Riotpot config mode, i.e. low, high or hybrid\n")
 	}
 
-	if !arrays.Contains(a.Settings.Riotpot.Allowed_modes, mode_received[0]) {
+	if !arrays.Contains(a.Configuration.Riotpot.Allowed_modes, mode_received[0]) {
 		log.Fatalf("\n %q mode is invalid, only choose low, high or hybrid mode only in Riotpot config\n", mode_received[0])
 	}
 }
@@ -244,8 +242,8 @@ func (a *Autopilot) CheckModesFromConfig() {
 func (a *Autopilot) RegisterPlugins() {
 	a.services = services.Services{}
 
-	service_paths := a.services.Autodiscover(a.Settings.Riotpot.Local_build_on)
-	service_paths = a.Settings.ValidateEmulators(service_paths)
+	service_paths := a.services.Autodiscover(a.Configuration.Riotpot.Local_build_on)
+	service_paths = a.Configuration.ValidateEmulators(service_paths)
 
 	a.services.AutoRegister(service_paths)
 	a.services.AddDB(a.DB)
@@ -253,7 +251,7 @@ func (a *Autopilot) RegisterPlugins() {
 
 // Discover the available docker images
 func (a *Autopilot) DiscoverImages() {
-	a.loaded_containers = a.Settings.GetDockerImages()
+	a.loaded_containers = a.Configuration.GetDockerImages()
 	fmt.Printf("[+] Found %d docker images \n", len(a.loaded_containers))
 	fmt.Printf("[+] Available Docker images are ")
 	fmt.Println(a.loaded_containers)
@@ -262,18 +260,8 @@ func (a *Autopilot) DiscoverImages() {
 // Displays which is the current Riotpot running mode, i.e. low, high or hybrid
 func (a *Autopilot) DiscoverRunningMode() {
 	str_mode := "[+] Current mode of running is %s"
-	mode := a.Settings.Riotpot.Mode
+	mode := a.Configuration.Riotpot.Mode
 	fmt.Printf(str_mode, mode)
-}
-
-// Load the greeting
-func (a *Autopilot) Greeting() {
-	a.greeting = greeting.Greet{
-		Tutorial: a.Profile.Greet.Tutorial,
-		Initial:  a.Profile.Greet.Initial,
-	}
-
-	a.greeting.Greeting()
 }
 
 // Load the greeting
@@ -313,7 +301,7 @@ func (a *Autopilot) CheckContainerPort() {
 // Deploy containers on host machine
 func (a *Autopilot) DeployContainers() {
 	for _, container := range a.containers_to_run {
-		uri := a.Settings.GetContainerURI(container)
+		uri := a.Configuration.GetContainerURI(container)
 		// get the port number of a given container, currently all container must have an entry in ports file
 		port := strconv.Itoa(ports.GetPort(arrays.AddSuffix(container, "d")))
 		port_mapping := port + ":" + port
@@ -329,7 +317,7 @@ func (a *Autopilot) DeployGlider() {
 		port := strconv.Itoa(ports.GetPort(arrays.AddSuffix(container, "d")))
 		protocol := ports.GetProtocol(arrays.AddSuffix(container, "d"))
 		listener := protocol + "://:" + port
-		remote_ip := a.Settings.GetContainerIP(container)
+		remote_ip := a.Configuration.GetContainerIP(container)
 		forwarder := protocol + "://" + remote_ip + ":" + port
 		fmt.Println(a.remote_host_ip)
 
@@ -457,10 +445,10 @@ func (a *Autopilot) GetContainersFromUser() (containers []string) {
 
 // Gives which plugins user wants to load in RIoTPot
 func (a *Autopilot) SetLoadedPlugins() {
-	if a.Settings.Riotpot.Local_build_on == "1" {
+	if a.Configuration.Riotpot.Local_build_on == "1" {
 		a.loaded_plugins = a.services.GetServicesNames(a.services.GetServices())
 	} else {
-		a.loaded_plugins = arrays.StringToArray(a.Settings.Riotpot.Boot_plugins)
+		a.loaded_plugins = arrays.StringToArray(a.Configuration.Riotpot.Boot_plugins)
 	}
 }
 

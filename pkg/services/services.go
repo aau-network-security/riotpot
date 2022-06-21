@@ -8,7 +8,6 @@ import (
 	"log"
 	"os"
 	"plugin"
-	"strings"
 	"time"
 
 	"path/filepath"
@@ -16,6 +15,8 @@ import (
 	"github.com/riotpot/tools/arrays"
 	"github.com/riotpot/tools/errors"
 	"go.mongodb.org/mongo-driver/mongo"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 // TODO: add documentation to the functions that do not even have a description
@@ -169,6 +170,8 @@ func (mx *MixinService) SetDb(conn *mongo.Client) {
 	mx.conn = conn
 }
 
+// TODO: For some reason, we have decided that the database is MongoDB. non-rel db's do not have schemas
+// Either change the database or delete this method
 func (mx *MixinService) Migrate(model interface{}) {
 	if mx.conn != nil {
 		// mx.conn.AutoMigrate(model)
@@ -229,7 +232,8 @@ func (se *Services) AutoRegister(service_paths []string) {
 func (se *Services) Get(name string) (s Service) {
 	// capitalize the name, so it matches the name, as it must be
 	// an exported function
-	name = strings.Title(name)
+	c := cases.Title(language.Und)
+	name = c.String(name)
 
 	// Iterate through the services to get the one with the name.
 	// This method is rather slow, but the services won't normally

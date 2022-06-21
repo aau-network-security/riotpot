@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/riotpot/pkg/models"
+	"github.com/riotpot/internal/database"
 	"github.com/riotpot/pkg/services"
 	"github.com/riotpot/tools/errors"
 )
@@ -36,7 +36,7 @@ type Echo struct {
 
 func (e *Echo) Run() (err error) {
 	// before running, migrate the model that we want to store
-	e.Migrate(&models.Connection{})
+	e.Migrate(&database.Connection{})
 
 	// convert the port number to a string that we can use it in the server
 	var port = fmt.Sprintf(":%d", e.Port)
@@ -124,7 +124,7 @@ func (e *Echo) handleConn(conn net.Conn) {
 
 func (e *Echo) save(conn net.Conn, payload []byte) {
 
-	connection := models.NewConnection()
+	connection := database.NewConnection()
 	connection.LocalAddress = conn.LocalAddr().String()
 	connection.RemoteAddress = conn.RemoteAddr().String()
 	connection.Protocol = "TCP"

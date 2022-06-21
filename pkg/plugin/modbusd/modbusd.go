@@ -5,7 +5,7 @@ import (
 	"io"
 	"net"
 
-	"github.com/riotpot/pkg/models"
+	"github.com/riotpot/internal/database"
 	"github.com/riotpot/pkg/services"
 	"github.com/riotpot/tools/errors"
 	"github.com/xiegeo/modbusone"
@@ -49,7 +49,7 @@ type Modbus struct {
 
 func (m *Modbus) Run() (err error) {
 	// before running, migrate the model that we want to store
-	m.Migrate(&models.Connection{})
+	m.Migrate(&database.Connection{})
 
 	// convert the port number to a string that we can use it in the server
 	var port = fmt.Sprintf(":%d", m.Port)
@@ -293,7 +293,7 @@ func writeTCP(w io.Writer, bs []byte, pdu modbusone.PDU) (int, error) {
 }
 
 func (m *Modbus) save(conn net.Conn, payload []byte) {
-	connection := models.NewConnection()
+	connection := database.NewConnection()
 	connection.LocalAddress = conn.LocalAddr().String()
 	connection.RemoteAddress = conn.RemoteAddr().String()
 	connection.Protocol = "TCP"

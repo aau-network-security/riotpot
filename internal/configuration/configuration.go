@@ -4,6 +4,7 @@ package configuration
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"strconv"
 	"strings"
@@ -15,44 +16,74 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-func NewSettings() (s Settings, err error) {
-	s = Settings{}
-	err = s.Load()
-	s.ResolveEnv()
+/** Constructor for the configuration
+*	This method loads the configuration from a local file
+*	then, it overrides the configuration fields with the values from the environment variables
+ */
+func NewConfiguration() (conf Configuration, err error) {
+	conf = Configuration{}
+	conf.configPath = "configuration.yml"
+
+	err = conf.Load()
+	conf.ResolveEnv()
 	return
 }
 
 // Interface that obligates the child to have the `load` and `save` methods
-type Configuration interface {
+type ConfigurationInterface interface {
+	// Load settings method
 	Load()
+	// Save or store settings method
 	Save()
 }
 
 // General configuration structure. It provides methods and attributes for parsing
 // different types of configuration files, store, load and transform the state.
-type Settings struct {
-	Configuration
+type Configuration struct {
+	ConfigurationInterface
 
-	Riotpot   ConfigRiotpot
+	Riotpot   ConfigRiotpot //TODO This could be just a manager
 	Databases []ConfigDatabase
 
-	// Secret key string.
-	Secret string
+	// Private fields
+	// Configuration file path
+	configPath string
 }
 
 // Load the configuration on the child.
-func (conf *Settings) Load() (err error) {
+func (conf *Configuration) Load() (err error) {
+	// TODO: Why are we user packer to find a file in the system?
 	box := packr.NewBox("../../configs/samples")
-	data, _ := box.Find("configuration.yml")
+	data, _ := box.Find(conf.configPath)
 
+	// Serialise the content of the yaml file and load it into the structure
 	err = yaml.Unmarshal(data, &conf)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return err
+}
+
+// Stores the configuration into the given path in `.yml` format.
+func (conf *Configuration) Save() (err error) {
+	// marshal the content of the configuration into a `.yaml` document
+	d, err := yaml.Marshal(&conf)
+	errors.Raise(err)
+
+	// Save to file.
+	// Mode 640: https://chmodcommand.com/chmod-640/
+	// Note: this truncates the file if it already exists !!!
+	err = os.WriteFile(conf.configPath, d, 0640)
 	errors.Raise(err)
 
 	return err
 }
 
 // Retrieve the image name from Images tag in configuration file
-func (conf *Settings) GetDockerImages() (images []string) {
+// TODO: Delete this function. If the attribute needs to be an array, set it as an array
+func (conf *Configuration) GetDockerImages() (images []string) {
 	for _, val := range conf.Riotpot.Images {
 		images = append(images, strings.TrimSuffix(arrays.StringToArray(val)[0], ","))
 	}
@@ -61,7 +92,8 @@ func (conf *Settings) GetDockerImages() (images []string) {
 }
 
 // Retrieve the image name from Start_images tag in configuration file
-func (conf *Settings) GetDockerImagesToRun() []string {
+// TODO: Delete this function. If the attribute needs to be an array, set it as an array
+func (conf *Configuration) GetDockerImagesToRun() []string {
 	// for _, val := range conf.Riotpot.Start_images {
 	// 	images = append(images, strings.TrimSuffix(arrays.StringToArray(val)[0], ","))
 	// }
@@ -70,7 +102,8 @@ func (conf *Settings) GetDockerImagesToRun() []string {
 }
 
 // Retrieve the container uri from Images tag in configuration file
-func (conf *Settings) GetContainerURI(container string) (uri string) {
+// TODO: instead of assigning IP's, use container names
+func (conf *Configuration) GetContainerURI(container string) (uri string) {
 	for _, val := range conf.Riotpot.Images {
 		data := strings.Split(val, ",")
 		service := data[0]
@@ -84,7 +117,8 @@ func (conf *Settings) GetContainerURI(container string) (uri string) {
 }
 
 // Retrieve the container image IP from Images tag in configuration file
-func (conf *Settings) GetContainerIP(container string) (ip string) {
+// TODO: instead of assigning IP's, use container names
+func (conf *Configuration) GetContainerIP(container string) (ip string) {
 	for _, val := range conf.Riotpot.Images {
 		data := strings.Split(val, ",")
 		image := data[0]
@@ -98,27 +132,13 @@ func (conf *Settings) GetContainerIP(container string) (ip string) {
 }
 
 // Retrieve the loaded plugins, i.e. plugins which are loaded in the system
-func (conf *Settings) GetLoadedPlugins() (plugins []string) {
+// TODO: What is the purpose of this function? can't we access this from the class?
+func (conf *Configuration) GetLoadedPlugins() (plugins []string) {
 	return conf.Riotpot.Start
 }
 
-// Stores the configuration into the given path in `.yml` format.
-func (conf *Settings) Save(path string) (err error) {
-	// marshal the content of the configuration into a `.yaml` document
-	d, err := yaml.Marshal(&conf)
-	errors.Raise(err)
-
-	// Save to file.
-	// Mode 640: https://chmodcommand.com/chmod-640/
-	// Note: this truncates the file if it already exists !!!
-	err = os.WriteFile(path, d, 0640)
-	errors.Raise(err)
-
-	return err
-}
-
 // Validates the name of the emulator
-func (conf *Settings) ValidateEmulators(service_paths []string) []string {
+func (conf *Configuration) ValidateEmulators(service_paths []string) []string {
 	var val []string
 	fmt.Printf("[+] Allowed plugins: %v\n", conf.Riotpot.Emulators)
 
@@ -143,7 +163,7 @@ func (conf *Settings) ValidateEmulators(service_paths []string) []string {
 }
 
 // This method overwrites the settings with the values from the environment
-func (conf *Settings) ResolveEnv() {
+func (conf *Configuration) ResolveEnv() {
 	var err error
 
 	// overwrite Autodiscover configuration setting
@@ -197,16 +217,21 @@ type ConfigRiotpot struct {
 	// List of plugins used for Riotpot to manage runtime plugins
 	Start []string
 	// Plugins which are booted in the system to run, supplied by user
+	// TODO: Why is this a string and not an array? Also, isn't this the "start" attribute??
 	Boot_plugins string
 	// Variable to check if the run is for local build or not
+	// TODO: Why is this a string and not a boolean?
 	Local_build_on string
 	// Available docker images along with docker registry name and ip address(for contianerized runs)
 	Images []string
 	// Interaction mode of Riotpot, used in containazried build
+	// TODO: Change this from a string to an integer or a tuple
 	Mode string
 	// Modes of operation which are currently supported by Riotpot
+	// TODO: Change this from a list of strings to a class instance. If there are modes, these should be part of the app
 	Allowed_modes []string
 	// Container images which are finalized to run in the Riotpot run
+	// TODO: Why is this a string?
 	Start_images string
 }
 
@@ -216,7 +241,7 @@ type ConfigDatabase struct {
 
 	/* Database configuration */
 	// engine used in the db e.g. sql, postgres, sqlite
-	Engine string
+	Engine string // TODO: it seems that the VIP has decided that this is a MongoDB
 	// username to use in the db
 	Username string
 	// password for the user
