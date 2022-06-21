@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"net"
 
+	"github.com/riotpot/internal/database"
 	"github.com/riotpot/pkg/fake/shell"
-	"github.com/riotpot/pkg/models"
 	"github.com/riotpot/pkg/services"
 	"github.com/riotpot/tools/errors"
 )
@@ -36,7 +36,7 @@ type Telnet struct {
 
 func (t *Telnet) Run() (err error) {
 	// before running, migrate the model that we want to store
-	t.Migrate(&models.Connection{})
+	t.Migrate(&database.Connection{})
 
 	// convert the port number to a string that we can use it in the server
 	var port = fmt.Sprintf(":%d", t.Port)
@@ -168,7 +168,7 @@ func (t *Telnet) respond(
 
 func (t *Telnet) save(conn net.Conn, payload []byte) {
 
-	connection := models.NewConnection()
+	connection := database.NewConnection()
 	connection.LocalAddress = conn.LocalAddr().String()
 	connection.RemoteAddress = conn.RemoteAddr().String()
 	connection.Protocol = "TCP"

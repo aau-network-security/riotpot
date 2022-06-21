@@ -6,7 +6,7 @@ type: template
 # documentation for internal structure when in doubt on usage.
 
 # 50 characters minimum long RANDOM string used to generate cryptographic signatures.
-secret: 
+secret:
 
 riotpot:
   # If this boolean is set to a falsy value then `start` must be filled with the
@@ -53,13 +53,13 @@ riotpot:
   # on-start variable used in Riotpot core on runtime only!
   start:
 
-# Following block is setup for the user in case they want to configure which plugin/contianer
-# to run upon starting of Riotpot core bypassing the manual interactive mode
-##################################################################################################
+  # Following block is setup for the user in case they want to configure which plugin/contianer
+  # to run upon starting of Riotpot core bypassing the manual interactive mode
+  ##################################################################################################
   #Services which will run at start. For all the services, set `autod` to `true`.
   # enter them separated by space
   boot_plugins: httpd echod telnetd mqttd coapd modbusd
-  
+
   # enter the name of the docker images which need to run at Riotpot
   start_images: mqtt http
 
@@ -75,7 +75,7 @@ riotpot:
 # connection information. As the name indicates, `default` will be the default
 # database used to store logs, binary entries, etc.
 databases:
-  - identity: 
+  - identity:
     # Name of the targeted database
     dbname: mongodb
     # RiotPot only supports `mongodb` currently.

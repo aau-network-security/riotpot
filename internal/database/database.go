@@ -47,7 +47,8 @@ func (db *Database) connect() (*mongo.Client, error) {
 	errors.Raise(err)
 
 	//set the command timeout
-	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
 	err = client.Connect(ctx)
 
 	errors.Raise(err)

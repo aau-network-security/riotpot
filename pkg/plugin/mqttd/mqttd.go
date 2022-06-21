@@ -7,7 +7,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/riotpot/pkg/models"
+	"github.com/riotpot/internal/database"
 	"github.com/riotpot/pkg/services"
 	"github.com/riotpot/tools/errors"
 )
@@ -39,7 +39,7 @@ type Mqtt struct {
 
 func (m *Mqtt) Run() (err error) {
 	// before running, migrate the model that we want to store
-	m.Migrate(&models.Connection{})
+	m.Migrate(&database.Connection{})
 
 	// convert the port number to a string that we can use it in the server
 	var port = fmt.Sprintf(":%d", m.Port)
@@ -147,7 +147,7 @@ func (m *Mqtt) save(packet *Packet, conn net.Conn) {
 		strings.Join(packet.Topics, ","),
 	)
 
-	connection := &models.Connection{
+	connection := &database.Connection{
 		LocalAddress:  "localhost",
 		RemoteAddress: conn.RemoteAddr().String(),
 		Payload:       data,

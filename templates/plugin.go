@@ -11,8 +11,6 @@ TIP: To create your own plugin...
 	3. `ctrl + F` > replace > "Template" with "<your pluggin name>"
 
 	4. Test it and place it in the `~/env/.env` file.
-
-TODO: Add a
 */
 package main
 

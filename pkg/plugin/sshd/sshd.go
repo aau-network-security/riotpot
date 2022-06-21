@@ -137,6 +137,7 @@ func (s *SSH) handleChannels(sshItem SSHConn, chans <-chan ssh.NewChannel) {
 			return
 		case conn := <-chans:
 			//TODO: this line crashes the app when the connection is lost!!!
+			// NOTE: As of [6/21/2022] this line has not been fixed yet.
 			// Fix it ASAP!
 			// ☟ ☟ ☟
 			go s.handleChannel(sshItem, conn)

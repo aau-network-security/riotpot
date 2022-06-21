@@ -5,7 +5,8 @@ import (
 	"strconv"
 )
 
-var ProtocolDetails = map[string]map[string]string{"coapd": {"protocol": "udp", "port": "5683"},
+var ProtocolDetails = map[string]map[string]string{
+	"coapd":   {"protocol": "udp", "port": "5683"},
 	"sshd":    {"protocol": "tcp", "port": "22"},
 	"httpd":   {"protocol": "tcp", "port": "8080"},
 	"echod":   {"protocol": "tcp", "port": "7"},

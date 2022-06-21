@@ -8,7 +8,7 @@ import (
 	"os"
 	"os/signal"
 
-	"github.com/riotpot/pkg/models"
+	"github.com/riotpot/internal/database"
 	"github.com/riotpot/pkg/services"
 )
 
@@ -37,7 +37,7 @@ type Http struct {
 }
 
 func (h *Http) Run() (err error) {
-	h.Migrate(&models.Connection{})
+	h.Migrate(&database.Connection{})
 
 	mux := http.NewServeMux()
 	mux.Handle("/", http.HandlerFunc(h.valid))
@@ -146,7 +146,7 @@ func (h *Http) loadHandler(path string, valid bool) {
 */
 
 func (h *Http) save(req *http.Request) {
-	connection := models.NewConnection()
+	connection := database.NewConnection()
 	connection.LocalAddress = "localhost"
 	connection.RemoteAddress = req.RemoteAddr
 	connection.Protocol = "TCP"
