@@ -1,5 +1,4 @@
-# Start from the latest golang base image
-FROM golang:1.18
+FROM golang:1.18 as builder
 LABEL maintainer="Shreyas Srinivasa <shsr@es.aau.dk>"
 
 ENV GO111MODULE=on
@@ -15,14 +14,6 @@ COPY go.sum .
 
 # download all the dependencies
 RUN go mod download
-
-# download and install glider
-RUN wget https://github.com/nadoo/glider/releases/download/v0.15.0/glider_0.15.0_linux_amd64.tar.gz
-
-RUN tar -xzf glider_0.15.0_linux_amd64.tar.gz && cd glider_0.15.0_linux_amd64 && cp glider /usr/bin/
-
-# install netcat so we can ping the db until it is ready
-RUN apt-get update && apt-get install -y netcat
 
 # Copy everything into the image
 # Copy only the app files in the image
@@ -40,8 +31,12 @@ COPY build/docker/entrypoint.sh ./
 COPY Makefile .
 RUN make builder
 
-# give permissions to the entrypoint to run the file
-RUN chmod +x ./entrypoint.sh
+FROM golang:1.18 as stage
+WORKDIR /app
+
+# TODO: Copy the plugins
+COPY --from=stage cmd/riotpot/main.go ./
+USER 1000
 
 # Run RIoTPot
-ENTRYPOINT [ "./entrypoint.sh" ]
+ENTRYPOINT [ "./main.go" ]
