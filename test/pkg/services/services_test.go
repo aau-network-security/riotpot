@@ -29,7 +29,7 @@ func init() {
 		"../../../pkg/plugin/coapd/plugin.so",
 	}
 
-	services := services.Services{}
+	services := services.Supervisor{}
 	services.AutoRegister(servs)
 
 	serviceToTest := COAP

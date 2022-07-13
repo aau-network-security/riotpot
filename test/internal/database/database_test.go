@@ -3,12 +3,9 @@ package database
 import (
 	"context"
 	"testing"
-	"time"
 
 	"github.com/riotpot/internal/configuration"
 	"github.com/riotpot/internal/database"
-	"github.com/riotpot/pkg/models"
-	"go.mongodb.org/mongo-driver/bson"
 )
 
 // Runs a simple test to check the health of MongoDB database and the configuration.
@@ -22,12 +19,12 @@ func TestDatabaseConnection(t *testing.T) {
 
 	var (
 		// Load an identity for the database
-		id = configuration.ConfigIdentity{
+		id = configuration.IdentityConfiguration{
 			Name: "test_db",
 		}
 
 		// Load a configuration for the database
-		config = configuration.ConfigDatabase{
+		config = configuration.DatabaseConfiguration{
 			Username: "superuser",
 			Password: "password",
 			Host:     "127.0.0.1",
@@ -35,10 +32,7 @@ func TestDatabaseConnection(t *testing.T) {
 			Port:     "27017",
 		}
 
-		// Load a database object
-		db = database.Database{
-			Config: config,
-		}
+		db = database.NewDatabase(config)
 	)
 
 	// Connect to the db
@@ -51,6 +45,7 @@ func TestDatabaseConnection(t *testing.T) {
 }
 
 // TODO: Delete this test, it does too many things. Divide it at the very least
+/*
 func TestDatabaseInsert(t *testing.T) {
 
 	var (
@@ -132,3 +127,4 @@ func TestDatabaseInsert(t *testing.T) {
 		t.Error("Database not accessible")
 	}
 }
+*/

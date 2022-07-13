@@ -13,6 +13,11 @@ const (
 	UDP = "udp"
 )
 
+var (
+	// Instantiate the proxy manager to allow other applications work with the proxies
+	Proxies = NewProxyManager()
+)
+
 // Proxy interface.
 type Proxy interface {
 	// Start proxy function
@@ -25,10 +30,12 @@ type Proxy interface {
 
 	// Setter and Getter for the port
 	SetPort(port int) (int, error)
-	GetPort() int
+	Port() int
+	Protocol() string
 
 	// Set the service in the proxy
 	SetService(service services.Service)
+	Service() services.Service
 }
 
 // Abstraction of the proxy endpoint
@@ -102,12 +109,22 @@ func (pe *AbstractProxy) SetPort(port int) (p int, err error) {
 }
 
 // Returns the proxy port
-func (pe *AbstractProxy) GetPort() int {
+func (pe *AbstractProxy) Port() int {
 	return pe.port
 }
 
 func (pe *AbstractProxy) SetService(service services.Service) {
 	pe.service = service
+}
+
+// Returns the service
+func (pe *AbstractProxy) Service() services.Service {
+	return pe.service
+}
+
+// Returns the service
+func (pe *AbstractProxy) Protocol() string {
+	return pe.protocol
 }
 
 // Create a new instance of the proxy
@@ -129,6 +146,8 @@ type ProxyManager interface {
 	CreateProxy(port int) (*TCPProxy, error)
 	// Delete a proxy from the list
 	DeleteProxy(port int) error
+	// Get all the proxies registered
+	Proxies() []Proxy
 	// Get a proxy by the port it uses
 	GetProxy(port int) (*TCPProxy, error)
 	// Set the service for a proxy
@@ -148,6 +167,7 @@ type ProxyManagerItem struct {
 	middlewares *MiddlewareManagerItem
 }
 
+// Create a new proxy and add it to the manager
 func (pm *ProxyManagerItem) CreateProxy(protocol string, port int) (pe Proxy, err error) {
 	// Check if there is another proxy with the same port
 	if proxy, _ := pm.GetProxy(port); proxy != nil {
@@ -168,7 +188,7 @@ func (pm *ProxyManagerItem) CreateProxy(protocol string, port int) (pe Proxy, er
 func (pm *ProxyManagerItem) DeleteProxy(port int) (err error) {
 	// Iterate the registered proxies for the proxy using the given port, and stop and remove it from the slice
 	for ind, proxy := range pm.proxies {
-		if proxy.GetPort() == port {
+		if proxy.Port() == port {
 			// Stop the proxy, just in case
 			proxy.Stop()
 			// Remove it from the slice by replacing it with the last item from the slice, and reducing the slice
@@ -186,11 +206,15 @@ func (pm *ProxyManagerItem) DeleteProxy(port int) (err error) {
 	return
 }
 
+func (pm *ProxyManagerItem) Proxies() []Proxy {
+	return pm.proxies
+}
+
 // Returns a proxy by the port number
 func (pm *ProxyManagerItem) GetProxy(port int) (pe Proxy, err error) {
 	// Iterate the proxies registered, and if the proxy using the given port is found, return it
 	for _, proxy := range pm.proxies {
-		if proxy.GetPort() == port {
+		if proxy.Port() == port {
 			pe = proxy
 			return
 		}

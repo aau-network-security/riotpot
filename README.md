@@ -86,15 +86,10 @@ Note: the list will be updated on support for additional scanning sources.
 
 ## 2. Requirements
 
-Make sure that you abide by the following software and platform requirements before running RIoTPot,
+Make sure that you abide by the following software and platform requirements before running RIoTPot:
 
-- Ubuntu 18.04 or higher
-- gcc 9.3.0 or higher
-- GNU make 4.2.1 or higher
-- Go version go1.16.4 or higher
-- MongoDB v4.4.8 or higher, having a username as `superuser` and password as `password`
-- Docker version 20.10.2 or higher
-- Docker-compose version 1.29.2 or higher
+- Ubuntu
+- [Golang ^V1.16](https://go.dev/dl/)
 
 ## 3. Installation
 
@@ -114,7 +109,7 @@ Follow the steps to get the RIoTPot project first:
 $ git clone git@github.com:aau-network-security/riotpot.git
 
 # 2. Navigate to the newly created directory with the repository
-$ cd RIoTPot
+$ cd riotpot
 ```
 
 ### 3.1 Local Build

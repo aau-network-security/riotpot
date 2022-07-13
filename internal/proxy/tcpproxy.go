@@ -89,7 +89,7 @@ func (tcpProxy *TCPProxy) Stop() (err error) {
 // Get or create a new listener
 func (tcpProxy *TCPProxy) GetListener() net.Listener {
 	if tcpProxy.listener == nil || !tcpProxy.Alive() {
-		listener, err := net.Listen(tcpProxy.protocol, fmt.Sprintf(":%d", tcpProxy.GetPort()))
+		listener, err := net.Listen(tcpProxy.protocol, fmt.Sprintf(":%d", tcpProxy.Port()))
 		if err != nil {
 			log.Fatal(err)
 		}
