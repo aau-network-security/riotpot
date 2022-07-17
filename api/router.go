@@ -42,7 +42,7 @@ func (r *AbstractRouter) Routes() []Route {
 	return r.routes
 }
 
-// Add the handlers to a router group
+// Add handlers to a router group
 func (r *AbstractRouter) addHandlers(parentGroup *gin.RouterGroup) *gin.RouterGroup {
 	// Iterate the routes and add the handlers registered in the
 	for _, route := range r.Routes() {
@@ -120,22 +120,3 @@ func NewRoute(path string, method string, handlers ...gin.HandlerFunc) *Abstract
 		handlers: handlers,
 	}
 }
-
-// This function creates a new router that listens for new connections in
-// the designated port
-/*
-func NewRouter(port int) {
-	// New default Gin router
-	router := gin.Default()
-
-	// Populate the routes
-	api := router.Group("/api")
-	{
-		// Proxies
-		api.GET("/proxies", nil)
-	}
-
-	router.NoRoute(func(ctx *gin.Context) { ctx.JSON(http.StatusNotFound, gin.H{}) })
-	router.Run(fmt.Sprintf(":%d", port))
-}
-*/

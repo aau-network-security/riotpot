@@ -182,10 +182,13 @@ func TestDeleteProxy(t *testing.T) {
 	// Create a new proxy manager
 	proxyManager := proxy.NewProxyManager()
 	// Add a proxy
-	proxyManager.CreateProxy(proxy.TCP, proxyPort)
-	// Delete the proxy
-	err := proxyManager.DeleteProxy(proxyPort)
+	pe, err := proxyManager.CreateProxy(proxy.TCP, proxyPort)
+	if err != nil {
+		t.Fatal(err)
+	}
 
+	// Delete the proxy
+	err = proxyManager.DeleteProxy(pe.ID())
 	// There may be an error if the proxy was not found
 	if err != nil {
 		t.Fatal(err)

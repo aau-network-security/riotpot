@@ -1,7 +1,6 @@
 package proxy
 
 import (
-	"log"
 	"net/http"
 	"strconv"
 
@@ -13,7 +12,7 @@ import (
 
 // Structures used to serialize data
 type Proxy struct {
-	ID       int      `json:"id" binding:"required" gorm:"primary_key"`
+	ID       string   `json:"id" gorm:"primary_key"`
 	Port     int      `json:"port" binding:"required"`
 	Protocol string   `json:"protocol" binding:"required"`
 	Status   bool     `json:"status"`
@@ -21,7 +20,7 @@ type Proxy struct {
 }
 
 type Service struct {
-	ID   int    `json:"id" binding:"required" gorm:"primary_key"`
+	ID   string `json:"id" binding:"required" gorm:"primary_key"`
 	Port int    `json:"port" binding:"required"`
 	Name string `json:"name" binding:"required"`
 	Host string `json:"host" binding:"required"`
@@ -31,27 +30,27 @@ type Service struct {
 var (
 	// Proxy Routes
 	proxyRoutes = []api.Route{
-		// Get proxies
-		api.NewRoute("/", "GET", getProxies),
-		// Get a proxy by port
-		api.NewRoute("/proxy/:port", "GET", getProxy),
-		// Post proxy by port
-		api.NewRoute("/proxy/:port", "POST", postProxy),
-		// Delete a proxy by port
-		api.NewRoute("/proxy/:port", "DELETE", delProxy),
-		// Patch (Not update) a proxy by port
-		api.NewRoute("/proxy/:port", "PATCH", patchProxy),
+
+		// GET and POST proxies
+		api.NewRoute("", "GET", getProxies),
+		api.NewRoute("", "POST", postProxy),
+
+		// CRUD operations for each proxy
+		api.NewRoute("proxy/:id", "GET", getProxy),
+		api.NewRoute("proxy/:id", "PATCH", patchProxy),
+		api.NewRoute("proxy/:id", "DELETE", delProxy),
 	}
 )
 
 // Routers
 var (
-	ProxyRouter = api.NewRouter("/proxies", proxyRoutes, nil)
+	ProxyRouter = api.NewRouter("proxies/", proxyRoutes, nil)
 )
 
 func newService(serv services.Service) (sv *Service) {
 	if serv != nil {
 		sv = &Service{
+			ID:   serv.GetID(),
 			Port: serv.GetPort(),
 			Name: serv.GetName(),
 			Host: serv.GetName(),
@@ -65,6 +64,7 @@ func newProxy(px proxy.Proxy) *Proxy {
 	serv := newService(px.Service())
 
 	return &Proxy{
+		ID:       px.ID(),
 		Port:     px.Port(),
 		Protocol: px.Protocol(),
 		Status:   px.Alive(),
@@ -72,6 +72,7 @@ func newProxy(px proxy.Proxy) *Proxy {
 	}
 }
 
+// TODO [7/17/2022]: Add filters to this method
 // GET proxies registered
 // Contains a filter to get proxies by port
 func getProxies(ctx *gin.Context) {
@@ -81,67 +82,77 @@ func getProxies(ctx *gin.Context) {
 	for _, px := range proxy.Proxies.Proxies() {
 		// Serialize the proxy
 		pr := newProxy(px)
-		// Append the proxy tot he casted
+		// Append the proxy to the casted
 		casted = append(casted, *pr)
 	}
 
 	// Set the header and transform the struct to JSON format
 	ctx.JSON(http.StatusOK, casted)
-
 }
 
-// GET proxy by port ":port"
-func getProxy(ctx *gin.Context) {
-	port, err := strconv.Atoi(ctx.Param("port"))
-	if err != nil {
-		log.Fatal(err)
+// POST a proxy by port ":port"
+func postProxy(ctx *gin.Context) {
+	// Validate the post request to create a new proxy
+	var input Proxy
+	if err := ctx.ShouldBindJSON(&input); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
 	}
 
-	// Get the proxy
-	px, err := proxy.Proxies.GetProxy(port)
+	// Get the port from the parameters
+	port, err := strconv.Atoi(ctx.Param("port"))
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 
-	// If the proxy could not be found, let the user know
+	// Create a new proxy
+	pe, err := proxy.Proxies.CreateProxy(ctx.Param("protocol"), port)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Serialize the new proxy and return it as a response
+	pr := newProxy(pe)
+	ctx.JSON(http.StatusOK, pr)
+}
+
+func getProxy(ctx *gin.Context) {
+	id := ctx.Param("id")
+	pe, err := proxy.Proxies.GetProxy(id)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	// Serialize the proxy and send it as a response
-	pr := newProxy(px)
+	pr := newProxy(pe)
 	ctx.JSON(http.StatusOK, pr)
 }
 
-// POST a proxy by port ":port"
-func postProxy(ctx *gin.Context) {}
-
-// DELETE a proxy by port ":port"
-func delProxy(ctx *gin.Context) {}
-
+// TODO [7/17/2022]: Missing PATCH method
 // PATCH proxy by port ":port"
 // Can update port, protocol, status and service
-func patchProxy(ctx *gin.Context) {}
-
-// Routers
-/*
-var (
-	ProxyRouter = &api.AbstractRouter{
-		path: "proxy",
-		routes: []Route{
-			GetProxies,
-			GetProxy,
-		},
+func patchProxy(ctx *gin.Context) {
+	// Validate the post request to create a new proxy
+	var input Proxy
+	if err := ctx.ShouldBindJSON(&input); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
 	}
-)
-*/
-
-/*
-func getProxies(ctx *gin.Context) {
-	// List of proxies
-	var proxies []Proxy
-
-	// Send the response with the proxies
-	ctx.Header("Content-Type", "application/json")
-	ctx.JSON(http.StatusOK, proxies)
-
 }
-*/
+
+// DELETE registered proxy
+func delProxy(ctx *gin.Context) {
+	id := ctx.Param("id")
+
+	err := proxy.Proxies.DeleteProxy(id)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Serialize the proxy and send it as a response
+	ctx.JSON(http.StatusOK, gin.H{"success": "Proxy deleted"})
+}

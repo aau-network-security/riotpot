@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -15,17 +16,21 @@ import (
 func SetupRouter() *gin.Engine {
 	// Create a router
 	router := gin.Default()
-	group := router.Group("/api")
+	group := router.Group("/api/")
 	// Add the proxy routes
-	group = api.ProxyRouter.Group(group)
+	api.ProxyRouter.Group(group)
 
 	return router
 }
 
 func TestApi(t *testing.T) {
-	mockResponse := `[{"id":0,"port":8080,"protocol":"tcp","status":false,"service":null}]`
+
 	// Add a proxy to the manager
-	proxy.Proxies.CreateProxy(proxy.TCP, 8080)
+	pe, _ := proxy.Proxies.CreateProxy(proxy.TCP, 8080)
+
+	// Mock the response with the proxy
+	mockResponse := fmt.Sprintf(`[{"id":%s,"port":%d,"protocol":"%s","status":false,"service":null}]`, pe.ID(), pe.Port(), pe.Protocol())
+
 	router := SetupRouter()
 
 	req, _ := http.NewRequest("GET", "/api/proxies/", nil)
