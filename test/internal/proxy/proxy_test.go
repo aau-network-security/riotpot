@@ -26,7 +26,7 @@ func TestCreateProxy(t *testing.T) {
 		t.Error(err)
 	}
 
-	assert.Equal(t, pr.Port(), proxyPort, "The ports should be the same")
+	assert.Equal(t, pr.GetPort(), proxyPort, "The ports should be the same")
 }
 
 // Test to start the proxy
@@ -49,7 +49,7 @@ func TestStartProxy(t *testing.T) {
 	}
 
 	// Create a new abstract service
-	service := services.NewAbstractPluginService("http", serverPort, protocol)
+	service := services.NewPluginService("http", serverPort, protocol, "")
 
 	// Set the service
 	pr.SetService(service)
@@ -126,7 +126,7 @@ func TestStopProxy(t *testing.T) {
 	}
 
 	// Create a new abstract service
-	service := services.NewAbstractPluginService("http", serverPort, protocol)
+	service := services.NewPluginService("http", serverPort, protocol, "")
 
 	// Set the service
 	pr.SetService(service)
@@ -157,12 +157,12 @@ func TestStopProxy(t *testing.T) {
 	pr.Start()
 
 	// Give the proxy some time to start
-	alive := pr.Alive()
+	alive := pr.GetStatus()
 	assert.Equal(alive, true, "The proxy is running")
 
 	// Stop the service
 	pr.Stop()
-	alive = pr.Alive()
+	alive = pr.GetStatus()
 	assert.Equal(alive, false, "The proxy is stop")
 }
 
@@ -188,7 +188,7 @@ func TestDeleteProxy(t *testing.T) {
 	}
 
 	// Delete the proxy
-	err = proxyManager.DeleteProxy(pe.ID())
+	err = proxyManager.DeleteProxy(pe.GetID())
 	// There may be an error if the proxy was not found
 	if err != nil {
 		t.Fatal(err)

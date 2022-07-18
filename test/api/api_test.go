@@ -18,7 +18,7 @@ func SetupRouter() *gin.Engine {
 	router := gin.Default()
 	group := router.Group("/api/")
 	// Add the proxy routes
-	api.ProxyRouter.Group(group)
+	api.ProxiesRouter.Group(group)
 
 	return router
 }
@@ -29,7 +29,7 @@ func TestApi(t *testing.T) {
 	pe, _ := proxy.Proxies.CreateProxy(proxy.TCP, 8080)
 
 	// Mock the response with the proxy
-	mockResponse := fmt.Sprintf(`[{"id":%s,"port":%d,"protocol":"%s","status":false,"service":null}]`, pe.ID(), pe.Port(), pe.Protocol())
+	mockResponse := fmt.Sprintf(`[{"id":%s,"port":%d,"protocol":"%s","status":false,"service":null}]`, pe.GetID(), pe.GetPort(), pe.GetProtocol())
 
 	router := SetupRouter()
 

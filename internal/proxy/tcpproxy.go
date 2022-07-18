@@ -17,9 +17,19 @@ type TCPProxy struct {
 }
 
 // Start listening for connections
-func (tcpProxy *TCPProxy) Start() {
+func (tcpProxy *TCPProxy) Start() (err error) {
+	// Check if the service is set, otherwise return with an error
+	if tcpProxy.GetService() == nil {
+		err = fmt.Errorf("service not set")
+		return
+	}
+
 	// Get the listener or create a new one
-	listener := tcpProxy.GetListener()
+	listener, err := tcpProxy.GetListener()
+	if err != nil {
+		return
+	}
+
 	// Create a channel to stop the proxy
 	tcpProxy.stop = make(chan struct{})
 
@@ -35,11 +45,7 @@ func (tcpProxy *TCPProxy) Start() {
 			// There is no need to continue if it is not
 			client, err := listener.Accept()
 			if err != nil {
-				// If the channel was closed, the proxy should stop
-				if !tcpProxy.Alive() {
-					return
-				}
-				fmt.Println(err)
+				return
 			}
 			defer client.Close()
 
@@ -69,33 +75,28 @@ func (tcpProxy *TCPProxy) Start() {
 			}()
 		}
 	}()
-}
 
-// Function to stop the proxy from runing
-func (tcpProxy *TCPProxy) Stop() (err error) {
-	// Stop the proxy if it is still alive
-	if tcpProxy.Alive() {
-		close(tcpProxy.stop)
-		tcpProxy.listener.Close()
-		// Wait for all the connections and the server to stop
-		tcpProxy.wg.Wait()
-		return
-	}
-
-	err = fmt.Errorf("proxy not running")
 	return
 }
 
-// Get or create a new listener
-func (tcpProxy *TCPProxy) GetListener() net.Listener {
-	if tcpProxy.listener == nil || !tcpProxy.Alive() {
-		listener, err := net.Listen(tcpProxy.protocol, fmt.Sprintf(":%d", tcpProxy.Port()))
+func (tcpProxy *TCPProxy) GetListener() (listener net.Listener, err error) {
+	listener = tcpProxy.listener
+
+	// Get the listener only
+	if listener == nil || tcpProxy.GetStatus() != ALIVE {
+		listener, err = tcpProxy.NewListener()
 		if err != nil {
-			log.Fatal(err)
+			return
 		}
 		tcpProxy.listener = listener
 	}
-	return tcpProxy.listener
+
+	return
+}
+
+func (tcpProxy *TCPProxy) NewListener() (listener net.Listener, err error) {
+	listener, err = net.Listen(tcpProxy.GetProtocol(), fmt.Sprintf(":%d", tcpProxy.GetPort()))
+	return
 }
 
 // TCP synchronous tunnel that forwards requests from source to destination and back
@@ -141,13 +142,10 @@ func (tcpProxy *TCPProxy) handle(from net.Conn, to net.Conn) {
 func NewTCPProxy(port int) (proxy *TCPProxy, err error) {
 	// Create a new proxy
 	proxy = &TCPProxy{
-		AbstractProxy: &AbstractProxy{
-			middlewares: Middlewares,
-			protocol:    TCP,
-		},
+		AbstractProxy: NewAbstractProxy(port, TCP),
 	}
 
 	// Set the port
-	_, err = proxy.SetPort(port)
+	proxy.SafeSetPort(port)
 	return
 }

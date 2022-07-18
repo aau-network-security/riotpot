@@ -2,46 +2,52 @@ package proxy
 
 import (
 	"fmt"
-	"net"
 	"sync"
 
+	"github.com/google/uuid"
+	"github.com/riotpot/internal/validators"
 	"github.com/riotpot/pkg/services"
 )
 
 const (
+	// Protocols
 	TCP = "tcp"
 	UDP = "udp"
 )
 
-var (
-	// Instantiate the proxy manager to allow other applications work with the proxies
-	Proxies = NewProxyManager()
+const (
+	// Values for the proxy status
+	// This variables are set to make development more readable and extensible
+	// If in the future other status are allowed, include them here
+	ALIVE = 1
+	DEAD  = 0
 )
 
 // Proxy interface.
 type Proxy interface {
-	// Start proxy function
-	Start()
-
-	// Stop the proxy
+	// Start and stop
+	Start() error
 	Stop() error
-	// Check if the proxy is running
-	Alive() bool
 
-	// Setter and Getter for the port
-	SetPort(port int) (int, error)
-	Port() int
-	Protocol() string
+	// Getters
+	GetID() string
+	GetPort() int
+	GetProtocol() string
+	GetStatus() int
+	GetService() services.Service
 
-	// Set the service in the proxy
-	SetService(service services.Service)
-	Service() services.Service
+	// Setters
+	SetPort(port int) int
+	SetService(service services.Service) services.Service
 }
 
 // Abstraction of the proxy endpoint
 // Contains private fields, do not use outside of this package
 type AbstractProxy struct {
 	Proxy
+
+	// ID of the proxy
+	id uuid.UUID
 
 	// Port in where the proxy will listen
 	port int
@@ -62,10 +68,28 @@ type AbstractProxy struct {
 
 	// Waiting group for the server
 	wg sync.WaitGroup
+
+	// Generic listener
+	listener interface{ Close() }
+}
+
+// Function to stop the proxy from runing
+func (pe *AbstractProxy) Stop() (err error) {
+	// Stop the proxy if it is still alive
+	if pe.GetStatus() != DEAD {
+		close(pe.stop)
+		pe.listener.Close()
+		// Wait for all the connections and the server to stop
+		pe.wg.Wait()
+		return
+	}
+
+	err = fmt.Errorf("proxy not running")
+	return
 }
 
 // Simple function to check if the proxy is running
-func (pe *AbstractProxy) Alive() (alive bool) {
+func (pe *AbstractProxy) GetStatus() (alive int) {
 	// When the proxy is instantiated, the stop channel is nil;
 	// therefore, the proxy is not running
 	if pe.stop == nil {
@@ -82,49 +106,65 @@ func (pe *AbstractProxy) Alive() (alive bool) {
 	case <-pe.stop:
 	// Return if the channel is open
 	default:
-		alive = true
+		alive = ALIVE
 	}
 
 	return
 }
 
-// Set the port based on some criteria
-func (pe *AbstractProxy) SetPort(port int) (p int, err error) {
-	p = port
-	// Check if there is a port and is acceptable
-	if !(port < 65536 && port > 0) {
-		err = fmt.Errorf("invalid port %d", port)
-		return
-	}
+func (pe *AbstractProxy) GetID() string {
+	return pe.id.String()
+}
 
-	// Check if the port is taken
-	ln, err := net.Listen(pe.protocol, fmt.Sprintf(":%d", port))
+// Set the port
+// NOTE: use the ValidatePort before assigning
+func (pe *AbstractProxy) SafeSetPort(port int) (p int, err error) {
+	p, err = validators.ValidatePort(port)
 	if err != nil {
 		return
 	}
-	defer ln.Close()
 
-	pe.port = port
+	pe.port = p
 	return
 }
 
-// Returns the proxy port
-func (pe *AbstractProxy) Port() int {
+// Set the port
+// NOTE: use the ValidatePort before assigning
+func (pe *AbstractProxy) SetPort(port int) int {
+
+	pe.port = port
 	return pe.port
 }
 
-func (pe *AbstractProxy) SetService(service services.Service) {
-	pe.service = service
+// Returns the proxy port
+func (pe *AbstractProxy) GetPort() int {
+	return pe.port
 }
 
-// Returns the service
-func (pe *AbstractProxy) Service() services.Service {
+// Set the service based on the list of registered services
+func (pe *AbstractProxy) SetService(service services.Service) services.Service {
+	pe.service = service
 	return pe.service
 }
 
 // Returns the service
-func (pe *AbstractProxy) Protocol() string {
+func (pe *AbstractProxy) GetService() services.Service {
+	return pe.service
+}
+
+// Returns the service
+func (pe *AbstractProxy) GetProtocol() string {
 	return pe.protocol
+}
+
+func NewAbstractProxy(port int, protocol string) (ab *AbstractProxy) {
+	ab = &AbstractProxy{
+		id:          uuid.New(),
+		port:        port,
+		protocol:    protocol,
+		middlewares: Middlewares,
+	}
+	return
 }
 
 // Create a new instance of the proxy
@@ -138,111 +178,4 @@ func NewProxyEndpoint(port int, protocol string) (pe Proxy, err error) {
 	}
 
 	return
-}
-
-// Interface for the proxy manager
-type ProxyManager interface {
-	// Create a new proxy and add it to the manager
-	CreateProxy(port int) (*TCPProxy, error)
-	// Delete a proxy from the list
-	DeleteProxy(port int) error
-	// Get all the proxies registered
-	Proxies() []Proxy
-	// Get a proxy by the port it uses
-	GetProxy(port int) (*TCPProxy, error)
-	// Set the service for a proxy
-	SetService(port int, service services.Service) (pe *TCPProxy, err error)
-}
-
-// Simple implementation of the proxy manager
-// This manager has access to the proxy endpoints registered. However, it does not observe newly
-//
-type ProxyManagerItem struct {
-	ProxyManager
-
-	// List of proxy endpoints registered in the manager
-	proxies []Proxy
-
-	// Instance of the middleware manager
-	middlewares *MiddlewareManagerItem
-}
-
-// Create a new proxy and add it to the manager
-func (pm *ProxyManagerItem) CreateProxy(protocol string, port int) (pe Proxy, err error) {
-	// Check if there is another proxy with the same port
-	if proxy, _ := pm.GetProxy(port); proxy != nil {
-		err = fmt.Errorf("proxy already registered")
-		return
-	}
-
-	// Create the proxy
-	pe, err = NewProxyEndpoint(port, protocol)
-
-	// Append the proxy to the list
-	pm.proxies = append(pm.proxies, pe)
-	return
-}
-
-// Delete a proxy from the registered list
-// The proxy is stopped before being removed
-func (pm *ProxyManagerItem) DeleteProxy(port int) (err error) {
-	// Iterate the registered proxies for the proxy using the given port, and stop and remove it from the slice
-	for ind, proxy := range pm.proxies {
-		if proxy.Port() == port {
-			// Stop the proxy, just in case
-			proxy.Stop()
-			// Remove it from the slice by replacing it with the last item from the slice, and reducing the slice
-			// by 1 element
-			lastInd := len(pm.proxies) - 1
-
-			pm.proxies[ind] = pm.proxies[lastInd]
-			pm.proxies = pm.proxies[:lastInd]
-			return
-		}
-	}
-
-	// If the proxy was not foun, send an error
-	err = fmt.Errorf("proxy not found")
-	return
-}
-
-func (pm *ProxyManagerItem) Proxies() []Proxy {
-	return pm.proxies
-}
-
-// Returns a proxy by the port number
-func (pm *ProxyManagerItem) GetProxy(port int) (pe Proxy, err error) {
-	// Iterate the proxies registered, and if the proxy using the given port is found, return it
-	for _, proxy := range pm.proxies {
-		if proxy.Port() == port {
-			pe = proxy
-			return
-		}
-	}
-
-	// If the proxy was not foun, send an error
-	err = fmt.Errorf("proxy not found")
-	return
-}
-
-// Set the service for some proxy
-func (pm *ProxyManagerItem) SetService(port int, service services.Service) (pe Proxy, err error) {
-	// Get the proxy from the list
-	pe, err = pm.GetProxy(port)
-	if err != nil {
-		return
-	}
-
-	// If the proxy was found, set the service
-	pe.SetService(service)
-
-	return
-}
-
-// Constructor for the proxy manager
-func NewProxyManager() *ProxyManagerItem {
-	return &ProxyManagerItem{
-		middlewares: Middlewares,
-		proxies:     make([]Proxy, 0),
-	}
 }

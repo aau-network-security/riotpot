@@ -12,10 +12,20 @@ type UDPProxy struct {
 	listener *net.UDPConn
 }
 
-func (udpProxy *UDPProxy) Start() {
+func (udpProxy *UDPProxy) Start() (err error) {
+	// Check if the service is set
+	if udpProxy.GetService() == nil {
+		err = fmt.Errorf("service not set")
+		return
+	}
+
 	// Get the listener or create a new one
-	client := udpProxy.GetListener()
+	client, err := udpProxy.GetListener()
+	if err != nil {
+		return
+	}
 	defer client.Close()
+
 	// Create a channel to stop the proxy
 	udpProxy.stop = make(chan struct{})
 
@@ -31,7 +41,6 @@ func (udpProxy *UDPProxy) Start() {
 		server, servErr := net.DialUDP(UDP, nil, &srvAddr)
 		// If there was an error, close the connection to the server and return
 		if servErr != nil {
-			server.Close()
 			return
 		}
 		defer server.Close()
@@ -54,7 +63,7 @@ func (udpProxy *UDPProxy) Start() {
 // Function to stop the proxy from runing
 func (udpProxy *UDPProxy) Stop() (err error) {
 	// Stop the proxy if it is still alive
-	if udpProxy.Alive() {
+	if udpProxy.GetStatus() != DEAD {
 		close(udpProxy.stop)
 		udpProxy.listener.Close()
 		// Wait for all the connections and the server to stop
@@ -67,21 +76,24 @@ func (udpProxy *UDPProxy) Stop() (err error) {
 }
 
 // Get or create a new listener
-func (udpProxy *UDPProxy) GetListener() *net.UDPConn {
-	if udpProxy.listener == nil || !udpProxy.Alive() {
+func (udpProxy *UDPProxy) GetListener() (listener *net.UDPConn, err error) {
+	listener = udpProxy.listener
+
+	// Check if there is a listener
+	if listener == nil || udpProxy.GetStatus() != ALIVE {
 		// Get the address of the UDP server
 		addr := net.UDPAddr{
 			Port: udpProxy.service.GetPort(),
 		}
 
-		listener, err := net.ListenUDP(UDP, &addr)
+		listener, err = net.ListenUDP(UDP, &addr)
 		if err != nil {
-			log.Fatal(err)
+			return
 		}
 		udpProxy.listener = listener
 	}
 
-	return udpProxy.listener
+	return
 }
 
 // TODO: Test this function
@@ -117,13 +129,10 @@ func (udpProxy *UDPProxy) handle(client *net.UDPConn, server *net.UDPConn) {
 func NewUDPProxy(port int) (proxy *UDPProxy, err error) {
 	// Create a new proxy
 	proxy = &UDPProxy{
-		AbstractProxy: &AbstractProxy{
-			middlewares: Middlewares,
-			protocol:    UDP,
-		},
+		AbstractProxy: NewAbstractProxy(port, UDP),
 	}
 
 	// Set the port
-	_, err = proxy.SetPort(port)
+	proxy.SetPort(port)
 	return
 }
