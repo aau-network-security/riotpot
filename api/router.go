@@ -11,7 +11,7 @@ type Router interface {
 	// Parent path for the router
 	Path() string
 	// Group the registered path
-	Group(parentGroup *gin.RouterGroup) *gin.RouterGroup
+	AddToGroup(parentGroup *gin.RouterGroup) *gin.RouterGroup
 }
 
 type AbstractRouter struct {
@@ -57,7 +57,7 @@ func (r *AbstractRouter) addChilds(parentGroup *gin.RouterGroup) *gin.RouterGrou
 	// Iterate through the child routers to add the routes
 	if len(r.childs) > 0 {
 		for _, child := range r.childs {
-			child.Group(parentGroup)
+			child.AddToGroup(parentGroup)
 		}
 	}
 
@@ -65,7 +65,7 @@ func (r *AbstractRouter) addChilds(parentGroup *gin.RouterGroup) *gin.RouterGrou
 }
 
 // Create the group routes inside of the router
-func (r *AbstractRouter) Group(parentGroup *gin.RouterGroup) *gin.RouterGroup {
+func (r *AbstractRouter) AddToGroup(parentGroup *gin.RouterGroup) *gin.RouterGroup {
 	// Create a group inside of the parent group for this child
 	childGroup := parentGroup.Group(r.Path())
 	// Add the routes handlers for the current group

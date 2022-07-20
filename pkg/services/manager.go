@@ -88,7 +88,7 @@ type ServiceManager interface {
 	// Register services
 	addService(services ...Service) (serv []Service, err error)
 
-	CreateService(name string, port int, protocol string, host string) Service
+	CreateService(name string, port int, protocol string, host string) (Service, error)
 
 	// Delete a service
 	DeleteService(id string) (err error)
@@ -136,6 +136,31 @@ func (se *ServiceManagerItem) addService(services ...Service) (serv []Service, e
 	// Add the services to the registered services array
 	se.services = append(se.services, serv...)
 
+	return
+}
+
+// Creates a new service and register it in the manager
+func (se *ServiceManagerItem) CreateService(name string, port int, protocol string, host string) (s Service, err error) {
+	// Iterate the services to determine whether the
+	for _, service := range se.GetServices() {
+		// Validate the name
+		if service.GetName() == name {
+			err = fmt.Errorf("service name already taken")
+			return
+		}
+
+		// Validate the address
+		if service.GetPort() == port && service.GetProtocol() == protocol && service.GetHost() == host {
+			err = fmt.Errorf("service address already taken")
+			return
+		}
+	}
+
+	// Create the new service
+	s = NewService(name, port, protocol, host)
+
+	// Append the new service to the list
+	se.services = append(se.services, s)
 	return
 }
 

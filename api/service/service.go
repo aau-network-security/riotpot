@@ -12,17 +12,19 @@ import (
 )
 
 type GetService struct {
-	ID     string `json:"id" binding:"required" gorm:"primary_key"`
-	Name   string `json:"name"`
-	Port   int    `json:"port"`
-	Host   string `json:"host"`
-	Locked bool   `json:"locked"`
+	ID       string `json:"id" binding:"required" gorm:"primary_key"`
+	Name     string `json:"name"`
+	Port     int    `json:"port"`
+	Host     string `json:"host"`
+	Protocol string `json:"protocol"`
+	Locked   bool   `json:"locked"`
 }
 
 type CreateService struct {
-	Name string `json:"name" binding:"required"`
-	Port int    `json:"port" binding:"required"`
-	Host string `json:"host" binding:"required"`
+	Name     string `json:"name" binding:"required"`
+	Port     int    `json:"port" binding:"required"`
+	Host     string `json:"host" binding:"required"`
+	Protocol string `json:"protocol" binding:"required"`
 }
 
 // Routes
@@ -56,10 +58,11 @@ var (
 func NewService(serv services.Service) (sv *GetService) {
 	if serv != nil {
 		sv = &GetService{
-			ID:   serv.GetID(),
-			Port: serv.GetPort(),
-			Name: serv.GetName(),
-			Host: serv.GetName(),
+			ID:       serv.GetID(),
+			Port:     serv.GetPort(),
+			Name:     serv.GetName(),
+			Host:     serv.GetHost(),
+			Protocol: serv.GetProtocol(),
 		}
 	}
 	return

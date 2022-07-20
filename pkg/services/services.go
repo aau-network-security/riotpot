@@ -42,13 +42,8 @@ type AbstractService struct {
 	// require the methods described by `Service` on loading
 	Service
 
-	// it is recommended to include some kind of identity for the service.
-	// This must be given!
-	id   uuid.UUID
-	name string
-
-	// declare here any other variable relevant for the
-	// service to run. These are merely examples...
+	id       uuid.UUID
+	name     string
 	protocol string
 	port     int
 	host     string
@@ -112,7 +107,6 @@ func (as *AbstractService) SetLocked(locked bool) (bool, error) {
 // Implementation of a plugin-based service
 // These services are stored localy as binary files that are mounted into the
 // application as symbols that can be called
-// TODO: Finish this implementation
 type PluginService interface {
 	Run() error
 }
