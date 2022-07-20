@@ -93,15 +93,8 @@ func createProxy(ctx *gin.Context) {
 		return
 	}
 
-	// Get the port from the parameters
-	port, err := strconv.Atoi(ctx.Param("port"))
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
 	// Create a new proxy
-	pe, err := proxy.Proxies.CreateProxy(ctx.Param("protocol"), port)
+	pe, err := proxy.Proxies.CreateProxy(input.Protocol, input.Port)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

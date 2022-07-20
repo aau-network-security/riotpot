@@ -97,7 +97,21 @@ func getService(ctx *gin.Context) {
 }
 
 func createService(ctx *gin.Context) {
-	log.Fatalf("Not implemented")
+	// Validate the post request to patch the proxy
+	var input CreateService
+	if err := ctx.ShouldBindJSON(&input); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	sv, err := services.Services.CreateService(input.Name, input.Port, input.Protocol, input.Host)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	ret := NewService(sv)
+	ctx.JSON(http.StatusOK, ret)
 }
 
 func patchService(ctx *gin.Context) {

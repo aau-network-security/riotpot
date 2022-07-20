@@ -1,7 +1,8 @@
 package api
 
 import (
-	"fmt"
+	"bytes"
+	"encoding/json"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -11,7 +12,6 @@ import (
 	apiProxy "github.com/riotpot/api/proxy"
 	apiService "github.com/riotpot/api/service"
 	"github.com/riotpot/internal/proxy"
-	"github.com/riotpot/pkg/services"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -28,47 +28,65 @@ func SetupRouter() *gin.Engine {
 
 func TestApiProxy(t *testing.T) {
 
-	// Add a proxy to the manager
-	pe, err := proxy.Proxies.CreateProxy(proxy.TCP, 8080)
-	if err != nil {
-		t.Fatal(err)
+	expected := &apiProxy.CreateProxy{
+		Port:     8080,
+		Protocol: proxy.TCP,
 	}
-
-	// Mock the response with the proxy
-	mockResponse := fmt.Sprintf(`[{"id":%s,"port":%d,"protocol":"%s","status":false,"service":null}]`, pe.GetID(), pe.GetPort(), pe.GetProtocol())
 
 	router := SetupRouter()
-	req, err := http.NewRequest("GET", "/api/proxies/", nil)
-	if err != nil {
-		t.Fatal(err)
-	}
-
 	w := httptest.NewRecorder()
-	router.ServeHTTP(w, req)
 
-	responseData, _ := ioutil.ReadAll(w.Body)
-	assert.Equal(t, mockResponse, string(responseData))
+	// POST request to create a new proxy
+	body, _ := json.Marshal(expected)
+	req, _ := http.NewRequest("POST", "/api/proxies/", bytes.NewBuffer(body))
+	router.ServeHTTP(w, req)
+	response, _ := ioutil.ReadAll(w.Body)
+
+	// Assert the body of the created proxy is equal to the response
+	outputPost := &apiProxy.CreateProxy{}
+	json.Unmarshal(response, outputPost)
+	assert.Equal(t, expected, outputPost)
+
+	// GET all the proxies
+	req, _ = http.NewRequest("GET", "/api/proxies/", nil)
+	router.ServeHTTP(w, req)
+	response, _ = ioutil.ReadAll(w.Body)
+
+	// Assert we got 1 proxy in total
+	outputGet := &[]apiProxy.CreateProxy{}
+	json.Unmarshal(response, outputGet)
+	assert.Equal(t, 1, len(*outputGet))
 }
 
 func TestApiService(t *testing.T) {
-	// Add a proxy to the manager
-	se, err := services.Services.CreateService("Test Service", 8080, proxy.TCP, "localhost")
-	if err != nil {
-		t.Fatal(err)
-	}
 
-	// Mock the response with the proxy
-	mockResponse := fmt.Sprintf(`[{"id":"%s","name":"%s","port":%d,"host":"%s","protocol":"%s","locked":%t}]`, se.GetID(), se.GetName(), se.GetPort(), se.GetHost(), se.GetProtocol(), se.IsLocked())
+	expected := &apiService.CreateService{
+		Name:     "Test Service",
+		Host:     "localhost",
+		Port:     8080,
+		Protocol: proxy.TCP,
+	}
 
 	router := SetupRouter()
-	req, err := http.NewRequest("GET", "/api/services/", nil)
-	if err != nil {
-		t.Fatal(err)
-	}
-
 	w := httptest.NewRecorder()
-	router.ServeHTTP(w, req)
 
-	responseData, _ := ioutil.ReadAll(w.Body)
-	assert.Equal(t, mockResponse, string(responseData))
+	// POST to create a new service
+	body, _ := json.Marshal(expected)
+	req, _ := http.NewRequest("POST", "/api/services/", bytes.NewBuffer(body))
+	router.ServeHTTP(w, req)
+	response, _ := ioutil.ReadAll(w.Body)
+
+	// Assert the body of the created service is equal to the response
+	outputPost := &apiService.CreateService{}
+	json.Unmarshal(response, outputPost)
+	assert.Equal(t, expected, outputPost)
+
+	// Request all services
+	req, _ = http.NewRequest("GET", "/api/services/", nil)
+	router.ServeHTTP(w, req)
+	response, _ = ioutil.ReadAll(w.Body)
+
+	outputGet := &[]apiService.CreateService{}
+	json.Unmarshal(response, outputGet)
+	assert.Equal(t, 1, len(*outputGet))
 }
