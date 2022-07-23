@@ -20,8 +20,8 @@ import (
 	"github.com/plgd-dev/go-coap/v2/message/codes"
 	"github.com/plgd-dev/go-coap/v2/mux"
 	"github.com/riotpot/pkg/profiles"
-	"github.com/riotpot/pkg/services"
 	"github.com/riotpot/pkg/profiles/ports"
+	"github.com/riotpot/pkg/services"
 )
 
 var Name string
@@ -31,12 +31,7 @@ func init() {
 }
 
 func Coapd() services.Service {
-	mx := services.MixinService{
-		Name:     Name,
-		Port:     ports.GetPort("coapd"),
-		Running:  make(chan bool, 1),
-		Protocol: "udp",
-	}
+	mx := services.NewPluginService(Name, ports.GetPort(Name), "udp")
 
 	profile := profiles.Profile{
 		Topics: profiles.RandomNumericTopics("/ps", 10),
@@ -49,7 +44,7 @@ func Coapd() services.Service {
 }
 
 type Coap struct {
-	services.MixinService
+	*services.PluginService
 	Profile profiles.Profile
 }
 
@@ -65,11 +60,11 @@ func (c *Coap) Run() (err error) {
 	// This will cause all the requests to go through this function.
 	r.DefaultHandleFunc(c.observeHandler)
 
-	fmt.Printf("[%s] Started listenning for connections in port %d\n", Name, c.Port)
+	fmt.Printf("[%s] Started listenning for connections in port %d\n", Name, c.GetPort())
 
 	// Run the server listening on the given port and using the defined
 	// lvl4 layer protocol.
-	log.Fatal(coap.ListenAndServe(c.Protocol, fmt.Sprintf(":%d", c.Port), r))
+	log.Fatal(coap.ListenAndServe(c.GetProtocol(), fmt.Sprintf(":%d", c.GetPort()), r))
 
 	return
 }

@@ -22,8 +22,7 @@ import (
 // This name will be used as a lookup symbol.
 var Plugin string
 
-//
-var ulp string
+var name string
 var protocol string
 var port int
 
@@ -34,7 +33,7 @@ func init() {
 // The function must be capitalize or exported, and return a `Service`
 // interface compatible struct.
 func Templated() services.PluginService {
-	mx := services.NewPluginService(ulp, port, protocol)
+	mx := services.NewPluginService(name, port, protocol, "localhost")
 
 	return &Template{
 		mx,
@@ -44,11 +43,10 @@ func Templated() services.PluginService {
 // Template structure, implements the mixin containing common
 // variables.
 type Template struct {
-	services.PluginService
+	services.Service
 }
 
-func (e *Template) Run() error {
-	var err error
-	// Place here your logic...
-	return err
+func (e *Template) Run() (err error) {
+	// Place the plugin logic here
+	return
 }

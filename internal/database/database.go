@@ -19,7 +19,7 @@ import (
 // through riotpot.
 type Database struct {
 	// Database configuration
-	Config configuration.ConfigDatabase
+	conf configuration.DatabaseConfiguration
 
 	// Pointer to the db connection
 	conn *mongo.Client
@@ -39,11 +39,11 @@ func (db *Database) connect() (*mongo.Client, error) {
 
 	// build the credential for the database authentication
 	credential := options.Credential{
-		Username: db.Config.Username,
-		Password: db.Config.Password,
+		Username: db.conf.Username,
+		Password: db.conf.Password,
 	}
 
-	client, err := mongo.NewClient(options.Client().ApplyURI("mongodb://" + db.Config.Host + ":" + db.Config.Port).SetAuth(credential))
+	client, err := mongo.NewClient(options.Client().ApplyURI("mongodb://" + db.conf.Host + ":" + db.conf.Port).SetAuth(credential))
 	errors.Raise(err)
 
 	//set the command timeout
@@ -76,4 +76,8 @@ func (db *Database) Connection() *mongo.Client {
 		errors.Raise(err)
 		return conn
 	}
+}
+
+func NewDatabase(configuration map[string]string) {
+
 }

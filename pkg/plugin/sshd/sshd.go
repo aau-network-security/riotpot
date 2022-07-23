@@ -8,6 +8,7 @@ import (
 	"sync"
 
 	"github.com/riotpot/pkg/fake/shell"
+	"github.com/riotpot/pkg/profiles/ports"
 	"github.com/riotpot/pkg/services"
 	"github.com/riotpot/tools/errors"
 	"github.com/traetox/pty"
@@ -23,20 +24,15 @@ func init() {
 // Inspiration from: https://github.com/jpillora/sshd-lite/
 func Sshd() services.Service {
 
-	mixin := services.MixinService{
-		Name:     Name,
-		Port:     22,
-		Running:  make(chan bool, 1),
-		Protocol: "tcp",
-	}
+	mx := services.NewPluginService(Name, ports.GetPort(Name), "tcp")
 
 	return &SSH{
-		mixin,
+		mx,
 	}
 }
 
 type SSH struct {
-	services.MixinService
+	*services.PluginService
 }
 
 func (s *SSH) Run() (err error) {
@@ -49,15 +45,11 @@ func (s *SSH) Run() (err error) {
 	// Add a private key for the connections
 	config.AddHostKey(s.PrivateKey())
 
-	// before running, migrate the model that we want to store
-	s.Migrate(&SSHConn{})
-	s.Migrate(&SSHAuth{})
-
 	// convert the port number to a string that we can use it in the server
-	var port = fmt.Sprintf(":%d", s.Port)
+	var port = fmt.Sprintf(":%d", s.GetPort())
 
 	// start a service in the `echo` port
-	listener, err := net.Listen(s.Protocol, port)
+	listener, err := net.Listen(s.GetProtocol(), port)
 	errors.Raise(err)
 	defer listener.Close()
 
@@ -79,12 +71,6 @@ func (s *SSH) Run() (err error) {
 
 // Function to authenticate the user into the app
 func (s *SSH) auth(c ssh.ConnMetadata, pass []byte) (*ssh.Permissions, error) {
-	// Store the credentials before anything
-	s.Store(&SSHAuth{
-		User:     c.User(),
-		Password: string(pass),
-	})
-
 	// Currently we don't really care about the credentials
 	// any user will have a successful login, as long as the user
 	// uses some credentials at all.
@@ -96,7 +82,7 @@ func (s *SSH) auth(c ssh.ConnMetadata, pass []byte) (*ssh.Permissions, error) {
 
 func (s *SSH) serve(listener net.Listener, config *ssh.ServerConfig) {
 	// open an infinite loop to receive connections
-	fmt.Printf("[%s] Started listenning for connections in port %d\n", Name, s.Port)
+	fmt.Printf("[%s] Started listenning for connections in port %d\n", Name, s.GetPort())
 	for {
 		// Accept the client connection
 		client, err := listener.Accept()
@@ -131,7 +117,7 @@ func (s *SSH) handleChannels(sshItem SSHConn, chans <-chan ssh.NewChannel) {
 		select {
 		case <-s.StopCh:
 			// stop the pool
-			fmt.Printf("[x] Stopping %s service...\n", s.Name)
+			fmt.Printf("[x] Stopping %s service...\n", s.GetName())
 			// update the status of the service
 			s.Running <- false
 			return
@@ -226,19 +212,7 @@ func (s *SSH) attachShell(sshItem SSHConn, conn ssh.Channel) (err error) {
 		once.Do(close)
 	}()
 
-	go func() {
-		for rsp := range shell.RspChan {
-			s.save(sshItem, rsp)
-		}
-	}()
-
 	return
-}
-
-func (s *SSH) save(sshItem SSHConn, msg []byte) {
-	c := &sshItem
-	c.Msg = string(msg)
-	s.Store(c)
 }
 
 // This method returns a private key signer

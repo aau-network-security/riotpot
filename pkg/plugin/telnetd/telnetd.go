@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/riotpot/internal/database"
 	"github.com/riotpot/pkg/fake/shell"
+	"github.com/riotpot/pkg/profiles/ports"
 	"github.com/riotpot/pkg/services"
 	"github.com/riotpot/tools/errors"
 )
@@ -18,31 +18,24 @@ func init() {
 }
 
 func Telnetd() services.Service {
-	mixin := services.MixinService{
-		Name:     Name,
-		Port:     23,
-		Running:  make(chan bool, 1),
-		Protocol: "tcp",
-	}
+	mx := services.NewPluginService(Name, ports.GetPort(Name), "tcp")
 
 	return &Telnet{
-		mixin,
+		mx,
 	}
 }
 
 type Telnet struct {
-	services.MixinService
+	*services.PluginService
 }
 
 func (t *Telnet) Run() (err error) {
-	// before running, migrate the model that we want to store
-	t.Migrate(&database.Connection{})
 
 	// convert the port number to a string that we can use it in the server
-	var port = fmt.Sprintf(":%d", t.Port)
+	var port = fmt.Sprintf(":%d", t.GetPort())
 
 	// start a service in the `telnet` port
-	listener, err := net.Listen(t.Protocol, port)
+	listener, err := net.Listen(t.GetProtocol(), port)
 	errors.Raise(err)
 
 	// create the channel for stopping the service
@@ -67,7 +60,7 @@ func (t *Telnet) Run() (err error) {
 
 func (t *Telnet) serve(ch chan net.Conn, listener net.Listener) {
 	// open an infinite loop to receive connections
-	fmt.Printf("[%s] Started listenning for connections in port %d\n", Name, t.Port)
+	fmt.Printf("[%s] Started listenning for connections in port %d\n", Name, t.GetPort())
 	for {
 		// Accept the client connection
 		client, err := listener.Accept()
@@ -89,7 +82,7 @@ func (t *Telnet) handlePool(ch chan net.Conn) {
 		select {
 		case <-t.StopCh:
 			// stop the pool
-			fmt.Printf("[x] Stopping %s service...\n", t.Name)
+			fmt.Printf("[x] Stopping %s service...\n", t.GetName())
 			// update the status of the service
 			t.Running <- false
 			return
@@ -137,12 +130,6 @@ func (t *Telnet) telnetShell(conn net.Conn, br *bufio.Reader) {
 	shell := shell.New()
 	shell.SetIo(conn)
 	shell.Start()
-
-	go func() {
-		for rq := range shell.RspChan {
-			t.save(conn, rq)
-		}
-	}()
 }
 
 // Method to send a message to the client, receive a response and save it
@@ -161,20 +148,5 @@ func (t *Telnet) respond(
 		return
 	}
 
-	// save the response in the database
-	t.save(conn, response)
 	return
-}
-
-func (t *Telnet) save(conn net.Conn, payload []byte) {
-
-	connection := database.NewConnection()
-	connection.LocalAddress = conn.LocalAddr().String()
-	connection.RemoteAddress = conn.RemoteAddr().String()
-	connection.Protocol = "TCP"
-	connection.Service = Name
-	connection.Incoming = true
-	connection.Payload = string(payload)
-
-	t.Store(connection)
 }

@@ -2,8 +2,9 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/riotpot/internal/configuration"
-	"github.com/riotpot/internal/database"
 	"github.com/riotpot/tools/errors"
 )
 
@@ -11,23 +12,10 @@ import (
 // It is the first function called when the application is run.
 // It also acts as an orchestrator, which dictates the functioning of the application.
 func main() {
+	// Say Hi, don't be rude!
+	fmt.Println("░▒▓███ RIoIPot ███▓▒░")
+
 	// Load the configuration settings
-	conf, err := configuration.NewConfiguration()
+	_, err := configuration.NewConfiguration()
 	errors.Raise(err)
-
-	db := database.Database{
-		// use only the default database
-		Config: conf.Databases[0],
-	}
-
-	// load the connection to the database before anything
-	conn := db.Connection()
-
-	// For now, run with the autopilot on...
-	auto := configuration.Autopilot{
-		Configuration: conf,
-		DB:            conn,
-	}
-
-	auto.Start()
 }

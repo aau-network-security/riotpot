@@ -4,10 +4,9 @@ package main
 import (
 	"fmt"
 	"net"
-	"strings"
 	"sync"
 
-	"github.com/riotpot/internal/database"
+	"github.com/riotpot/pkg/profiles/ports"
 	"github.com/riotpot/pkg/services"
 	"github.com/riotpot/tools/errors"
 )
@@ -19,12 +18,7 @@ func init() {
 }
 
 func Mqttd() services.Service {
-	mx := services.MixinService{
-		Name:     Name,
-		Port:     1883,
-		Running:  make(chan bool, 1),
-		Protocol: "tcp",
-	}
+	mx := services.NewPluginService(Name, ports.GetPort(Name), "tcp")
 
 	return &Mqtt{
 		mx,
@@ -33,19 +27,17 @@ func Mqttd() services.Service {
 }
 
 type Mqtt struct {
-	services.MixinService
+	*services.PluginService
 	wg sync.WaitGroup
 }
 
 func (m *Mqtt) Run() (err error) {
-	// before running, migrate the model that we want to store
-	m.Migrate(&database.Connection{})
 
 	// convert the port number to a string that we can use it in the server
-	var port = fmt.Sprintf(":%d", m.Port)
+	var port = fmt.Sprintf(":%d", m.GetPort())
 
 	// start a service in the `mqtt` port
-	listener, err := net.Listen(m.Protocol, port)
+	listener, err := net.Listen(m.GetProtocol(), port)
 	errors.Raise(err)
 
 	// create the channel for stopping the service
@@ -77,7 +69,7 @@ func (m *Mqtt) serve(ch chan net.Conn, listener net.Listener) {
 	defer m.wg.Done()
 
 	// open an infinite loop to receive connections
-	fmt.Printf("[%s] Started listenning for connections in port %d\n", Name, m.Port)
+	fmt.Printf("[%s] Started listenning for connections in port %d\n", Name, m.GetPort())
 	for {
 		// Accept the client connection
 		client, err := listener.Accept()
@@ -99,7 +91,7 @@ func (m *Mqtt) handlePool(ch chan net.Conn) {
 		select {
 		case <-m.StopCh:
 			// stop the pool
-			fmt.Printf("[x] Stopping %s service...\n", m.Name)
+			fmt.Printf("[x] Stopping %s service...\n", m.GetName())
 			// update the status of the service
 			m.Running <- false
 			return
@@ -127,33 +119,8 @@ func (m *Mqtt) handleConn(conn net.Conn) {
 			return
 		}
 
-		// store the content of the packet
-		m.save(packet, conn)
-
 		// respond to the message
 		s.Answer(*packet, &conn)
 	}
 
-}
-
-// Save method used to store an incomming connection
-// packet. The packet is stored using the `Connection` model.
-// NOTE: this should be expanded and further develop
-// to better capture the packet specs.
-func (m *Mqtt) save(packet *Packet, conn net.Conn) {
-	data := fmt.Sprintf(
-		"msg: %v\ntopics: %v",
-		string(packet.Data),
-		strings.Join(packet.Topics, ","),
-	)
-
-	connection := &database.Connection{
-		LocalAddress:  "localhost",
-		RemoteAddress: conn.RemoteAddr().String(),
-		Payload:       data,
-		Protocol:      "TCP",
-		Service:       Name,
-		Incoming:      true,
-	}
-	m.Store(connection)
 }

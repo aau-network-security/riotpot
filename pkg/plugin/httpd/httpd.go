@@ -8,7 +8,7 @@ import (
 	"os"
 	"os/signal"
 
-	"github.com/riotpot/internal/database"
+	"github.com/riotpot/pkg/profiles/ports"
 	"github.com/riotpot/pkg/services"
 )
 
@@ -19,31 +19,24 @@ func init() {
 }
 
 func Httpd() services.Service {
-	mixin := services.MixinService{
-		Name:     Name,
-		Port:     8080,
-		Protocol: "tcp",
-		Running:  make(chan bool, 1),
-	}
+	mx := services.NewPluginService(Name, ports.GetPort(Name), "tcp")
 
 	return &Http{
-		mixin,
+		mx,
 	}
 }
 
 type Http struct {
 	// Anonymous fields from the mixin
-	services.MixinService
+	*services.PluginService
 }
 
 func (h *Http) Run() (err error) {
-	h.Migrate(&database.Connection{})
-
 	mux := http.NewServeMux()
 	mux.Handle("/", http.HandlerFunc(h.valid))
 
 	srv := &http.Server{
-		Addr:    fmt.Sprintf(":%d", h.Port),
+		Addr:    fmt.Sprintf(":%d", h.GetPort()),
 		Handler: mux,
 	}
 
@@ -66,7 +59,7 @@ func (h *Http) Run() (err error) {
 }
 
 func (h *Http) serve(srv *http.Server) {
-	fmt.Printf("[%s] Started listenning for connections in port %d\n", Name, h.Port)
+	fmt.Printf("[%s] Started listenning for connections in port %d\n", Name, h.GetPort())
 	if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 		log.Fatalf("listen:%+s\n", err)
 	}
@@ -122,37 +115,9 @@ func (h *Http) valid(w http.ResponseWriter, req *http.Request) {
 		</div>
 		`
 		body = errormessage + body
-
-		// save the request
-		h.save(req)
 	}
 
 	response := fmt.Sprintf("%s%s", head, body)
 
 	fmt.Fprint(w, response)
-}
-
-// This function handles connections made to an invalid path
-/* func (h *Http) invalid(w http.ResponseWriter, req *http.Request) { ...} */
-
-/*
-func (h *Http) loadHandler(path string, valid bool) {
-	if valid {
-		http.HandleFunc(path, h.valid)
-	} else {
-		http.HandleFunc(path, h.invalid)
-	}
-}
-*/
-
-func (h *Http) save(req *http.Request) {
-	connection := database.NewConnection()
-	connection.LocalAddress = "localhost"
-	connection.RemoteAddress = req.RemoteAddr
-	connection.Protocol = "TCP"
-	connection.Service = "HTTP"
-	connection.Incoming = true
-	connection.Payload = req.PostForm.Encode()
-
-	h.Store(connection)
 }
