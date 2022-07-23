@@ -1,0 +1,111 @@
+/:
+  get:
+    operationId: getServices
+    description: Get all the registered services
+    tags:
+      - Services
+    responses:
+      "200":
+        description: Returns all the proxies
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: Service.yaml
+  post:
+    operationId: createService
+    description: Create a new Service
+    tags:
+      - Services
+    parameters:
+      - in: query
+        name: port
+        required: true
+        schema:
+          $ref: Px.yaml#/properties/port
+      - in: query
+        name: protocol
+        required: true
+        schema:
+          $ref: Px.yaml#/properties/protocol
+      - in: query
+        name: name
+        required: true
+        schema:
+          $ref: Service.yaml#/properties/name
+      - in: query
+        name: host
+        required: true
+        schema:
+          $ref: Service.yaml#/properties/host
+    responses:
+      "200":
+        description: Returns the structure of the proxy created
+        content:
+          application/json:
+            schema:
+              $ref: Service.yaml
+
+/{id}:
+  parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        $ref: Px.yaml#/properties/id
+
+  get:
+    operationId: getService
+    description: Get an instance of a registered service
+    tags:
+      - Services
+    responses:
+      "200":
+        description: Returns the instance of the service
+        content:
+          application/json:
+            schema:
+              $ref: Service.yaml
+
+  patch:
+    operationId: updateService
+    description: Updates a service with new values
+    tags:
+      - Services
+    parameters:
+      - in: query
+        name: port
+        required: false
+        schema:
+          $ref: Px.yaml#/properties/port
+      - in: query
+        name: name
+        required: false
+        schema:
+          $ref: Service.yaml#/properties/name
+      - in: query
+        name: host
+        required: false
+        schema:
+          $ref: Service.yaml#/properties/host
+      - in: query
+        name: locked
+        required: false
+        schema:
+          $ref: Service.yaml#/properties/locked
+    responses:
+      "200":
+        description: Returns the instance of the proxy updated
+        content:
+          application/json:
+            schema:
+              $ref: Service.yaml
+  delete:
+    operationId: deleteService
+    description: Removes a service
+    tags:
+      - Services
+    responses:
+      "200":
+        description: OK

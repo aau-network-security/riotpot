@@ -1,0 +1,21 @@
+type: object
+properties:
+  id:
+    type: string
+    example: 123e4567-e89b-12d3-a456-426614174000
+    description: UUID
+  port:
+    type: integer
+    minimum: 1
+    maximum: 65536
+    example: 8080
+    description: Port to listen for connections
+  protocol:
+    type: string
+    enum:
+      - tcp
+      - udp
+    example: tcp
+    description: Trasport layer communication protocol
+required:
+  - id

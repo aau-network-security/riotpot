@@ -51,7 +51,7 @@ var (
 var (
 	// Proxies
 	ProxiesRouter = api.NewRouter("proxies/", proxiesRoutes, []api.Router{ProxyRouter})
-	ProxyRouter   = api.NewRouter("proxy/:id", proxyRoutes, []api.Router{service.ServiceRouter})
+	ProxyRouter   = api.NewRouter(":id/", proxyRoutes, []api.Router{service.ServiceRouter})
 )
 
 func NewProxy(px proxy.Proxy) *GetProxy {

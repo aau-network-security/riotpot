@@ -52,7 +52,7 @@ var (
 var (
 	// Services
 	ServicesRouter = api.NewRouter("services/", servicesRoutes, []api.Router{ServiceRouter})
-	ServiceRouter  = api.NewRouter("service/:id", serviceRoutes, nil)
+	ServiceRouter  = api.NewRouter(":id/", serviceRoutes, nil)
 )
 
 func NewService(serv services.Service) (sv *GetService) {
