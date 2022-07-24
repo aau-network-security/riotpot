@@ -11,8 +11,15 @@ info:
     url: https://choosealicense.com/licenses/mit/
 
 servers:
-  - url: api
+  - url: http://{host}:{port}/api
     description: API path for riotpot
+    variables:
+      host:
+        default: "localhost"
+      port:
+        enum:
+          - "2022"
+        default: "2022"
 
 tags:
   - name: Proxies
