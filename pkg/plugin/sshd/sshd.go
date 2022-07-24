@@ -8,31 +8,43 @@ import (
 	"sync"
 
 	"github.com/riotpot/pkg/fake/shell"
-	"github.com/riotpot/pkg/profiles/ports"
 	"github.com/riotpot/pkg/services"
 	"github.com/riotpot/tools/errors"
 	"github.com/traetox/pty"
 	"golang.org/x/crypto/ssh"
 )
 
-var Name string
+var Plugin string
+
+var (
+	name     string
+	protocol string
+	port     int
+	host     string
+)
 
 func init() {
-	Name = "Sshd"
+	Plugin = name
 }
 
 // Inspiration from: https://github.com/jpillora/sshd-lite/
 func Sshd() services.Service {
 
-	mx := services.NewPluginService(Name, ports.GetPort(Name), "tcp")
+	mx := services.NewPluginService(name, port, protocol, host)
+	pKey, err := ioutil.ReadFile("riopot_rsa")
+	errors.Raise(err)
 
 	return &SSH{
-		mx,
+		Service:    mx,
+		wg:         sync.WaitGroup{},
+		privateKey: pKey,
 	}
 }
 
 type SSH struct {
-	*services.PluginService
+	services.Service
+	wg         sync.WaitGroup
+	privateKey []byte
 }
 
 func (s *SSH) Run() (err error) {
@@ -53,36 +65,27 @@ func (s *SSH) Run() (err error) {
 	errors.Raise(err)
 	defer listener.Close()
 
-	// create the channel for stopping the service
-	s.StopCh = make(chan int, 1)
-
 	// build a channel stack to receive connections to the service
 	s.serve(listener, config)
-
-	// update the status of the service
-	s.Running <- true
-
-	// Close the channel for stopping the service
-	fmt.Print("[x] Service stopped...\n")
-	close(s.StopCh)
-
 	return
 }
 
 // Function to authenticate the user into the app
-func (s *SSH) auth(c ssh.ConnMetadata, pass []byte) (*ssh.Permissions, error) {
+func (s *SSH) auth(c ssh.ConnMetadata, pass []byte) (perms *ssh.Permissions, err error) {
 	// Currently we don't really care about the credentials
 	// any user will have a successful login, as long as the user
 	// uses some credentials at all.
 	if c.User() != "" && string(pass) != "" {
-		return nil, nil
+		return
 	}
-	return nil, fmt.Errorf("invalid pair of username and password")
+
+	err = fmt.Errorf("invalid pair of username and password")
+	return
 }
 
 func (s *SSH) serve(listener net.Listener, config *ssh.ServerConfig) {
 	// open an infinite loop to receive connections
-	fmt.Printf("[%s] Started listenning for connections in port %d\n", Name, s.GetPort())
+	fmt.Printf("[%s] Started listenning for connections in port %d\n", s.GetName(), s.GetPort())
 	for {
 		// Accept the client connection
 		client, err := listener.Accept()
@@ -99,36 +102,26 @@ func (s *SSH) serve(listener net.Listener, config *ssh.ServerConfig) {
 		}
 
 		sshItem := NewSshConn(sshConn)
+		defer sshConn.Close()
+		defer sshConn.Conn.Close()
 
-		wg := sync.WaitGroup{}
-		wg.Add(1)
+		s.wg.Add(1)
 		// Discard all global out-of-band Requests
 		go ssh.DiscardRequests(reqs)
 		// Handle all the channels open by the connection
 		s.handleChannels(sshItem, chans)
-		wg.Wait()
-		sshConn.Close()
-		sshConn.Conn.Close()
+		s.wg.Wait()
 	}
 }
 
 func (s *SSH) handleChannels(sshItem SSHConn, chans <-chan ssh.NewChannel) {
-	for {
-		select {
-		case <-s.StopCh:
-			// stop the pool
-			fmt.Printf("[x] Stopping %s service...\n", s.GetName())
-			// update the status of the service
-			s.Running <- false
-			return
-		case conn := <-chans:
-			//TODO: this line crashes the app when the connection is lost!!!
-			// NOTE: As of [6/21/2022] this line has not been fixed yet.
-			// Fix it ASAP!
-			// ☟ ☟ ☟
-			go s.handleChannel(sshItem, conn)
-			// ☝ ☝ ☝
-		}
+	for conn := range chans {
+		//TODO: this line crashes the app when the connection is lost!!!
+		// NOTE: As of [6/21/2022] this line has not been fixed yet.
+		// Fix it ASAP!
+		// ☟ ☟ ☟
+		go s.handleChannel(sshItem, conn)
+		// ☝ ☝ ☝
 	}
 }
 
@@ -163,8 +156,8 @@ func (s *SSH) oob(sshItem SSHConn, requests <-chan *ssh.Request, conn ssh.Channe
 			} else {
 				req.Reply(false, nil)
 			}
-			// Generally, we would put the fake shell
-			// under here
+
+			// Give a shell to the client
 			err := s.attachShell(sshItem, conn)
 			if err != nil {
 				return
@@ -186,13 +179,11 @@ func (s *SSH) oob(sshItem SSHConn, requests <-chan *ssh.Request, conn ssh.Channe
 
 func (s *SSH) attachShell(sshItem SSHConn, conn ssh.Channel) (err error) {
 	// load a unix-like fake shell
-	shell := shell.New()
-	shell.User = sshItem.User
-	shell.Host = "ubuntu"
+	shell := shell.New(sshItem.User, "ubuntu")
 
 	f, err := pty.StartFaker(shell)
 	if err != nil {
-		fmt.Printf("Failed to start faker: %v", err)
+		return
 	}
 
 	close := func() {
@@ -217,12 +208,8 @@ func (s *SSH) attachShell(sshItem SSHConn, conn ssh.Channel) (err error) {
 
 // This method returns a private key signer
 func (s *SSH) PrivateKey() (key ssh.Signer) {
-	// Read the key from a file (???)
-	pKey, err := ioutil.ReadFile("configs/keys/riopot_rsa")
-	errors.Raise(err)
-
 	// Gets the signer from a key
-	key, err = ssh.ParsePrivateKey(pKey)
+	key, err := ssh.ParsePrivateKey(s.privateKey)
 	errors.Raise(err)
 
 	return

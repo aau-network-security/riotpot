@@ -23,7 +23,7 @@ type shellface interface {
 	commands()
 }
 
-func New() *shell {
+func New(user string, host string) *shell {
 	commands := [][]interface{}{
 		{"enable", c_enable},
 		{"exit", c_exit},
@@ -33,8 +33,8 @@ func New() *shell {
 	return &shell{
 		comm:     commands,
 		mu:       &sync.Mutex{},
-		User:     "root",
-		Host:     "ubuntu",
+		User:     user,
+		Host:     host,
 		Path:     "",
 		RspChan:  make(chan []byte, 10),
 		doneChan: make(chan error, 2),

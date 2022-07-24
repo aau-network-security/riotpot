@@ -5,13 +5,19 @@ import (
 	"io"
 	"net"
 
-	"github.com/riotpot/pkg/profiles/ports"
 	"github.com/riotpot/pkg/services"
 	"github.com/riotpot/tools/errors"
 	"github.com/xiegeo/modbusone"
 )
 
-var Name string
+var Plugin string
+
+var (
+	name     = "Modbusd"
+	protocol = "tcp"
+	port     = 502
+	host     = "localhost"
+)
 
 const size = 0x10000
 
@@ -23,11 +29,11 @@ var (
 )
 
 func init() {
-	Name = "Modbusd"
+	Plugin = name
 }
 
 func Modbusd() services.Service {
-	mx := services.NewPluginService(Name, ports.GetPort(Name), "tcp")
+	mx := services.NewPluginService(name, port, protocol, host)
 
 	handler := handler()
 
@@ -38,7 +44,7 @@ func Modbusd() services.Service {
 }
 
 type Modbus struct {
-	*services.PluginService
+	services.Service
 	handler modbusone.ProtocolHandler
 }
 
@@ -51,22 +57,9 @@ func (m *Modbus) Run() (err error) {
 	listener, err := net.Listen("tcp", port)
 	errors.Raise(err)
 
-	// create the channel for stopping the service
-	m.StopCh = make(chan int, 1)
-
 	// build a channel stack to receive connections to the service
 	conn := make(chan net.Conn)
 	m.serve(conn, listener)
-
-	// update the status of the service
-	m.Running <- true
-
-	// block here until we receive an stopping signal in the channel
-	<-m.StopCh
-
-	// Close the channel for stopping the service
-	fmt.Print("[x] Service stopped...\n")
-	close(m.StopCh)
 
 	return
 }
@@ -75,7 +68,7 @@ func (m *Modbus) Run() (err error) {
 // inspired on https://gist.github.com/paulsmith/775764#file-echo-go
 func (m *Modbus) serve(ch chan net.Conn, listener net.Listener) {
 	// open an infinite loop to receive connections
-	fmt.Printf("[%s] Started listenning for connections in port %d\n", Name, m.GetPort())
+	fmt.Printf("[%s] Started listenning for connections in port %d\n", m.GetName(), m.GetPort())
 	for {
 		// Accept the client connection
 		client, err := listener.Accept()
@@ -85,27 +78,7 @@ func (m *Modbus) serve(ch chan net.Conn, listener net.Listener) {
 		defer client.Close()
 
 		// push the client connection to the channel
-		ch <- client
-	}
-}
-
-// Handle the pool of connections to the service
-func (m *Modbus) handlePool(ch chan net.Conn) {
-	// open an infinite loop to handle the connections
-	for {
-		// while the `stop` channel remains empty, continue handling
-		// new connections.
-		select {
-		case <-m.StopCh:
-			// stop the pool
-			fmt.Printf("[x] Stopping %s service...\n", m.GetName())
-			// update the status of the service
-			m.Running <- false
-			return
-		case conn := <-ch:
-			// use one goroutine per connection.
-			go m.handleSession(conn)
-		}
+		go m.handleSession(client)
 	}
 }
 

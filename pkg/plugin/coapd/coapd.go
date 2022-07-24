@@ -19,22 +19,27 @@ import (
 	"github.com/plgd-dev/go-coap/v2/message"
 	"github.com/plgd-dev/go-coap/v2/message/codes"
 	"github.com/plgd-dev/go-coap/v2/mux"
-	"github.com/riotpot/pkg/profiles"
-	"github.com/riotpot/pkg/profiles/ports"
 	"github.com/riotpot/pkg/services"
 )
 
-var Name string
+var Plugin string
+
+var (
+	name     = "Coapd"
+	port     = 5683
+	protocol = "udp"
+	host     = "localhost"
+)
 
 func init() {
-	Name = "Coapd"
+	Plugin = name
 }
 
 func Coapd() services.Service {
-	mx := services.NewPluginService(Name, ports.GetPort(Name), "udp")
+	mx := services.NewPluginService(name, port, protocol, host)
 
-	profile := profiles.Profile{
-		Topics: profiles.RandomNumericTopics("/ps", 10),
+	profile := Profile{
+		Topics: RandomNumericTopics("/ps", 10),
 	}
 
 	return &Coap{
@@ -44,8 +49,8 @@ func Coapd() services.Service {
 }
 
 type Coap struct {
-	*services.PluginService
-	Profile profiles.Profile
+	services.Service
+	Profile Profile
 }
 
 func (c *Coap) Run() (err error) {
@@ -60,7 +65,7 @@ func (c *Coap) Run() (err error) {
 	// This will cause all the requests to go through this function.
 	r.DefaultHandleFunc(c.observeHandler)
 
-	fmt.Printf("[%s] Started listenning for connections in port %d\n", Name, c.GetPort())
+	fmt.Printf("[%s] Started listenning for connections in port %d\n", c.GetName(), c.GetPort())
 
 	// Run the server listening on the given port and using the defined
 	// lvl4 layer protocol.
@@ -315,12 +320,12 @@ func (c *Coap) get(cc mux.Client, token []byte, msg []byte, obs int64) error {
 	return cc.WriteMessage(&m)
 }
 
-func (c *Coap) msg(topic profiles.Topic) []byte {
+func (c *Coap) msg(topic Topic) []byte {
 	msg := topic.Message()
 	return []byte(msg)
 }
 
-func (c *Coap) periodicTransmitter(cc mux.Client, token []byte, topic profiles.Topic) {
+func (c *Coap) periodicTransmitter(cc mux.Client, token []byte, topic Topic) {
 
 	obs := int64(2)
 
@@ -333,7 +338,7 @@ func (c *Coap) periodicTransmitter(cc mux.Client, token []byte, topic profiles.T
 	for {
 		select {
 		case <-stop:
-			break
+			return
 		default:
 			msg := c.msg(topic)
 			err := c.get(cc, token, msg, obs)
@@ -355,7 +360,7 @@ func (c *Coap) save(w mux.ResponseWriter, r *mux.Message) {
 }
 
 // Filter a list of topics based on the query string included and the flag
-func filter(topics []profiles.Topic, path string, flag string, query string) (t []profiles.Topic) {
+func filter(topics []Topic, path string, flag string, query string) (t []Topic) {
 	// Replace all the quotation marks on the query.
 	// Queryes might contain quotation marks e.g. `/ps/a?ct="50"`
 	query = strings.Replace(query, `"`, "", -1)

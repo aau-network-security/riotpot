@@ -3,7 +3,7 @@
 //
 // TODO include a method to load profile topics and determine whether the returning
 // value should be a number in a range, a string or something else.
-package profiles
+package main
 
 import (
 	"fmt"

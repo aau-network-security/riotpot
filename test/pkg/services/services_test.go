@@ -11,62 +11,25 @@ import (
 	"time"
 
 	"github.com/riotpot/pkg/services"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/plgd-dev/go-coap/v2/message"
 	"github.com/plgd-dev/go-coap/v2/udp"
 	"github.com/plgd-dev/go-coap/v2/udp/message/pool"
 )
 
-var ser services.Service
-
-const (
-	ECHOD = "Echod"
-	COAP  = "Coapd"
+var (
+	PORT = 5683
+	HOST = "localhost"
 )
 
 func init() {
-	servs := []string{
-		"../../../pkg/plugin/coapd/plugin.so",
-	}
-
-	services := services.Supervisor{}
-	services.AutoRegister(servs)
-
-	serviceToTest := COAP
-
-	ser = services.Get(serviceToTest)
-	if ser == nil {
-		fmt.Print("Service not found")
-	}
-
-	fmt.Printf("[+] Ready to run %s\n", serviceToTest)
-
-	// Initiate the service
-	go ser.Run()
-	fmt.Printf("[+] Service %s Running...\n", serviceToTest)
-}
-
-func TestStopServiceRunning(t *testing.T) {
-	// Log the current status of the service
-	status := ser.Status()
-	t.Log(status)
-
-	// checks if the service is running.
-	// this is also done by the function `Stop` though
-	if status == "Running" {
-		ser.Stop()
-		t.Log(ser.Status())
-	} else {
-		t.Error("Service is not running, restarting")
-		ser.Restart()
-
-		// Note! this might cause a race condition
-		t.Log(ser.Status())
-	}
+	services.Services.Start()
 }
 
 func TestCoapDiscovery(t *testing.T) {
-	co, err := udp.Dial("localhost:5683")
+	address := fmt.Sprintf("%s:%d", HOST, PORT)
+	co, err := udp.Dial(address)
 	if err != nil {
 		log.Fatalf("Error dialing: %v", err)
 	}
@@ -88,7 +51,8 @@ func TestCoapDiscovery(t *testing.T) {
 func TestCoapObserver(t *testing.T) {
 
 	sync := make(chan bool)
-	co, err := udp.Dial("localhost:5683")
+	address := fmt.Sprintf("%s:%d", HOST, PORT)
+	co, err := udp.Dial(address)
 	if err != nil {
 		log.Fatalf("Error dialing: %v", err)
 	}
@@ -140,6 +104,7 @@ func TestNetServiceRunning(t *testing.T) {
 			conn, err := net.Dial(serv.protocol, serv.port)
 			if err != nil {
 				t.Error("could not connect to server: ", err)
+				return
 			}
 			defer conn.Close()
 
@@ -149,19 +114,16 @@ func TestNetServiceRunning(t *testing.T) {
 			// write some data to the server
 			if _, err := conn.Write(tc.payload); err != nil {
 				t.Errorf("Could not write payload to server: %v", err)
+				return
 			}
 
 			// read the response from the server and compare it to the desired
 			// response.
 			out := make([]byte, 1024)
 			if _, err := conn.Read(out); err == nil {
-				if bytes.Equal(out, tc.want) {
-					t.Log("Messages were equal")
-				} else {
-					t.Errorf("Unexpected response: %s", out)
-				}
+				assert.Equal(t, out, tc.want)
 			} else {
-				t.Error("Could not read from connection")
+				t.Error("could not read from connection")
 			}
 		}
 	}

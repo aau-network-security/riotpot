@@ -6,19 +6,25 @@ import (
 	"net"
 	"sync"
 
-	"github.com/riotpot/pkg/profiles/ports"
 	"github.com/riotpot/pkg/services"
 	"github.com/riotpot/tools/errors"
 )
 
-var Name string
+var Plugin string
+
+var (
+	name     = "Mqttd"
+	protocol = "tcp"
+	port     = 1883
+	host     = "localhost"
+)
 
 func init() {
-	Name = "Mqttd"
+	Plugin = name
 }
 
 func Mqttd() services.Service {
-	mx := services.NewPluginService(Name, ports.GetPort(Name), "tcp")
+	mx := services.NewPluginService(name, port, protocol, host)
 
 	return &Mqtt{
 		mx,
@@ -27,7 +33,7 @@ func Mqttd() services.Service {
 }
 
 type Mqtt struct {
-	*services.PluginService
+	services.Service
 	wg sync.WaitGroup
 }
 
@@ -40,9 +46,6 @@ func (m *Mqtt) Run() (err error) {
 	listener, err := net.Listen(m.GetProtocol(), port)
 	errors.Raise(err)
 
-	// create the channel for stopping the service
-	m.StopCh = make(chan int, 1)
-
 	// build a channel stack to receive connections to the service
 	conn := make(chan net.Conn)
 
@@ -50,15 +53,9 @@ func (m *Mqtt) Run() (err error) {
 	m.wg.Add(1)
 	go m.serve(conn, listener)
 
-	// update the status of the service
-	m.Running <- true
-
 	// handle the connections from the channel
 	m.handlePool(conn)
-
-	// Close the channel for stopping the service
-	fmt.Print("[x] Service stopped...\n")
-	close(m.StopCh)
+	m.wg.Wait()
 
 	return
 }
@@ -69,7 +66,7 @@ func (m *Mqtt) serve(ch chan net.Conn, listener net.Listener) {
 	defer m.wg.Done()
 
 	// open an infinite loop to receive connections
-	fmt.Printf("[%s] Started listenning for connections in port %d\n", Name, m.GetPort())
+	fmt.Printf("[%s] Started listenning for connections in port %d\n", m.GetName(), m.GetPort())
 	for {
 		// Accept the client connection
 		client, err := listener.Accept()
@@ -89,12 +86,6 @@ func (m *Mqtt) handlePool(ch chan net.Conn) {
 		// while the `stop` channel remains empty, continue handling
 		// new connections.
 		select {
-		case <-m.StopCh:
-			// stop the pool
-			fmt.Printf("[x] Stopping %s service...\n", m.GetName())
-			// update the status of the service
-			m.Running <- false
-			return
 		case conn := <-ch:
 			// use one goroutine per connection.
 			go m.handleConn(conn)

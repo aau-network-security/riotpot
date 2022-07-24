@@ -1,4 +1,5 @@
 openapi: 3.0.2
+
 info:
   title: RIoTPoT API
   version: "1.0"
@@ -12,6 +13,7 @@ info:
 servers:
   - url: api
     description: API path for riotpot
+
 tags:
   - name: Proxies
   - name: Services
@@ -24,6 +26,7 @@ components:
       $ref: Proxy.yaml
     Service:
       $ref: Service.yaml
+
 paths:
   # Proxies
   /proxies:

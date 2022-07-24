@@ -1,9 +1,11 @@
+# This is an abstract structure that can be used for servers and proxies alike
 type: object
 properties:
   id:
     type: string
+    format: uuid
     example: 123e4567-e89b-12d3-a456-426614174000
-    description: UUID
+    description: Unique Identifier of the object
   port:
     type: integer
     minimum: 1

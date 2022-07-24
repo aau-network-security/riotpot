@@ -1,25 +1,28 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"log"
 	"net/http"
-	"os"
-	"os/signal"
 
-	"github.com/riotpot/pkg/profiles/ports"
 	"github.com/riotpot/pkg/services"
 )
 
-var Name string
+var Plugin string
+
+var (
+	name     = "HTTPd"
+	protocol = "tcp"
+	port     = 8080
+	host     = "localhost"
+)
 
 func init() {
-	Name = "Httpd"
+	Plugin = name
 }
 
 func Httpd() services.Service {
-	mx := services.NewPluginService(Name, ports.GetPort(Name), "tcp")
+	mx := services.NewPluginService(name, port, protocol, host)
 
 	return &Http{
 		mx,
@@ -28,7 +31,7 @@ func Httpd() services.Service {
 
 type Http struct {
 	// Anonymous fields from the mixin
-	*services.PluginService
+	services.Service
 }
 
 func (h *Http) Run() (err error) {
@@ -41,25 +44,12 @@ func (h *Http) Run() (err error) {
 	}
 
 	go h.serve(srv)
-	h.Running <- true
 
-	for {
-		// block until we get the stop signal
-		<-h.StopCh
-
-		// send an interrupt signal
-		sigint := make(chan os.Signal, 1)
-		signal.Notify(sigint, os.Interrupt)
-		<-sigint
-
-		// shut down the server
-		srv.Shutdown(context.Background())
-		return
-	}
+	return
 }
 
 func (h *Http) serve(srv *http.Server) {
-	fmt.Printf("[%s] Started listenning for connections in port %d\n", Name, h.GetPort())
+	fmt.Printf("[%s] Started listenning for connections in port %d\n", h.GetName(), h.GetPort())
 	if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 		log.Fatalf("listen:%+s\n", err)
 	}

@@ -22,9 +22,12 @@ import (
 // This name will be used as a lookup symbol.
 var Plugin string
 
-var name string
-var protocol string
-var port int
+var (
+	name     string
+	protocol string
+	port     int
+	host     string
+)
 
 func init() {
 	Plugin = "Templated"
@@ -33,7 +36,7 @@ func init() {
 // The function must be capitalize or exported, and return a `Service`
 // interface compatible struct.
 func Templated() services.PluginService {
-	mx := services.NewPluginService(name, port, protocol, "localhost")
+	mx := services.NewPluginService(name, port, protocol, host)
 
 	return &Template{
 		mx,

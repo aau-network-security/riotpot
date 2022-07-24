@@ -5,19 +5,25 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/riotpot/pkg/profiles/ports"
 	"github.com/riotpot/pkg/services"
 	"github.com/riotpot/tools/errors"
 )
 
-var Name string
+var Plugin string
+
+var (
+	name     = "Echod"
+	port     = 7
+	protocol = "tcp"
+	host     = "localhost"
+)
 
 func init() {
-	Name = "Echod"
+	Plugin = name
 }
 
 func Echod() services.PluginService {
-	mx := services.NewPluginService(Name, ports.GetPort("echod"), "tcp")
+	mx := services.NewPluginService(name, port, protocol, host)
 
 	return &Echo{
 		mx,
@@ -26,7 +32,7 @@ func Echod() services.PluginService {
 
 type Echo struct {
 	// Anonymous fields from the mixin
-	services.PluginService
+	services.Service
 }
 
 func (e *Echo) Run() (err error) {
@@ -54,7 +60,7 @@ func (e *Echo) Run() (err error) {
 // inspired on https://gist.github.com/paulsmith/775764#file-echo-go
 func (e *Echo) serve(ch chan net.Conn, listener net.Listener) {
 	// open an infinite loop to receive connections
-	fmt.Printf("[%s] Started listenning for connections in port %d\n", Name, e.GetPort())
+	fmt.Printf("[%s] Started listenning for connections in port %d\n", e.GetName(), e.GetPort())
 	for {
 		// Accept the client connection
 		client, err := listener.Accept()
