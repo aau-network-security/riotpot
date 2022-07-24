@@ -15,10 +15,9 @@ import (
 var Plugin string
 
 var (
-	name     = "Telnetd"
+	name     = "Telnet"
 	protocol = "tcp"
 	port     = 23
-	host     = "localhost"
 )
 
 func init() {
@@ -26,7 +25,7 @@ func init() {
 }
 
 func Telnetd() services.Service {
-	mx := services.NewPluginService(name, port, protocol, host)
+	mx := services.NewPluginService(name, port, protocol)
 	content, err := ioutil.ReadFile("banner.txt")
 	if err != nil {
 		log.Fatal(err)

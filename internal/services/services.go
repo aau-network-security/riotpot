@@ -163,8 +163,8 @@ func NewService(name string, port int, protocol string, host string) *AbstractSe
 }
 
 // Simple constructor for plugin services
-func NewPluginService(name string, port int, protocol string, host string) Service {
+func NewPluginService(name string, port int, protocol string) Service {
 	return &PluginServiceItem{
-		service: NewService(name, port, protocol, host),
+		service: NewService(name, port, protocol, "localhost"),
 	}
 }

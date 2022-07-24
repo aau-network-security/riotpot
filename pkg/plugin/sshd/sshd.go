@@ -17,10 +17,9 @@ import (
 var Plugin string
 
 var (
-	name     string
-	protocol string
-	port     int
-	host     string
+	name     = "SSH"
+	protocol = "tcp"
+	port     = 22
 )
 
 func init() {
@@ -30,7 +29,7 @@ func init() {
 // Inspiration from: https://github.com/jpillora/sshd-lite/
 func Sshd() services.Service {
 
-	mx := services.NewPluginService(name, port, protocol, host)
+	mx := services.NewPluginService(name, port, protocol)
 	pKey, err := ioutil.ReadFile("riopot_rsa")
 	errors.Raise(err)
 

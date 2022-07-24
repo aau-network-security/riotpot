@@ -13,10 +13,9 @@ import (
 var Plugin string
 
 var (
-	name     = "Mqttd"
+	name     = "MQTT"
 	protocol = "tcp"
 	port     = 1883
-	host     = "localhost"
 )
 
 func init() {
@@ -24,7 +23,7 @@ func init() {
 }
 
 func Mqttd() services.Service {
-	mx := services.NewPluginService(name, port, protocol, host)
+	mx := services.NewPluginService(name, port, protocol)
 
 	return &Mqtt{
 		mx,

@@ -12,10 +12,9 @@ import (
 var Plugin string
 
 var (
-	name     = "Echod"
+	name     = "Echo"
 	port     = 7
 	protocol = "tcp"
-	host     = "localhost"
 )
 
 func init() {
@@ -23,7 +22,7 @@ func init() {
 }
 
 func Echod() services.PluginService {
-	mx := services.NewPluginService(name, port, protocol, host)
+	mx := services.NewPluginService(name, port, protocol)
 
 	return &Echo{
 		mx,

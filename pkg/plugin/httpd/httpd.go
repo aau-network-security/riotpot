@@ -11,10 +11,9 @@ import (
 var Plugin string
 
 var (
-	name     = "HTTPd"
+	name     = "HTTP"
 	protocol = "tcp"
 	port     = 8080
-	host     = "localhost"
 )
 
 func init() {
@@ -22,7 +21,7 @@ func init() {
 }
 
 func Httpd() services.Service {
-	mx := services.NewPluginService(name, port, protocol, host)
+	mx := services.NewPluginService(name, port, protocol)
 
 	return &Http{
 		mx,

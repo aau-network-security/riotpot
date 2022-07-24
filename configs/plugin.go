@@ -26,7 +26,6 @@ var (
 	name     string
 	protocol string
 	port     int
-	host     string
 )
 
 func init() {
@@ -36,7 +35,7 @@ func init() {
 // The function must be capitalize or exported, and return a `Service`
 // interface compatible struct.
 func Templated() services.PluginService {
-	mx := services.NewPluginService(name, port, protocol, host)
+	mx := services.NewPluginService(name, port, protocol)
 
 	return &Template{
 		mx,

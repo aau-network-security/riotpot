@@ -25,10 +25,9 @@ import (
 var Plugin string
 
 var (
-	name     = "Coapd"
+	name     = "CoAP"
 	port     = 5683
 	protocol = "udp"
-	host     = "localhost"
 )
 
 func init() {
@@ -36,7 +35,7 @@ func init() {
 }
 
 func Coapd() services.Service {
-	mx := services.NewPluginService(name, port, protocol, host)
+	mx := services.NewPluginService(name, port, protocol)
 
 	profile := Profile{
 		Topics: RandomNumericTopics("/ps", 10),

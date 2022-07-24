@@ -13,10 +13,9 @@ import (
 var Plugin string
 
 var (
-	name     = "Modbusd"
+	name     = "Modbus"
 	protocol = "tcp"
 	port     = 502
-	host     = "localhost"
 )
 
 const size = 0x10000
@@ -33,7 +32,7 @@ func init() {
 }
 
 func Modbusd() services.Service {
-	mx := services.NewPluginService(name, port, protocol, host)
+	mx := services.NewPluginService(name, port, protocol)
 
 	handler := handler()
 
