@@ -6,16 +6,8 @@ import (
 	"fmt"
 
 	"github.com/google/uuid"
+	"github.com/riotpot/internal/validators"
 )
-
-func ValidatePortNumber(port int) (err error) {
-	// Check if there is a port and is acceptable
-	if !(port < 65536 && port > 0) {
-		err = fmt.Errorf("invalid port %d", port)
-		return
-	}
-	return
-}
 
 // Interface used by every service plugin that offers a service. At the very least, every plugin
 // must contain the set of methods and attributes from this interface.
@@ -81,7 +73,7 @@ func (as *AbstractService) IsLocked() bool {
 
 // Setters
 func (as *AbstractService) SetPort(port int) (p int, err error) {
-	err = ValidatePortNumber(port)
+	err = validators.ValidatePortNumber(port)
 	if err != nil {
 		return
 	}
@@ -141,7 +133,7 @@ func (aps *PluginServiceItem) GetHost() string {
 }
 
 func (aps *PluginServiceItem) IsLocked() bool {
-	return aps.service.IsLocked()
+	return true
 }
 
 func (aps *PluginServiceItem) SetPort(port int) (p int, err error) {

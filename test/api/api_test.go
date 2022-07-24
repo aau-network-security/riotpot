@@ -9,14 +9,11 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
+	"github.com/riotpot/internal/proxy"
+	"github.com/stretchr/testify/assert"
+
 	apiProxy "github.com/riotpot/api/proxy"
 	apiService "github.com/riotpot/api/service"
-	"github.com/riotpot/internal/proxy"
-
-	swaggerFiles "github.com/swaggo/files"
-	ginSwagger "github.com/swaggo/gin-swagger"
-
-	"github.com/stretchr/testify/assert"
 )
 
 func SetupRouter() *gin.Engine {
@@ -26,9 +23,6 @@ func SetupRouter() *gin.Engine {
 	// Add the proxy routes
 	apiProxy.ProxiesRouter.AddToGroup(group)
 	apiService.ServicesRouter.AddToGroup(group)
-
-	// Add the Swagger UI
-	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	return router
 }

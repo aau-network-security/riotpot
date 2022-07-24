@@ -29,8 +29,8 @@ func getServicePlugin(path string) Service {
 	errors.Raise(err)
 
 	// check the name of the function that exports the service
-	// The plugin *Must* contain a variable called `Name`.
-	s, err := pg.Lookup("Name")
+	// The plugin *Must* contain a variable called `Plugin`.
+	s, err := pg.Lookup("Plugin")
 	errors.Raise(err)
 
 	// log the name of the plugin being loaded
@@ -47,12 +47,11 @@ func getServicePlugin(path string) Service {
 }
 
 // Get the plugin services included in the app
-func pluginServices(pathLike string) (services []Service) {
+func pluginServices(pathLike string) (services []Service, err error) {
 	// Get the paths to the plugins
 	paths, err := filepath.Glob(pathLike)
-
 	if err != nil {
-		log.Fatal(err)
+		return
 	}
 
 	// Get the actual plugin and add it to the slice
@@ -60,15 +59,6 @@ func pluginServices(pathLike string) (services []Service) {
 		service := getServicePlugin(path)
 		services = append(services, service)
 	}
-
-	return
-}
-
-func discover(pluginsPath string) (services []Service, err error) {
-	// Get the plugins and register them
-	plugins := pluginServices(pluginsPath)
-
-	services = append(services, plugins...)
 
 	return
 }
@@ -100,7 +90,7 @@ type ServiceManager interface {
 	GetService(id string) (Service, error)
 
 	// Start the plugin services
-	Start(ids ...string) []Service
+	Start(ids ...string) ([]Service, error)
 }
 
 type ServiceManagerItem struct {
@@ -208,12 +198,44 @@ func (se *ServiceManagerItem) GetService(id string) (ret Service, err error) {
 	return
 }
 
+func (se *ServiceManagerItem) Start(ids ...string) (servs []Service, err error) {
+	for _, id := range ids {
+		service, e := se.GetService(id)
+		if e != nil {
+			err = e
+			return
+		}
+
+		i, ok := service.(*PluginServiceItem)
+		// If the service is not
+		if !ok {
+			err = fmt.Errorf("service %s is can not be started", service.GetName())
+			return
+		}
+
+		// Run the service
+		i.Run()
+		servs = append(servs, i)
+	}
+
+	return
+}
+
 // Create a new pointer to a supervisor
-func NewServiceManager(pluginPath string) (super ServiceManager) {
-	super = &ServiceManagerItem{}
+func NewServiceManager(pluginPath string) (manager ServiceManager) {
+	// Initialise the manager
+	manager = &ServiceManagerItem{
+		services: []Service{},
+	}
 
 	// Discover the services available to riotpot (running and stopped)
-	discover(pluginPath)
+	services, err := pluginServices(pluginPath)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Add/register the plugin services
+	manager.addService(services...)
 
 	return
 }
