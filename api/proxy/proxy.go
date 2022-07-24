@@ -9,8 +9,8 @@ import (
 	"github.com/riotpot/api"
 	"github.com/riotpot/api/service"
 	"github.com/riotpot/internal/proxy"
+	"github.com/riotpot/internal/services"
 	"github.com/riotpot/internal/validators"
-	"github.com/riotpot/pkg/services"
 )
 
 // Structures used to serialize data:

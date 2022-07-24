@@ -10,7 +10,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/riotpot/pkg/services"
+	"github.com/riotpot/internal/services"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/plgd-dev/go-coap/v2/message"

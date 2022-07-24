@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/riotpot/internal/proxy"
-	"github.com/riotpot/pkg/services"
+	"github.com/riotpot/internal/services"
 	"github.com/stretchr/testify/assert"
 )
 

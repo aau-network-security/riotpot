@@ -19,7 +19,7 @@ import (
 	"github.com/plgd-dev/go-coap/v2/message"
 	"github.com/plgd-dev/go-coap/v2/message/codes"
 	"github.com/plgd-dev/go-coap/v2/mux"
-	"github.com/riotpot/pkg/services"
+	"github.com/riotpot/internal/services"
 )
 
 var Plugin string

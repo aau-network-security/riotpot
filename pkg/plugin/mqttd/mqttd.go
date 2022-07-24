@@ -6,7 +6,7 @@ import (
 	"net"
 	"sync"
 
-	"github.com/riotpot/pkg/services"
+	"github.com/riotpot/internal/services"
 	"github.com/riotpot/tools/errors"
 )
 

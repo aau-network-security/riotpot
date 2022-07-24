@@ -7,8 +7,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/riotpot/api"
+	"github.com/riotpot/internal/services"
 	"github.com/riotpot/internal/validators"
-	"github.com/riotpot/pkg/services"
 )
 
 type GetService struct {

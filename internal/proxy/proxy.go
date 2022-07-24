@@ -5,8 +5,8 @@ import (
 	"sync"
 
 	"github.com/google/uuid"
+	"github.com/riotpot/internal/services"
 	"github.com/riotpot/internal/validators"
-	"github.com/riotpot/pkg/services"
 )
 
 const (

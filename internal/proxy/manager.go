@@ -6,7 +6,7 @@ package proxy
 import (
 	"fmt"
 
-	"github.com/riotpot/pkg/services"
+	"github.com/riotpot/internal/services"
 )
 
 var (

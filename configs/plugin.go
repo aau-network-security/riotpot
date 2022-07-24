@@ -15,7 +15,7 @@ TIP: To create your own plugin...
 package main
 
 import (
-	"github.com/riotpot/pkg/services"
+	"github.com/riotpot/internal/services"
 )
 
 // Place here the name of the function which returns the service interface.

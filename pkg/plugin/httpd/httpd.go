@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/riotpot/pkg/services"
+	"github.com/riotpot/internal/services"
 )
 
 var Plugin string

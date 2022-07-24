@@ -7,8 +7,8 @@ import (
 	"log"
 	"net"
 
+	"github.com/riotpot/internal/services"
 	"github.com/riotpot/pkg/fake/shell"
-	"github.com/riotpot/pkg/services"
 	"github.com/riotpot/tools/errors"
 )
 
