@@ -11,7 +11,6 @@ import (
 
 	arrays "github.com/riotpot/tools/arrays"
 	environ "github.com/riotpot/tools/environ"
-	errors "github.com/riotpot/tools/errors"
 	"gopkg.in/yaml.v3"
 )
 
@@ -74,31 +73,37 @@ type Configuration struct {
 func (conf *Configuration) Load() (err error) {
 	// Read the content of the configuration file
 	var f embed.FS
-	data, _ := f.ReadFile(conf.configPath)
+	data, err := f.ReadFile(conf.configPath)
+	if err != nil {
+		return
+	}
 
 	// Serialise the content of the yaml file and load it into the structure
 	err = yaml.Unmarshal(data, &conf)
-
 	if err != nil {
-		log.Fatal(err)
+		return
 	}
 
-	return err
+	return
 }
 
 // Stores the configuration into the given path in `.yml` format.
 func (conf *Configuration) Save() (err error) {
 	// marshal the content of the configuration into a `.yaml` document
 	d, err := yaml.Marshal(&conf)
-	errors.Raise(err)
+	if err != nil {
+		return
+	}
 
 	// Save to file.
 	// Mode 640: https://chmodcommand.com/chmod-640/
 	// Note: this truncates the file if it already exists !!!
 	err = os.WriteFile(conf.configPath, d, 0640)
-	errors.Raise(err)
+	if err != nil {
+		return
+	}
 
-	return err
+	return
 }
 
 // Validates the name of the emulator

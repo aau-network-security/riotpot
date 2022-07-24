@@ -20,6 +20,7 @@ import (
 
 // Place here the name of the function which returns the service interface.
 // This name will be used as a lookup symbol.
+// NOTE: The name must be unique!
 var Plugin string
 
 var (

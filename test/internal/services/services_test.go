@@ -7,7 +7,6 @@ import (
 	"testing"
 
 	"context"
-	"log"
 	"time"
 
 	"github.com/riotpot/internal/services"
@@ -31,7 +30,7 @@ func TestCoapDiscovery(t *testing.T) {
 	address := fmt.Sprintf("%s:%d", HOST, PORT)
 	co, err := udp.Dial(address)
 	if err != nil {
-		log.Fatalf("Error dialing: %v", err)
+		t.Error(err)
 	}
 	path := "/ps"
 
@@ -54,20 +53,20 @@ func TestCoapObserver(t *testing.T) {
 	address := fmt.Sprintf("%s:%d", HOST, PORT)
 	co, err := udp.Dial(address)
 	if err != nil {
-		log.Fatalf("Error dialing: %v", err)
+		t.Fatalf("Error dialing: %v", err)
 	}
 	num := 0
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 	obs, err := co.Observe(ctx, "/some/path", func(req *pool.Message) {
-		log.Printf("Got %+v\n", req)
+		t.Logf("Got %+v\n", req)
 		num++
 		if num >= 10 {
 			sync <- true
 		}
 	})
 	if err != nil {
-		log.Fatalf("Unexpected error '%v'", err)
+		t.Fatalf("Unexpected error '%v'", err)
 	}
 	<-sync
 	ctx, cancel = context.WithTimeout(context.Background(), time.Second)

@@ -11,14 +11,14 @@ import (
 
 var Plugin string
 
-var (
+const (
 	name     = "Echo"
 	port     = 7
 	protocol = "tcp"
 )
 
 func init() {
-	Plugin = name
+	Plugin = "Echod"
 }
 
 func Echod() services.PluginService {

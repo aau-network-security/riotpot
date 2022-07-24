@@ -4,9 +4,9 @@ import (
 	"bufio"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net"
 
+	lr "github.com/riotpot/internal/logger"
 	"github.com/riotpot/internal/services"
 	"github.com/riotpot/pkg/fake/shell"
 	"github.com/riotpot/tools/errors"
@@ -14,21 +14,21 @@ import (
 
 var Plugin string
 
-var (
+const (
 	name     = "Telnet"
 	protocol = "tcp"
 	port     = 23
 )
 
 func init() {
-	Plugin = name
+	Plugin = "Telnetd"
 }
 
 func Telnetd() services.Service {
 	mx := services.NewPluginService(name, port, protocol)
 	content, err := ioutil.ReadFile("banner.txt")
 	if err != nil {
-		log.Fatal(err)
+		lr.Log.Fatal().Err(err)
 	}
 
 	return &Telnet{

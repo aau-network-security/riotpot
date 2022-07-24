@@ -2,9 +2,10 @@ package proxy
 
 import (
 	"fmt"
-	"log"
 	"net"
 	"sync"
+
+	lr "github.com/riotpot/internal/logger"
 )
 
 type UDPProxy struct {
@@ -107,12 +108,12 @@ func (udpProxy *UDPProxy) handle(client *net.UDPConn, server *net.UDPConn) {
 	var handle = func(from *net.UDPConn, to *net.UDPConn) {
 		n, addr, err := from.ReadFrom(buf[0:])
 		if err != nil {
-			log.Print(err)
+			lr.Log.Warn().Err(err)
 		}
 
 		_, err = to.WriteTo(buf[:n], addr)
 		if err != nil {
-			log.Print(err)
+			lr.Log.Warn().Err(err)
 		}
 	}
 

@@ -8,7 +8,6 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"log"
 	"math/rand"
 	"regexp"
 	"strconv"
@@ -20,18 +19,20 @@ import (
 	"github.com/plgd-dev/go-coap/v2/message/codes"
 	"github.com/plgd-dev/go-coap/v2/mux"
 	"github.com/riotpot/internal/services"
+
+	lr "github.com/riotpot/internal/logger"
 )
 
 var Plugin string
 
-var (
+const (
 	name     = "CoAP"
 	port     = 5683
 	protocol = "udp"
 )
 
 func init() {
-	Plugin = name
+	Plugin = "Coapd"
 }
 
 func Coapd() services.Service {
@@ -64,11 +65,11 @@ func (c *Coap) Run() (err error) {
 	// This will cause all the requests to go through this function.
 	r.DefaultHandleFunc(c.observeHandler)
 
-	fmt.Printf("[%s] Started listenning for connections in port %d\n", c.GetName(), c.GetPort())
+	lr.Log.Info().Msgf("Service %s started listenning for connections in port %d", c.GetName(), c.GetPort())
 
 	// Run the server listening on the given port and using the defined
 	// lvl4 layer protocol.
-	log.Fatal(coap.ListenAndServe(c.GetProtocol(), fmt.Sprintf(":%d", c.GetPort()), r))
+	err = coap.ListenAndServe(c.GetProtocol(), fmt.Sprintf(":%d", c.GetPort()), r)
 
 	return
 }
@@ -142,7 +143,7 @@ func (c *Coap) observeHandler(w mux.ResponseWriter, req *mux.Message) {
 
 		// otherwise we consider the connection as a simple request on the state
 		msg := c.msg(topic)
-		err = c.get(w.Client(), req.Token, msg, -1)
+		err = c.get(w.Client(), req.Token, msg, -1) // Error is handled below
 
 	// Create a topic. It must indicate the path and the Content Format (ct)
 	// It should return the path and a response 2.01 created, since any
@@ -164,7 +165,7 @@ func (c *Coap) observeHandler(w mux.ResponseWriter, req *mux.Message) {
 	}
 
 	if err != nil {
-		log.Printf("Error on transmitter: %v", err)
+		lr.Log.Error().Err(err).Msg("Error on transmitter")
 	}
 }
 
@@ -218,7 +219,10 @@ func (c *Coap) discovery(cc mux.Client, token []byte, path string, flag string, 
 	// check if the buffer is too small. This might be caused because the bufer was never allocated.
 	if err == message.ErrTooSmall {
 		buf = append(buf, make([]byte, n)...)
-		opts, n, err = opts.SetContentFormat(buf, message.AppLinkFormat)
+		opts, _, err = opts.SetContentFormat(buf, message.AppLinkFormat)
+		if err != nil {
+			lr.Log.Error().Err(err).Msg("Error on transmitter")
+		}
 	}
 
 	m.Options = opts
@@ -258,7 +262,10 @@ func (c *Coap) post(cc mux.Client, token []byte, path string) error {
 	// check if the buffer is too small. This might be caused because the bufer was never allocated.
 	if err == message.ErrTooSmall {
 		buf = append(buf, make([]byte, n)...)
-		opts, n, err = opts.SetContentFormat(buf, message.AppLinkFormat)
+		opts, _, err = opts.SetContentFormat(buf, message.AppLinkFormat)
+		if err != nil {
+			lr.Log.Error().Err(err).Msg("Error on transmitter")
+		}
 	}
 
 	// The server MUST add the path to the created topic
@@ -293,7 +300,7 @@ func (c *Coap) get(cc mux.Client, token []byte, msg []byte, obs int64) error {
 	// check if the buffer is too small. This might be caused because the bufer was never allocated.
 	if err == message.ErrTooSmall {
 		buf = append(buf, make([]byte, n)...)
-		opts, n, err = opts.SetContentFormat(buf, message.TextPlain)
+		opts, _, err = opts.SetContentFormat(buf, message.TextPlain)
 	}
 
 	if err != nil {
@@ -307,7 +314,7 @@ func (c *Coap) get(cc mux.Client, token []byte, msg []byte, obs int64) error {
 
 			// set the observer in the options, making the message a notification,
 			// this value is simply now a counter for reordering.
-			opts, n, err = opts.SetObserve(buf, uint32(obs))
+			opts, _, err = opts.SetObserve(buf, uint32(obs))
 		}
 		if err != nil {
 			return fmt.Errorf("cannot set options to response: %w", err)
@@ -342,7 +349,7 @@ func (c *Coap) periodicTransmitter(cc mux.Client, token []byte, topic Topic) {
 			msg := c.msg(topic)
 			err := c.get(cc, token, msg, obs)
 			if err != nil {
-				log.Printf("Error on transmitter, stopping: %v", err)
+				lr.Log.Error().Err(err).Msg("Error on transmitter. Shutting down.")
 				return
 			}
 

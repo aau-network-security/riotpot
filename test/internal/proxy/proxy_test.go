@@ -49,7 +49,7 @@ func TestStartProxy(t *testing.T) {
 	}
 
 	// Create a new abstract service
-	service := services.NewPluginService("http", serverPort, protocol, "")
+	service := services.NewService("http", serverPort, protocol, "")
 
 	// Set the service
 	pr.SetService(service)
@@ -63,27 +63,24 @@ func TestStartProxy(t *testing.T) {
 		defer l.Close()
 
 		// Accept the connection
-		for {
-			conn, err := l.Accept()
-			if err != nil {
-				errs <- err
-			}
-			defer conn.Close()
-
-			buf, err := ioutil.ReadAll(conn)
-			if err != nil {
-				errs <- err
-			}
-
-			ret = string(buf[:])
-
-			// Check that the first message we got is the same as the expected
-			assert.Equal(ret, message, "The messages must be equal")
-
-			// Close the connection and return
-			l.Close()
-			return
+		conn, err := l.Accept()
+		if err != nil {
+			errs <- err
 		}
+		defer conn.Close()
+
+		buf, err := ioutil.ReadAll(conn)
+		if err != nil {
+			errs <- err
+		}
+
+		ret = string(buf[:])
+
+		// Check that the first message we got is the same as the expected
+		assert.Equal(ret, message, "The messages must be equal")
+
+		// Close the connection and return
+		l.Close()
 	}()
 
 	// Start the proxy
@@ -126,7 +123,7 @@ func TestStopProxy(t *testing.T) {
 	}
 
 	// Create a new abstract service
-	service := services.NewPluginService("http", serverPort, protocol, "")
+	service := services.NewService("http", serverPort, protocol, "")
 
 	// Set the service
 	pr.SetService(service)
@@ -140,17 +137,14 @@ func TestStopProxy(t *testing.T) {
 		defer l.Close()
 
 		// Accept the connection
-		for {
-			conn, err := l.Accept()
-			if err != nil {
-				errs <- err
-			}
-			defer conn.Close()
-
-			// Close the connection and return
-			l.Close()
-			return
+		conn, err := l.Accept()
+		if err != nil {
+			errs <- err
 		}
+		defer conn.Close()
+
+		// Close the connection and return
+		l.Close()
 	}()
 
 	// Start the proxy

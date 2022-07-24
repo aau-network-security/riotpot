@@ -2,11 +2,11 @@ package service
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/riotpot/api"
+	lr "github.com/riotpot/internal/logger"
 	"github.com/riotpot/internal/services"
 	"github.com/riotpot/internal/validators"
 )
@@ -190,5 +190,5 @@ func delService(ctx *gin.Context) {
 }
 
 func getServiceProxies(ctx *gin.Context) {
-	log.Fatalf("Not implemented")
+	lr.Log.Fatal().Msg("Not implemented")
 }

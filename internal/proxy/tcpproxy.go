@@ -3,10 +3,11 @@ package proxy
 import (
 	"fmt"
 	"io"
-	"log"
 	"net"
 	"sync"
 	"time"
+
+	lr "github.com/riotpot/internal/logger"
 )
 
 // Implementation of a TCP proxy
@@ -111,19 +112,19 @@ func (tcpProxy *TCPProxy) handle(from net.Conn, to net.Conn) {
 		// Write the content from the source to the destination
 		_, err := io.Copy(dest, source)
 		if err != nil {
-			log.Print(err)
+			lr.Log.Warn().Err(err).Msg("Could not copy from source to destination")
 		}
 
 		// Close the connection to the source
 		if err := source.Close(); err != nil {
-			log.Print(err)
+			lr.Log.Warn().Err(err)
 		}
 
 		// Attempt to close the writter. This may not always work
 		// Another solution is to just call `Close()` on the writter
 		if d, ok := dest.(*net.TCPConn); ok {
 			if err := d.CloseWrite(); err != nil {
-				log.Print(err)
+				lr.Log.Warn().Err(err)
 			}
 
 		}

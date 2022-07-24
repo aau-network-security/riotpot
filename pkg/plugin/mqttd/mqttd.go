@@ -12,14 +12,14 @@ import (
 
 var Plugin string
 
-var (
+const (
 	name     = "MQTT"
 	protocol = "tcp"
 	port     = 1883
 )
 
 func init() {
-	Plugin = name
+	Plugin = "Mqttd"
 }
 
 func Mqttd() services.Service {

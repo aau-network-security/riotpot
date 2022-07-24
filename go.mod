@@ -45,6 +45,7 @@ require (
 	github.com/pion/udp v0.1.1 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/plgd-dev/kit/v2 v2.0.0-20211006190727-057b33161b90 // indirect
+	github.com/rs/zerolog v1.27.0
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect
 	github.com/xdg-go/scram v1.1.1 // indirect
 	github.com/xdg-go/stringprep v1.0.3 // indirect

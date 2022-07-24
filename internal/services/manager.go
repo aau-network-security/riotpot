@@ -5,10 +5,10 @@ package services
 
 import (
 	"fmt"
-	"log"
 	"path/filepath"
 	"plugin"
 
+	lr "github.com/riotpot/internal/logger"
 	"github.com/riotpot/tools/errors"
 	"golang.org/x/exp/slices"
 )
@@ -231,7 +231,7 @@ func NewServiceManager(pluginPath string) (manager ServiceManager) {
 	// Discover the services available to riotpot (running and stopped)
 	services, err := pluginServices(pluginPath)
 	if err != nil {
-		log.Fatal(err)
+		lr.Log.Fatal().Err(err).Msgf("One or more services could not be found")
 	}
 
 	// Add/register the plugin services

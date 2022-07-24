@@ -12,13 +12,12 @@ import (
 
 var Plugin string
 
-var (
+const (
 	name     = "Modbus"
 	protocol = "tcp"
 	port     = 502
+	size     = 0x10000
 )
-
-const size = 0x10000
 
 var (
 	discretes        [size]bool
@@ -28,7 +27,7 @@ var (
 )
 
 func init() {
-	Plugin = name
+	Plugin = "Modbusd"
 }
 
 func Modbusd() services.Service {

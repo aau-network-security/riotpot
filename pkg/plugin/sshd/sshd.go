@@ -16,14 +16,14 @@ import (
 
 var Plugin string
 
-var (
+const (
 	name     = "SSH"
 	protocol = "tcp"
 	port     = 22
 )
 
 func init() {
-	Plugin = name
+	Plugin = "Sshd"
 }
 
 // Inspiration from: https://github.com/jpillora/sshd-lite/

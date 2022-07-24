@@ -2,22 +2,22 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 
+	lr "github.com/riotpot/internal/logger"
 	"github.com/riotpot/internal/services"
 )
 
 var Plugin string
 
-var (
+const (
 	name     = "HTTP"
 	protocol = "tcp"
 	port     = 8080
 )
 
 func init() {
-	Plugin = name
+	Plugin = "Httpd"
 }
 
 func Httpd() services.Service {
@@ -50,7 +50,7 @@ func (h *Http) Run() (err error) {
 func (h *Http) serve(srv *http.Server) {
 	fmt.Printf("[%s] Started listenning for connections in port %d\n", h.GetName(), h.GetPort())
 	if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-		log.Fatalf("listen:%+s\n", err)
+		lr.Log.Fatal().Err(err)
 	}
 }
 
