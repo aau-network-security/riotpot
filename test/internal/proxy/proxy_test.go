@@ -6,6 +6,7 @@ import (
 	"net"
 	"testing"
 
+	"github.com/riotpot/internal/globals"
 	"github.com/riotpot/internal/proxy"
 	"github.com/riotpot/internal/services"
 	"github.com/stretchr/testify/assert"
@@ -14,13 +15,13 @@ import (
 const (
 	proxyPort  = 8080
 	serverPort = 8081
-	protocol   = proxy.TCP
+	network    = globals.TCP
 )
 
 // Test to create a service, the ports at the end should be the same
 func TestCreateProxy(t *testing.T) {
 	// Instantiate the proxy
-	pr, err := proxy.NewProxyEndpoint(proxyPort, protocol)
+	pr, err := proxy.NewProxyEndpoint(proxyPort, network)
 
 	if err != nil {
 		t.Error(err)
@@ -43,20 +44,20 @@ func TestStartProxy(t *testing.T) {
 	ret := ""
 
 	// Instantiate the proxy
-	pr, err := proxy.NewProxyEndpoint(proxyPort, protocol)
+	pr, err := proxy.NewProxyEndpoint(proxyPort, network)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	// Create a new abstract service
-	service := services.NewService("http", serverPort, protocol, "")
+	service := services.NewService("http", serverPort, network, "")
 
 	// Set the service
 	pr.SetService(service)
 
 	// Start a listener for that port and accept anything (server)
 	go func() {
-		l, err := net.Listen(protocol, service.GetAddress())
+		l, err := net.Listen(network.String(), service.GetAddress())
 		if err != nil {
 			errs <- err
 		}
@@ -89,7 +90,7 @@ func TestStartProxy(t *testing.T) {
 	// Start a new client connections that sends the message (client)
 	go func() {
 		// Connect to the proxy
-		conn, err := net.Dial(protocol, fmt.Sprintf(":%d", proxyPort))
+		conn, err := net.Dial(network.String(), fmt.Sprintf(":%d", proxyPort))
 		if err != nil {
 			errs <- err
 		}
@@ -117,20 +118,20 @@ func TestStopProxy(t *testing.T) {
 	errs := make(chan error, 1)
 
 	// Instantiate the proxy
-	pr, err := proxy.NewProxyEndpoint(proxyPort, protocol)
+	pr, err := proxy.NewProxyEndpoint(proxyPort, network)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	// Create a new abstract service
-	service := services.NewService("http", serverPort, protocol, "")
+	service := services.NewService("http", serverPort, network, "")
 
 	// Set the service
 	pr.SetService(service)
 
 	// Start a listener for that port and accept anything (server)
 	go func() {
-		l, err := net.Listen(protocol, service.GetAddress())
+		l, err := net.Listen(network.String(), service.GetAddress())
 		if err != nil {
 			errs <- err
 		}
@@ -164,7 +165,7 @@ func TestCreateNewProxy(t *testing.T) {
 	// Create a new proxy manager
 	proxyManager := proxy.NewProxyManager()
 	// Add a proxy
-	_, err := proxyManager.CreateProxy(proxy.TCP, proxyPort)
+	_, err := proxyManager.CreateProxy(globals.TCP, proxyPort)
 
 	// There would be an error if the proxy was already registered or the port is unavailable
 	if err != nil {
@@ -176,7 +177,7 @@ func TestDeleteProxy(t *testing.T) {
 	// Create a new proxy manager
 	proxyManager := proxy.NewProxyManager()
 	// Add a proxy
-	pe, err := proxyManager.CreateProxy(proxy.TCP, proxyPort)
+	pe, err := proxyManager.CreateProxy(globals.TCP, proxyPort)
 	if err != nil {
 		t.Fatal(err)
 	}

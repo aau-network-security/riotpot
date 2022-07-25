@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"plugin"
 
+	"github.com/riotpot/internal/globals"
 	lr "github.com/riotpot/internal/logger"
 	"github.com/riotpot/tools/errors"
 	"golang.org/x/exp/slices"
@@ -78,7 +79,7 @@ type ServiceManager interface {
 	// Register services
 	addService(services ...Service) (serv []Service, err error)
 
-	CreateService(name string, port int, protocol string, host string) (Service, error)
+	CreateService(name string, port int, network globals.Network, host string) (Service, error)
 
 	// Delete a service
 	DeleteService(id string) (err error)
@@ -130,7 +131,7 @@ func (se *ServiceManagerItem) addService(services ...Service) (serv []Service, e
 }
 
 // Creates a new service and register it in the manager
-func (se *ServiceManagerItem) CreateService(name string, port int, protocol string, host string) (s Service, err error) {
+func (se *ServiceManagerItem) CreateService(name string, port int, network globals.Network, host string) (s Service, err error) {
 	// Iterate the services to determine whether the
 	for _, service := range se.GetServices() {
 		// Validate the name
@@ -140,14 +141,14 @@ func (se *ServiceManagerItem) CreateService(name string, port int, protocol stri
 		}
 
 		// Validate the address
-		if service.GetPort() == port && service.GetProtocol() == protocol && service.GetHost() == host {
+		if service.GetPort() == port && service.GetNetwork() == network && service.GetHost() == host {
 			err = fmt.Errorf("service address already taken")
 			return
 		}
 	}
 
 	// Create the new service
-	s = NewService(name, port, protocol, host)
+	s = NewService(name, port, network, host)
 
 	// Append the new service to the list
 	se.services = append(se.services, s)

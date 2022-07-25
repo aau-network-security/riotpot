@@ -6,6 +6,7 @@ package proxy
 import (
 	"fmt"
 
+	"github.com/riotpot/internal/globals"
 	"github.com/riotpot/internal/services"
 )
 
@@ -26,7 +27,7 @@ type ProxyManager interface {
 	DeleteProxy(id string) error
 
 	// Wrapper method to find a proxy using the port and protocol
-	GetProxyFromParams(protocol string, port int)
+	GetProxyFromParams(network string, port int)
 
 	// Set the service for a proxy
 	SetService(port int, service services.Service) (pe Proxy, err error)
@@ -46,15 +47,16 @@ type ProxyManagerItem struct {
 }
 
 // Create a new proxy and add it to the manager
-func (pm *ProxyManagerItem) CreateProxy(protocol string, port int) (pe Proxy, err error) {
+func (pm *ProxyManagerItem) CreateProxy(network globals.Network, port int) (pe Proxy, err error) {
+
 	// Check if there is another proxy with the same port
-	if proxy, _ := pm.GetProxyFromParams(protocol, port); proxy != nil {
+	if proxy, _ := pm.GetProxyFromParams(network, port); proxy != nil {
 		err = fmt.Errorf("proxy already registered")
 		return
 	}
 
 	// Create the proxy
-	pe, err = NewProxyEndpoint(port, protocol)
+	pe, err = NewProxyEndpoint(port, network)
 
 	// Append the proxy to the list
 	pm.proxies = append(pm.proxies, pe)
@@ -88,10 +90,10 @@ func (pm *ProxyManagerItem) GetProxies() []Proxy {
 }
 
 // Returns a proxy by the port number
-func (pm *ProxyManagerItem) GetProxyFromParams(protocol string, port int) (pe Proxy, err error) {
+func (pm *ProxyManagerItem) GetProxyFromParams(network globals.Network, port int) (pe Proxy, err error) {
 	// Iterate the proxies registered, and if the proxy using the given port is found, return it
 	for _, proxy := range pm.proxies {
-		if proxy.GetPort() == port && proxy.GetProtocol() == protocol {
+		if proxy.GetPort() == port && proxy.GetNetwork() == network {
 			pe = proxy
 			return
 		}
@@ -105,7 +107,7 @@ func (pm *ProxyManagerItem) GetProxyFromParams(protocol string, port int) (pe Pr
 // Set the service for some proxy
 func (pm *ProxyManagerItem) SetService(port int, service services.Service) (pe Proxy, err error) {
 	// Get the proxy from the list
-	pe, err = pm.GetProxyFromParams(service.GetProtocol(), port)
+	pe, err = pm.GetProxyFromParams(service.GetNetwork(), port)
 	if err != nil {
 		return
 	}

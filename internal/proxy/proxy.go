@@ -5,22 +5,9 @@ import (
 	"sync"
 
 	"github.com/google/uuid"
+	"github.com/riotpot/internal/globals"
 	"github.com/riotpot/internal/services"
 	"github.com/riotpot/internal/validators"
-)
-
-const (
-	// Protocols
-	TCP = "tcp"
-	UDP = "udp"
-)
-
-const (
-	// Values for the proxy status
-	// This variables are set to make development more readable and extensible
-	// If in the future other status are allowed, include them here
-	ALIVE = 1
-	DEAD  = 0
 )
 
 // Proxy interface.
@@ -32,8 +19,8 @@ type Proxy interface {
 	// Getters
 	GetID() string
 	GetPort() int
-	GetProtocol() string
-	GetStatus() int
+	GetNetwork() globals.Network
+	GetStatus() globals.Status
 	GetService() services.Service
 
 	// Setters
@@ -52,7 +39,7 @@ type AbstractProxy struct {
 	// Port in where the proxy will listen
 	port int
 	// Protocol meant for this proxy
-	protocol string
+	network globals.Network
 
 	// Create a channel to stop the proxy gracefully
 	// This channel is also used to guess if the proxy is running
@@ -76,7 +63,7 @@ type AbstractProxy struct {
 // Function to stop the proxy from runing
 func (pe *AbstractProxy) Stop() (err error) {
 	// Stop the proxy if it is still alive
-	if pe.GetStatus() != DEAD {
+	if pe.GetStatus() != globals.StoppedStatus {
 		close(pe.stop)
 		pe.listener.Close()
 		// Wait for all the connections and the server to stop
@@ -89,7 +76,7 @@ func (pe *AbstractProxy) Stop() (err error) {
 }
 
 // Simple function to check if the proxy is running
-func (pe *AbstractProxy) GetStatus() (alive int) {
+func (pe *AbstractProxy) GetStatus() (alive globals.Status) {
 	// When the proxy is instantiated, the stop channel is nil;
 	// therefore, the proxy is not running
 	if pe.stop == nil {
@@ -106,7 +93,7 @@ func (pe *AbstractProxy) GetStatus() (alive int) {
 	case <-pe.stop:
 	// Return if the channel is open
 	default:
-		alive = ALIVE
+		alive = globals.RunningStatus
 	}
 
 	return
@@ -153,27 +140,26 @@ func (pe *AbstractProxy) GetService() services.Service {
 }
 
 // Returns the service
-func (pe *AbstractProxy) GetProtocol() string {
-	return pe.protocol
+func (pe *AbstractProxy) GetProtocol() globals.Network {
+	return pe.network
 }
 
-func NewAbstractProxy(port int, protocol string) (ab *AbstractProxy) {
+func NewAbstractProxy(port int, network globals.Network) (ab *AbstractProxy) {
 	ab = &AbstractProxy{
 		id:          uuid.New(),
 		port:        port,
-		protocol:    protocol,
+		network:     network,
 		middlewares: Middlewares,
 	}
 	return
 }
 
 // Create a new instance of the proxy
-func NewProxyEndpoint(port int, protocol string) (pe Proxy, err error) {
-	// Get the proxy for UDP or TCP
-	switch protocol {
-	case TCP:
+func NewProxyEndpoint(port int, network globals.Network) (pe Proxy, err error) {
+	switch network {
+	case globals.TCP:
 		pe, err = NewTCPProxy(port)
-	case UDP:
+	case globals.UDP:
 		pe, err = NewUDPProxy(port)
 	}
 

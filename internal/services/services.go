@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/google/uuid"
+	"github.com/riotpot/internal/globals"
 	"github.com/riotpot/internal/validators"
 )
 
@@ -16,7 +17,7 @@ type Service interface {
 	// Get attributes from the structure
 	GetID() string
 	GetName() string
-	GetProtocol() string
+	GetNetwork() globals.Network
 	GetPort() int
 	GetAddress() string
 	GetHost() string
@@ -34,12 +35,12 @@ type AbstractService struct {
 	// require the methods described by `Service` on loading
 	Service
 
-	id       uuid.UUID
-	name     string
-	protocol string
-	port     int
-	host     string
-	locked   bool
+	id      uuid.UUID
+	name    string
+	network globals.Network
+	port    int
+	host    string
+	locked  bool
 }
 
 // Getters
@@ -51,8 +52,8 @@ func (as *AbstractService) GetName() string {
 	return as.name
 }
 
-func (as *AbstractService) GetProtocol() string {
-	return as.protocol
+func (as *AbstractService) GetNetwork() globals.Network {
+	return as.network
 }
 
 func (as *AbstractService) GetPort() int {
@@ -116,8 +117,8 @@ func (aps *PluginServiceItem) GetAddress() string {
 	return aps.service.GetAddress()
 }
 
-func (aps *PluginServiceItem) GetProtocol() string {
-	return aps.service.GetProtocol()
+func (aps *PluginServiceItem) GetNetwork() globals.Network {
+	return aps.service.GetNetwork()
 }
 
 func (aps *PluginServiceItem) GetPort() int {
@@ -152,19 +153,19 @@ func (aps *PluginServiceItem) SetLocked(locked bool) (bool, error) {
 	return true, fmt.Errorf("the lock status of this service can not change")
 }
 
-func NewService(name string, port int, protocol string, host string) *AbstractService {
+func NewService(name string, port int, network globals.Network, host string) *AbstractService {
 	return &AbstractService{
-		id:       uuid.New(),
-		name:     name,
-		port:     port,
-		protocol: protocol,
-		host:     host,
+		id:      uuid.New(),
+		name:    name,
+		port:    port,
+		network: network,
+		host:    host,
 	}
 }
 
 // Simple constructor for plugin services
-func NewPluginService(name string, port int, protocol string) Service {
+func NewPluginService(name string, port int, network globals.Network) Service {
 	return &PluginServiceItem{
-		service: NewService(name, port, protocol, "localhost"),
+		service: NewService(name, port, network, "localhost"),
 	}
 }

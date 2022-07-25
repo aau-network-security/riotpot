@@ -3,11 +3,11 @@ allOf:
   - $ref: Px.yaml
 properties:
   status:
-    type: integer
+    type: string
     enum:
-      - 0
-      - 1
-    example: 0
-    description: State of the service. Running (1) or Stopped (0)
+      - running
+      - stopped
+    example: stopped
+    description: State of the service.
   service:
     $ref: Service.yaml

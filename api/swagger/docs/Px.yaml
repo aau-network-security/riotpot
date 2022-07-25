@@ -12,7 +12,7 @@ properties:
     maximum: 65536
     example: 8080
     description: Port to listen for connections
-  protocol:
+  network:
     type: string
     enum:
       - tcp

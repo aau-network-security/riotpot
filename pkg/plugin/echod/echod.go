@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net"
 
+	"github.com/riotpot/internal/globals"
 	"github.com/riotpot/internal/services"
 	"github.com/riotpot/tools/errors"
 )
@@ -12,9 +13,9 @@ import (
 var Plugin string
 
 const (
-	name     = "Echo"
-	port     = 7
-	protocol = "tcp"
+	name    = "Echo"
+	port    = 7
+	network = globals.TCP
 )
 
 func init() {
@@ -22,7 +23,7 @@ func init() {
 }
 
 func Echod() services.PluginService {
-	mx := services.NewPluginService(name, port, protocol)
+	mx := services.NewPluginService(name, port, network)
 
 	return &Echo{
 		mx,
@@ -39,7 +40,7 @@ func (e *Echo) Run() (err error) {
 	var port = fmt.Sprintf(":%d", e.GetPort())
 
 	// start a service in the `echo` port
-	listener, err := net.Listen(e.GetProtocol(), port)
+	listener, err := net.Listen(e.GetNetwork().String(), port)
 	errors.Raise(err)
 
 	// build a channel stack to receive connections to the service

@@ -7,6 +7,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/riotpot/internal/globals"
 	lr "github.com/riotpot/internal/logger"
 )
 
@@ -51,7 +52,7 @@ func (tcpProxy *TCPProxy) Start() (err error) {
 			defer client.Close()
 
 			// Get a connection to the server for each new connection with the client
-			server, servErr := net.DialTimeout(TCP, tcpProxy.service.GetAddress(), 1*time.Second)
+			server, servErr := net.DialTimeout(globals.TCP.String(), tcpProxy.service.GetAddress(), 1*time.Second)
 
 			// If there was an error, close the connection to the server and return
 			if servErr != nil {
@@ -84,7 +85,7 @@ func (tcpProxy *TCPProxy) GetListener() (listener net.Listener, err error) {
 	listener = tcpProxy.listener
 
 	// Get the listener only
-	if listener == nil || tcpProxy.GetStatus() != ALIVE {
+	if listener == nil || tcpProxy.GetStatus() != globals.RunningStatus {
 		listener, err = tcpProxy.NewListener()
 		if err != nil {
 			return
@@ -96,7 +97,7 @@ func (tcpProxy *TCPProxy) GetListener() (listener net.Listener, err error) {
 }
 
 func (tcpProxy *TCPProxy) NewListener() (listener net.Listener, err error) {
-	listener, err = net.Listen(tcpProxy.GetProtocol(), fmt.Sprintf(":%d", tcpProxy.GetPort()))
+	listener, err = net.Listen(tcpProxy.GetProtocol().String(), fmt.Sprintf(":%d", tcpProxy.GetPort()))
 	return
 }
 
@@ -143,7 +144,7 @@ func (tcpProxy *TCPProxy) handle(from net.Conn, to net.Conn) {
 func NewTCPProxy(port int) (proxy *TCPProxy, err error) {
 	// Create a new proxy
 	proxy = &TCPProxy{
-		AbstractProxy: NewAbstractProxy(port, TCP),
+		AbstractProxy: NewAbstractProxy(port, globals.TCP),
 	}
 
 	// Set the port

@@ -15,6 +15,7 @@ TIP: To create your own plugin...
 package main
 
 import (
+	"github.com/riotpot/internal/globals"
 	"github.com/riotpot/internal/services"
 )
 
@@ -24,9 +25,9 @@ import (
 var Plugin string
 
 var (
-	name     string
-	protocol string
-	port     int
+	name    string
+	network globals.Network
+	port    int
 )
 
 func init() {
@@ -36,7 +37,7 @@ func init() {
 // The function must be capitalize or exported, and return a `Service`
 // interface compatible struct.
 func Templated() services.PluginService {
-	mx := services.NewPluginService(name, port, protocol)
+	mx := services.NewPluginService(name, port, network)
 
 	return &Template{
 		mx,

@@ -5,6 +5,7 @@ import (
 	"io"
 	"net"
 
+	"github.com/riotpot/internal/globals"
 	"github.com/riotpot/internal/services"
 	"github.com/riotpot/tools/errors"
 	"github.com/xiegeo/modbusone"
@@ -13,10 +14,10 @@ import (
 var Plugin string
 
 const (
-	name     = "Modbus"
-	protocol = "tcp"
-	port     = 502
-	size     = 0x10000
+	name    = "Modbus"
+	network = globals.TCP
+	port    = 502
+	size    = 0x10000
 )
 
 var (
@@ -31,7 +32,7 @@ func init() {
 }
 
 func Modbusd() services.Service {
-	mx := services.NewPluginService(name, port, protocol)
+	mx := services.NewPluginService(name, port, network)
 
 	handler := handler()
 

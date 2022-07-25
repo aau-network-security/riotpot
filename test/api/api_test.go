@@ -9,7 +9,7 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
-	"github.com/riotpot/internal/proxy"
+	"github.com/riotpot/internal/globals"
 	"github.com/stretchr/testify/assert"
 
 	apiProxy "github.com/riotpot/api/proxy"
@@ -30,8 +30,8 @@ func SetupRouter() *gin.Engine {
 func TestApiProxy(t *testing.T) {
 
 	expected := &apiProxy.CreateProxy{
-		Port:     8080,
-		Protocol: proxy.TCP,
+		Port:    8080,
+		Network: globals.TCP.String(),
 	}
 
 	router := SetupRouter()
@@ -62,10 +62,10 @@ func TestApiProxy(t *testing.T) {
 func TestApiService(t *testing.T) {
 
 	expected := &apiService.CreateService{
-		Name:     "Test Service",
-		Host:     "localhost",
-		Port:     8080,
-		Protocol: proxy.TCP,
+		Name:    "Test Service",
+		Host:    "localhost",
+		Port:    8080,
+		Network: globals.TCP.String(),
 	}
 
 	router := SetupRouter()

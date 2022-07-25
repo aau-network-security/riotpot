@@ -18,6 +18,7 @@ import (
 	"github.com/plgd-dev/go-coap/v2/message"
 	"github.com/plgd-dev/go-coap/v2/message/codes"
 	"github.com/plgd-dev/go-coap/v2/mux"
+	"github.com/riotpot/internal/globals"
 	"github.com/riotpot/internal/services"
 
 	lr "github.com/riotpot/internal/logger"
@@ -26,9 +27,9 @@ import (
 var Plugin string
 
 const (
-	name     = "CoAP"
-	port     = 5683
-	protocol = "udp"
+	name    = "CoAP"
+	port    = 5683
+	network = globals.UDP
 )
 
 func init() {
@@ -36,7 +37,7 @@ func init() {
 }
 
 func Coapd() services.Service {
-	mx := services.NewPluginService(name, port, protocol)
+	mx := services.NewPluginService(name, port, network)
 
 	profile := Profile{
 		Topics: RandomNumericTopics("/ps", 10),
@@ -69,7 +70,7 @@ func (c *Coap) Run() (err error) {
 
 	// Run the server listening on the given port and using the defined
 	// lvl4 layer protocol.
-	err = coap.ListenAndServe(c.GetProtocol(), fmt.Sprintf(":%d", c.GetPort()), r)
+	err = coap.ListenAndServe(c.GetNetwork().String(), fmt.Sprintf(":%d", c.GetPort()), r)
 
 	return
 }

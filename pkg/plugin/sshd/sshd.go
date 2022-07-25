@@ -7,6 +7,7 @@ import (
 	"net"
 	"sync"
 
+	"github.com/riotpot/internal/globals"
 	"github.com/riotpot/internal/services"
 	"github.com/riotpot/pkg/fake/shell"
 	"github.com/riotpot/tools/errors"
@@ -17,9 +18,9 @@ import (
 var Plugin string
 
 const (
-	name     = "SSH"
-	protocol = "tcp"
-	port     = 22
+	name    = "SSH"
+	network = globals.TCP
+	port    = 22
 )
 
 func init() {
@@ -29,7 +30,7 @@ func init() {
 // Inspiration from: https://github.com/jpillora/sshd-lite/
 func Sshd() services.Service {
 
-	mx := services.NewPluginService(name, port, protocol)
+	mx := services.NewPluginService(name, port, network)
 	pKey, err := ioutil.ReadFile("riopot_rsa")
 	errors.Raise(err)
 
@@ -60,7 +61,7 @@ func (s *SSH) Run() (err error) {
 	var port = fmt.Sprintf(":%d", s.GetPort())
 
 	// start a service in the `echo` port
-	listener, err := net.Listen(s.GetProtocol(), port)
+	listener, err := net.Listen(s.GetNetwork().String(), port)
 	errors.Raise(err)
 	defer listener.Close()
 

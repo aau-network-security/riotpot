@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/riotpot/internal/globals"
 	lr "github.com/riotpot/internal/logger"
 	"github.com/riotpot/internal/services"
 )
@@ -11,9 +12,9 @@ import (
 var Plugin string
 
 const (
-	name     = "HTTP"
-	protocol = "tcp"
-	port     = 8080
+	name    = "HTTP"
+	network = globals.TCP
+	port    = 8080
 )
 
 func init() {
@@ -21,7 +22,7 @@ func init() {
 }
 
 func Httpd() services.Service {
-	mx := services.NewPluginService(name, port, protocol)
+	mx := services.NewPluginService(name, port, network)
 
 	return &Http{
 		mx,

@@ -6,6 +6,7 @@ import (
 	"net"
 	"sync"
 
+	"github.com/riotpot/internal/globals"
 	"github.com/riotpot/internal/services"
 	"github.com/riotpot/tools/errors"
 )
@@ -13,9 +14,9 @@ import (
 var Plugin string
 
 const (
-	name     = "MQTT"
-	protocol = "tcp"
-	port     = 1883
+	name    = "MQTT"
+	network = globals.TCP
+	port    = 1883
 )
 
 func init() {
@@ -23,7 +24,7 @@ func init() {
 }
 
 func Mqttd() services.Service {
-	mx := services.NewPluginService(name, port, protocol)
+	mx := services.NewPluginService(name, port, network)
 
 	return &Mqtt{
 		mx,
@@ -42,7 +43,7 @@ func (m *Mqtt) Run() (err error) {
 	var port = fmt.Sprintf(":%d", m.GetPort())
 
 	// start a service in the `mqtt` port
-	listener, err := net.Listen(m.GetProtocol(), port)
+	listener, err := net.Listen(m.GetNetwork().String(), port)
 	errors.Raise(err)
 
 	// build a channel stack to receive connections to the service

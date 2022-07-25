@@ -3,11 +3,11 @@ package proxy
 import (
 	"fmt"
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/riotpot/api"
 	"github.com/riotpot/api/service"
+	"github.com/riotpot/internal/globals"
 	"github.com/riotpot/internal/proxy"
 	"github.com/riotpot/internal/services"
 	"github.com/riotpot/internal/validators"
@@ -15,16 +15,21 @@ import (
 
 // Structures used to serialize data:
 type GetProxy struct {
-	ID       string              `json:"id" binding:"required" gorm:"primary_key"`
-	Port     int                 `json:"port"`
-	Protocol string              `json:"protocol"`
-	Status   int                 `json:"status"`
-	Service  *service.GetService `json:"service"`
+	ID      string              `json:"id" binding:"required" gorm:"primary_key"`
+	Port    int                 `json:"port"`
+	Network string              `json:"network"`
+	Status  string              `json:"status"`
+	Service *service.GetService `json:"service"`
 }
 
 type CreateProxy struct {
-	Port     int    `json:"port" binding:"required"`
-	Protocol string `json:"protocol" binding:"required"`
+	Port    int    `json:"port" binding:"required"`
+	Network string `json:"network" binding:"required"`
+}
+
+type ChangeProxyStatus struct {
+	ID     string `json:"id" binding:"required" gorm:"primary_key"`
+	Status string `json:"status"`
 }
 
 // Routes
@@ -58,11 +63,11 @@ func NewProxy(px proxy.Proxy) *GetProxy {
 	serv := service.NewService(px.GetService())
 
 	return &GetProxy{
-		ID:       px.GetID(),
-		Port:     px.GetPort(),
-		Protocol: px.GetProtocol(),
-		Status:   px.GetStatus(),
-		Service:  serv,
+		ID:      px.GetID(),
+		Port:    px.GetPort(),
+		Network: px.GetNetwork().String(),
+		Status:  px.GetStatus().String(),
+		Service: serv,
 	}
 }
 
@@ -93,8 +98,14 @@ func createProxy(ctx *gin.Context) {
 		return
 	}
 
+	nt, err := globals.ParseNetwork(input.Network)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
 	// Create a new proxy
-	pe, err := proxy.Proxies.CreateProxy(input.Protocol, input.Port)
+	pe, err := proxy.Proxies.CreateProxy(nt, input.Port)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -131,8 +142,7 @@ func patchProxy(ctx *gin.Context) {
 	}
 
 	// Get the proxy to update
-	id := ctx.Param("id")
-	pe, err := proxy.Proxies.GetProxy(id)
+	pe, err := proxy.Proxies.GetProxy(input.ID)
 	if err != nil {
 		errors = append(errors, err)
 	}
@@ -180,26 +190,30 @@ func delProxy(ctx *gin.Context) {
 
 // POST request to change the status of the proxy
 func changeProxyStatus(ctx *gin.Context) {
-	// Get the proxy using the id
-	id := ctx.Param("id")
-	pe, err := proxy.Proxies.GetProxy(id)
-	if err != nil {
+	// Validate the post request to patch the proxy
+	var input ChangeProxyStatus
+	if err := ctx.ShouldBindJSON(&input); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	// Convert the status string to integer
-	status, err := strconv.Atoi(ctx.Param("status"))
+	pe, err := proxy.Proxies.GetProxy(input.ID)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	// Attempt to change the status
+	status, err := globals.ParseStatus(input.Status)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
 	switch status {
-	case proxy.ALIVE:
+	case globals.RunningStatus:
 		err = pe.Start()
-	case proxy.DEAD:
+	case globals.StoppedStatus:
 		err = pe.Stop()
 	default:
 		err = fmt.Errorf("status not allowed")

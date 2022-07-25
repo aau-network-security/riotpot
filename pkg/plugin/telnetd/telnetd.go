@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net"
 
+	"github.com/riotpot/internal/globals"
 	lr "github.com/riotpot/internal/logger"
 	"github.com/riotpot/internal/services"
 	"github.com/riotpot/pkg/fake/shell"
@@ -15,9 +16,9 @@ import (
 var Plugin string
 
 const (
-	name     = "Telnet"
-	protocol = "tcp"
-	port     = 23
+	name    = "Telnet"
+	network = globals.TCP
+	port    = 23
 )
 
 func init() {
@@ -25,7 +26,7 @@ func init() {
 }
 
 func Telnetd() services.Service {
-	mx := services.NewPluginService(name, port, protocol)
+	mx := services.NewPluginService(name, port, network)
 	content, err := ioutil.ReadFile("banner.txt")
 	if err != nil {
 		lr.Log.Fatal().Err(err)
@@ -48,7 +49,7 @@ func (t *Telnet) Run() (err error) {
 	var port = fmt.Sprintf(":%d", t.GetPort())
 
 	// start a service in the `telnet` port
-	listener, err := net.Listen(t.GetProtocol(), port)
+	listener, err := net.Listen(t.GetNetwork().String(), port)
 	errors.Raise(err)
 
 	// build a channel stack to receive connections to the service

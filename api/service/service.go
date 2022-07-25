@@ -6,25 +6,26 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/riotpot/api"
+	"github.com/riotpot/internal/globals"
 	lr "github.com/riotpot/internal/logger"
 	"github.com/riotpot/internal/services"
 	"github.com/riotpot/internal/validators"
 )
 
 type GetService struct {
-	ID       string `json:"id" binding:"required" gorm:"primary_key"`
-	Name     string `json:"name"`
-	Port     int    `json:"port"`
-	Host     string `json:"host"`
-	Protocol string `json:"protocol"`
-	Locked   bool   `json:"locked"`
+	ID      string `json:"id" binding:"required" gorm:"primary_key"`
+	Name    string `json:"name"`
+	Port    int    `json:"port"`
+	Host    string `json:"host"`
+	Network string `json:"network"`
+	Locked  bool   `json:"locked"`
 }
 
 type CreateService struct {
-	Name     string `json:"name" binding:"required"`
-	Port     int    `json:"port" binding:"required"`
-	Host     string `json:"host" binding:"required"`
-	Protocol string `json:"protocol" binding:"required"`
+	Name    string `json:"name" binding:"required"`
+	Port    int    `json:"port" binding:"required"`
+	Host    string `json:"host" binding:"required"`
+	Network string `json:"network" binding:"required"`
 }
 
 // Routes
@@ -58,11 +59,11 @@ var (
 func NewService(serv services.Service) (sv *GetService) {
 	if serv != nil {
 		sv = &GetService{
-			ID:       serv.GetID(),
-			Port:     serv.GetPort(),
-			Name:     serv.GetName(),
-			Host:     serv.GetHost(),
-			Protocol: serv.GetProtocol(),
+			ID:      serv.GetID(),
+			Port:    serv.GetPort(),
+			Name:    serv.GetName(),
+			Host:    serv.GetHost(),
+			Network: serv.GetNetwork().String(),
 		}
 	}
 	return
@@ -104,7 +105,13 @@ func createService(ctx *gin.Context) {
 		return
 	}
 
-	sv, err := services.Services.CreateService(input.Name, input.Port, input.Protocol, input.Host)
+	nt, err := globals.ParseNetwork(input.Network)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	sv, err := services.Services.CreateService(input.Name, input.Port, nt, input.Host)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

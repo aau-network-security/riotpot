@@ -25,10 +25,10 @@
         schema:
           $ref: Px.yaml#/properties/port
       - in: query
-        name: protocol
+        name: network
         required: true
         schema:
-          $ref: Px.yaml#/properties/protocol
+          $ref: Px.yaml#/properties/network
     responses:
       "200":
         description: Returns the structure of the proxy created
