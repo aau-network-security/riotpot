@@ -17,6 +17,7 @@ func ValidatePortNumber(port int) (err error) {
 }
 
 // Returns whether the port is available
+// [7/18/2022] NOTE: this only considers TCP!!
 func ValidatePortAvailable(port int) (err error) {
 	// Check if the port is taken
 	ln, err := net.Listen("tcp", fmt.Sprintf(":%d", port))

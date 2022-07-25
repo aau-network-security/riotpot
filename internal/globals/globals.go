@@ -2,6 +2,8 @@ package globals
 
 import (
 	"strconv"
+
+	"github.com/riotpot/tools/environ"
 )
 
 type (
@@ -9,7 +11,7 @@ type (
 	Network int8
 )
 
-// Status
+// Proxy status
 const (
 	// Status representing a stopped proxy
 	StoppedStatus Status = iota
@@ -41,11 +43,13 @@ func ParseStatus(status string) (st Status, err error) {
 		return RunningStatus, nil
 	}
 
+	// Attempt to convert the status into an integer
 	i, err := strconv.Atoi(status)
 	if err != nil {
 		return
 	}
 
+	// Return the status by the number
 	return Status(i), nil
 }
 
@@ -90,3 +94,27 @@ func ParseNetwork(network string) (nt Network, err error) {
 	// Return the network and the error
 	return Network(i), nil
 }
+
+// API
+var (
+	// Root of the API endpoint
+	ApiEndpoint string = environ.Getenv("API_ROOT", "/api/")
+	// Address of the API
+	ApiHost string = environ.Getenv("API_HOST", "localhost")
+	// Port in where the API is listening
+	ApiPort string = environ.Getenv("API_PORT", "2022")
+)
+
+// Database
+var (
+	// Database username
+	DbUsername string = environ.Getenv("DB_USER", "username")
+	// Database user password
+	DbPassword string = environ.Getenv("DB_PASS", "password")
+	// Database host
+	DbHost string = environ.Getenv("DB_HOST", "localhost")
+	// Database port
+	DbPort string = environ.Getenv("DB_PORT", "5432")
+	// Database name of the targeted database
+	DbName string = environ.Getenv("DB_Name", "db")
+)

@@ -1,5 +1,6 @@
 // This package implements the configuration of RiotPot.
 // The package contains interfaces that help load, store and modify the configuration.
+// NOTE: Not in use
 package configuration
 
 import (
@@ -157,11 +158,9 @@ func (conf *Configuration) ResolveEnv() {
 	conf.Database = dbCfg
 }
 
-/**
-Constructor for the configuration
-This method loads the configuration from a local file
-then, it overrides the configuration fields with the values from the environment variables
-*/
+// Constructor for the configuration
+// This method loads the configuration from a local file
+// then, it overrides the configuration fields with the values from the environment variables
 func NewConfiguration() (conf Configuration, err error) {
 	conf = Configuration{
 		configPath: "configs/configuration.yml",
