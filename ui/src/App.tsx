@@ -1,24 +1,55 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { Routes, Route } from "react-router-dom";
+
+/* CSS */
+import { Container, Col, Row } from "react-bootstrap";
+import "./App.scss";
+
+/* Components */
+import Navbar from "./components/navbar/Navbar";
+import Services from "./routes/services/Services";
+import Instances from "./routes/instances/Instances";
+import Profiles from "./routes/profiles/Profiles";
+
+/* Pages */
 
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Container>
+        <Row>
+          {/* Navigation */}
+          <Col>
+            <Navbar />
+          </Col>
+
+          {/* Content */}
+          <Col xs={7}>
+            <Routes>
+              <Route path="instances" element={<Instances />}>
+                <Route path=":id"></Route>
+              </Route>
+              <Route path="services" element={<Services />}>
+                <Route path=":id"></Route>
+              </Route>
+              <Route path="profiles" element={<Profiles />}>
+                <Route path=":id"></Route>
+              </Route>
+              <Route path="settings"></Route>
+              <Route
+                path="*"
+                element={
+                  <main style={{ padding: "1rem" }}>
+                    <p>Page not found</p>
+                  </main>
+                }
+              ></Route>
+            </Routes>
+          </Col>
+
+          {/* Right space */}
+          <Col></Col>
+        </Row>
+      </Container>
     </div>
   );
 }

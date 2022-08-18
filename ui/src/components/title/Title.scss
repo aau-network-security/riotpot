@@ -1,0 +1,12 @@
+@import "../../styles";
+
+@mixin title {
+    div.pageTitle {
+
+        .subTitle{
+            color: $color-dim;
+        }
+    }
+}
+
+@include title;

@@ -1,0 +1,30 @@
+@import "../../styles";
+
+@mixin table{
+    table{
+        @include component;
+        border-collapse: separate !important;
+        border-spacing: 0;
+        width: -webkit-fill-available;
+
+        thead{
+            background: $background-light;
+            border-bottom: 1px solid $border-dark;
+            border-radius: $radius $radius 0px 0px;
+        }
+
+        tr.tableRow{
+            &:not(:last-child){
+                border-bottom: 1px solid $border-dark;
+            }
+        }
+        
+        td.tableCell, th.tableCell {
+            text-align: left;
+            padding: 10px;
+            border-bottom: 1px solid $border-dark;
+        }
+    }
+}
+
+@include table
