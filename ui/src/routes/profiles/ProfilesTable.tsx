@@ -1,60 +1,89 @@
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import Table from "../../components/table/Table";
 import {
   DeleteDropdownItem,
+  EditDropdownItem,
   OptionsDropdown,
 } from "../../components/utils/Common";
+import { getPage } from "../../constants/globals";
 import {
-  getPage,
-  InteractionOption,
-  InteractionOptions,
-  NetworkOption,
-  NetworkOptions,
-} from "../../constants/globals";
+  profiles,
+  Profile,
+  removeProfile,
+  profileFormFieldErrors,
+  profilesFilter,
+} from "../../recoil/atoms/profiles";
+
 import { ProfileRowInfoPop } from "../instances/InstancesUtils";
+import { SimpleForm } from "../../components/forms/Form";
+import { ProfileFormFields } from "./ProfileForm";
 
-export interface ProfileService {
-  name: string;
-  interaction: InteractionOption;
-  network: NetworkOption;
-}
+const EditProfile = ({ profile }: { profile: Profile }) => {
+  // Get the page to set the icon
+  const page = getPage("Profiles");
 
-export interface Profile {
-  name: string;
-  services: ProfileService[];
-}
+  // Get the current values of the profile
+  const setter = useSetRecoilState(profilesFilter(profile.id));
 
-const ProfileRowOptions = ({ name }: { name: string }) => {
+  // Create a setter for the submit
+  const onSubmit = (newElement: any) => {
+    setter(newElement);
+  };
+
+  // Create the form with the default values as they currently are
+  const content = (
+    <SimpleForm
+      create={true}
+      defaultValues={profile}
+      errors={profileFormFieldErrors}
+      onSubmit={onSubmit}
+      page="Profiles"
+      fields={ProfileFormFields}
+    />
+  );
+
+  // Get the form with the update tag
+  return (
+    <EditDropdownItem form={content} icon={page?.icon} title={"profile"} />
+  );
+};
+
+const ProfileRowOptions = ({ profile }: { profile: Profile }) => {
+  // Profiles
+  const [profilesList, setProfilesList] = useRecoilState(profiles);
+  // Delete option
+  const deleteProfile = () =>
+    removeProfile(profile.id, profilesList, setProfilesList);
+
   const page = getPage("Profiles");
   const note =
     "This profile will be unregistered. However, instances using this profile will not stop working";
   return (
     <OptionsDropdown>
-      {page && <DeleteDropdownItem page={page} note={note} name={name} />}
+      <EditProfile profile={profile} />
+      {page && (
+        <DeleteDropdownItem
+          page={page}
+          note={note}
+          name={profile.name}
+          onClick={deleteProfile}
+        />
+      )}
     </OptionsDropdown>
   );
 };
 
-const ProfileRow = ({ name, services }: Profile) => {
+const profileRow = (profile: Profile) => {
   return [
-    name,
-    <ProfileRowInfoPop services={services} />,
-    <ProfileRowOptions name={name} />,
+    profile.name,
+    <ProfileRowInfoPop services={profile.services} />,
+    <ProfileRowOptions profile={profile} />,
   ];
 };
 
 export const ProfilesTable = () => {
-  const profile = {
-    name: "Wi-Fi Printer",
-    services: [
-      {
-        name: "CoAP",
-        interaction: InteractionOptions[0],
-        network: NetworkOptions[0],
-      },
-    ],
-  };
-
-  const rows = [ProfileRow(profile), ProfileRow(profile)];
+  const profilesList = useRecoilValue(profiles);
+  const rows = profilesList.map((profile: Profile) => profileRow(profile));
 
   const data = {
     headers: [`${rows.length} Profiles`, "", ""],

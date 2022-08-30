@@ -110,7 +110,16 @@ const InstanceRowOptions = ({ name }: { name: string }) => {
     "Instance services will be stopped and removed from the instance register.";
   return (
     <OptionsDropdown>
-      {page && <DeleteDropdownItem page={page} note={note} name={name} />}
+      {page && (
+        <DeleteDropdownItem
+          onClick={() => {
+            return;
+          }}
+          page={page}
+          note={note}
+          name={name}
+        />
+      )}
     </OptionsDropdown>
   );
 };

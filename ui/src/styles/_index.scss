@@ -79,7 +79,7 @@ html { font-family: 'Inter', sans-serif; }
     .#{$theme-name}{
         background: $background;
         height: 100vh; // whole screen
-        padding: 2rem;
+        padding: 5%;
 
         * {
             color: $text;

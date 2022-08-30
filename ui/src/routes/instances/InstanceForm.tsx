@@ -1,12 +1,13 @@
 import { SimpleForm } from "../../components/forms/Form";
 
 type InstanceFormProps = {
-  name: string;
-  description: string;
-  host: string;
+  selector: any;
+  errors: any;
+  create: boolean;
+  onSubmit: any;
 };
 
-const InstanceForm = ({ data }: { data?: InstanceFormProps }) => {
+const InstanceForm = (props: InstanceFormProps) => {
   // TODO: Perhaps repalce this in the future with an API call to get the fields and their structure
   let fields = [
     {
@@ -15,7 +16,6 @@ const InstanceForm = ({ data }: { data?: InstanceFormProps }) => {
       fieldattrs: {
         type: "text",
         required: true,
-        value: data?.name,
         placeholder: "Type a name for the instance",
       },
     },
@@ -25,7 +25,6 @@ const InstanceForm = ({ data }: { data?: InstanceFormProps }) => {
       fieldattrs: {
         type: "text",
         required: false,
-        value: data?.description,
         placeholder: "Add a short description for the instance",
         as: "textarea",
       },
@@ -36,13 +35,18 @@ const InstanceForm = ({ data }: { data?: InstanceFormProps }) => {
       fieldattrs: {
         type: "text",
         required: true,
-        value: data?.host,
         placeholder: "localhost",
       },
     },
   ];
 
-  return <SimpleForm page="Instances" fields={fields}></SimpleForm>;
+  return (
+    <SimpleForm
+      onSubmit={props.onSubmit}
+      page="Instances"
+      fields={fields}
+    ></SimpleForm>
+  );
 };
 
 export default InstanceForm;

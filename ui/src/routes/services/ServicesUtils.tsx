@@ -1,19 +1,64 @@
+import { useRecoilValue } from "recoil";
+import { SimpleForm } from "../../components/forms/Form";
 import { CreateButton, UtilsBar } from "../../components/utils/Utils";
 import { getPage } from "../../constants/globals";
-import ServiceForm from "./ServiceForm";
+import { AddWithValidators, CreateItem } from "../../recoil/atoms/common";
+import {
+  DefaultService,
+  serviceFormErrors,
+  serviceFormFieldErrors,
+  ServiceNameValidator,
+  services,
+  servicesFormFields,
+} from "../../recoil/atoms/services";
+import { ServiceFormFields } from "./ServiceForm";
 
-export const ServicesUtils = ({ view }: { view: string }) => {
+const CreateService = () => {
   // Utils buttons
-  const page = getPage(view);
-  const content = <ServiceForm create={true} />;
-  const createbtn = (
+  const page = getPage("Services");
+
+  var props: any = CreateItem({
+    items: services,
+    filter: servicesFormFields,
+    errors: serviceFormErrors,
+    validators: [ServiceNameValidator],
+  });
+
+  const onSubmit = (newElement: any) => {
+    const updatedProps = {
+      ...props,
+      newElement: {
+        ...DefaultService,
+        ...newElement,
+      },
+    };
+
+    AddWithValidators(updatedProps);
+  };
+
+  const defaultValues = useRecoilValue(servicesFormFields);
+
+  const content = (
+    <SimpleForm
+      create={true}
+      defaultValues={defaultValues}
+      errors={serviceFormFieldErrors}
+      onSubmit={onSubmit}
+      page="Services"
+      fields={ServiceFormFields}
+    />
+  );
+
+  return (
     <CreateButton
       title="Service"
       icon={page?.icon}
       content={content}
     ></CreateButton>
   );
-  const buttons = [createbtn];
+};
 
+export const ServicesUtils = () => {
+  const buttons = [<CreateService />];
   return <UtilsBar buttons={buttons} />;
 };

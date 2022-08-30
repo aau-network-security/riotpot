@@ -30,10 +30,10 @@ const Row = ({ cells }: { cells: any }) => {
   );
 };
 
-const Body = ({ rows }: { rows: any }) => {
+const Body = ({ rows }: { rows: any[] }) => {
   return (
     <tbody>
-      {rows.map((cells: any, ind: Number) => {
+      {rows.map((cells: any[], ind: Number) => {
         return <Row cells={cells} />;
       })}
     </tbody>

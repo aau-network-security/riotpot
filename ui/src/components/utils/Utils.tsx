@@ -1,18 +1,7 @@
 import React from "react";
-import { Button } from "react-bootstrap";
 import { AiOutlinePlus } from "react-icons/ai";
 import { CenteredModal } from "../modal/Modal";
 import "./Utils.scss";
-
-export const Submit = () => {
-  const onclick = () => {};
-
-  return (
-    <Button onClick={onclick} variant="success">
-      Submit
-    </Button>
-  );
-};
 
 type CreateButtonProps = {
   icon?: any;
@@ -25,11 +14,10 @@ const CreateButton = ({ icon, title, content }: CreateButtonProps) => {
 
   const props = {
     title: "New " + title,
+    show: modalShow,
+    content: content,
     icon: icon,
     onHide: () => setModalShow(false),
-    show: modalShow,
-    submit: <Submit />,
-    content: content,
   };
 
   return (
@@ -42,7 +30,6 @@ const CreateButton = ({ icon, title, content }: CreateButtonProps) => {
 
 /**
  *This component creates a utils bar with access to transform the current view.
- *
  */
 const UtilsBar = ({ buttons = [] }: { buttons?: any[] }) => {
   return (

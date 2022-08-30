@@ -1,15 +1,15 @@
 import "./Modal.scss";
 
 import Modal from "react-bootstrap/Modal";
-import Button from "react-bootstrap/Button";
 
 type ModalProps = {
   title: string;
-  icon?: any;
   content: any;
+  icon: any;
+
+  // Modal state
   show: boolean;
   onHide: () => void;
-  submit?: any;
 };
 
 /**
@@ -31,12 +31,7 @@ const CenteredModal = ({ props }: { props: ModalProps }) => {
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>{props.content}</Modal.Body>
-      <Modal.Footer>
-        <Button onClick={props.onHide} variant="outline-light">
-          Close
-        </Button>
-        {props.submit}
-      </Modal.Footer>
+      <Modal.Footer></Modal.Footer>
     </Modal>
   );
 };

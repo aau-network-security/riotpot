@@ -11,7 +11,7 @@ const Services = () => {
   return (
     <main>
       <ServicesHeader view={view} />
-      <ServicesUtils view={view} />
+      <ServicesUtils />
       <SearchBar filter="services and proxies" />
       <ServicesTable />
     </main>

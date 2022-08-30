@@ -5,9 +5,9 @@ import { getPage, InteractionOption, Page } from "../../constants/globals";
 import { FiEdit2, FiMoreHorizontal } from "react-icons/fi";
 import { SimpleDropdown } from "../dropdown/Dropdown";
 import { CgDetailsLess } from "react-icons/cg";
-import React from "react";
 import { RiDeleteBinLine } from "react-icons/ri";
 import { CenteredModal } from "../modal/Modal";
+import { useState } from "react";
 
 type BaseBadgeProps = {
   text: string;
@@ -28,7 +28,7 @@ export const NetworkBadge = ({ value, label }: InteractionOption) => {
 
 type AddressProps = {
   host: string;
-  port: Number;
+  port: string | Number;
 };
 
 export const Address = ({ host, port }: AddressProps) => {
@@ -36,14 +36,14 @@ export const Address = ({ host, port }: AddressProps) => {
 
   return (
     <span className="address">
-      {page && <page.icon />} {host} : 1111
+      {page && <page.icon />} {`${host} : ${port}`}
     </span>
   );
 };
 
 export const OptionsDropdown = ({ children }: any) => {
   const links = [
-    { text: "Edit", icon: FiEdit2 },
+    //{ text: "Edit", icon: FiEdit2 },
     { text: "Details", icon: CgDetailsLess },
   ];
 
@@ -55,13 +55,31 @@ export const OptionsDropdown = ({ children }: any) => {
   return <SimpleDropdown {...props}>{children}</SimpleDropdown>;
 };
 
-export const DeleteButton = () => {
-  const onclick = () => {};
+type EditProps = {
+  icon: any;
+  title: string;
+  form: any;
+};
+
+export const EditDropdownItem = ({ icon, title, form }: EditProps) => {
+  const [modalShow, setModalShow] = useState(false);
+
+  const modalprops = {
+    content: form,
+    icon: icon,
+    title: "Edit " + title,
+    onHide: () => setModalShow(false),
+    show: modalShow,
+  };
 
   return (
-    <Button onClick={onclick} variant="danger">
-      Delete
-    </Button>
+    <>
+      <Dropdown.Item onClick={() => setModalShow(true)}>
+        <FiEdit2 />
+        Edit
+      </Dropdown.Item>
+      <CenteredModal props={modalprops}></CenteredModal>
+    </>
   );
 };
 
@@ -69,12 +87,26 @@ export type DeleteProps = {
   page: Page;
   name: string;
   note?: string;
+  onClick: () => void;
 };
 
-export const DeleteDropdownItem = ({ page, note, name }: DeleteProps) => {
-  const [modalShow, setModalShow] = React.useState(false);
+export const DeleteButton = ({ onClick }: { onClick?: () => void }) => {
+  return (
+    <Button onClick={onClick} variant="danger">
+      Delete
+    </Button>
+  );
+};
 
-  const content = () => {
+export const DeleteDropdownItem = ({
+  page,
+  note,
+  name,
+  onClick,
+}: DeleteProps) => {
+  const [modalShow, setModalShow] = useState(false);
+
+  const Content = () => {
     const msg = `Are you sure you want to delete the following ${page.verbose.toLowerCase()}?`;
     const pstyle = {
       color: "#FF8686",
@@ -83,11 +115,21 @@ export const DeleteDropdownItem = ({ page, note, name }: DeleteProps) => {
 
     return (
       <>
-        <h5>{msg}</h5>
-        <ul>
-          <li style={pstyle}>{name}</li>
-        </ul>
-        <small>{sub}</small>
+        <div>
+          <h5>{msg}</h5>
+          <ul>
+            <li style={pstyle}>{name}</li>
+          </ul>
+          <small>{sub}</small>
+        </div>
+        <div>
+          <DeleteButton
+            onClick={() => {
+              onClick();
+              setModalShow(false);
+            }}
+          />
+        </div>
       </>
     );
   };
@@ -97,8 +139,7 @@ export const DeleteDropdownItem = ({ page, note, name }: DeleteProps) => {
     onHide: () => setModalShow(false),
     icon: page.icon,
     show: modalShow,
-    submit: <DeleteButton />,
-    content: content(),
+    content: <Content />,
   };
 
   return (

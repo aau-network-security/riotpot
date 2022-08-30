@@ -5,27 +5,27 @@ import { CustomToggle } from "../../components/dropdown/Dropdown";
 import { CenteredModal } from "../../components/modal/Modal";
 import { Pop } from "../../components/pop/Pop";
 import { InteractionBadge, NetworkBadge } from "../../components/utils/Common";
-import { Submit, UtilsBar } from "../../components/utils/Utils";
+import { UtilsBar } from "../../components/utils/Utils";
 import {
   getPage,
   InteractionOptions,
   NetworkOptions,
 } from "../../constants/globals";
-import { ProfileService, Profile } from "../profiles/ProfilesTable";
 import InstanceForm from "./InstanceForm";
+import { Service } from "../../recoil/atoms/services";
+import { Profile } from "../../recoil/atoms/profiles";
 
 const CustomInstanceDropdownItem = () => {
   const [modalShow, setModalShow] = React.useState(false);
   const icon = getPage("Instances")?.icon;
-  const content = <InstanceForm />;
+  const content = ""; //<InstanceForm />;
 
   const props = {
     title: "New Custom Instance",
-    icon: icon,
     onHide: () => setModalShow(false),
     show: modalShow,
-    submit: <Submit />,
     content: content,
+    icon: icon,
   };
 
   return (
@@ -76,7 +76,7 @@ const InstancesAddProfileDropdownMenu = React.forwardRef(
   }
 );
 
-const ProfilePop = ({ service }: any) => {
+const ProfilePop = ({ service }: { service: Service }) => {
   return (
     <Col>
       {service.name}
@@ -86,11 +86,7 @@ const ProfilePop = ({ service }: any) => {
   );
 };
 
-export const ProfileRowInfoPop = ({
-  services,
-}: {
-  services: ProfileService[];
-}) => {
+export const ProfileRowInfoPop = ({ services }: { services: Service[] }) => {
   const [show, setShow] = useState(false);
   const target = useRef(null);
 
@@ -105,11 +101,13 @@ export const ProfileRowInfoPop = ({
         <AiOutlineInfoCircle />
         {`${services.length} ${services.length === 1 ? "service" : "services"}`}
       </small>
-      <Pop target={target} show={show} placement="left">
-        {services.map((service) => {
-          return <ProfilePop service={service} />;
-        })}
-      </Pop>
+      {!!services.length && (
+        <Pop target={target} show={show} placement="left">
+          {services.map((service) => {
+            return <ProfilePop service={service} />;
+          })}
+        </Pop>
+      )}
     </>
   );
 };
@@ -157,6 +155,6 @@ export const InstancesUtils = ({ view }: { view: string }) => {
     },
   ];
 
-  const buttons = [<AddButton profiles={profiles} />];
+  const buttons = [<AddButton profiles={[]} />];
   return <UtilsBar buttons={buttons} />;
 };
