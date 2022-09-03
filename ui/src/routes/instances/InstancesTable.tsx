@@ -7,18 +7,24 @@ import {
 } from "react-icons/ai";
 import { BsArrowRepeat, BsGlobe } from "react-icons/bs";
 import { FaNetworkWired } from "react-icons/fa";
+import { useRecoilCallback, useRecoilState, useRecoilValue } from "recoil";
+import { SimpleForm } from "../../components/forms/Form";
 import { Pop } from "../../components/pop/Pop";
-import Table from "../../components/table/Table";
+import { Table, Row } from "../../components/table/Table";
 import {
   DeleteDropdownItem,
+  EditDropdownItem,
   InteractionBadge,
   OptionsDropdown,
 } from "../../components/utils/Common";
+import { getPage, InteractionOption } from "../../constants/globals";
 import {
-  getPage,
-  InteractionOption,
-  InteractionOptions,
-} from "../../constants/globals";
+  Instance,
+  instanceIds,
+  instances,
+  intanceFormFieldErrors,
+} from "../../recoil/atoms/instances";
+import { InstanceFormFields } from "./InstanceForm";
 
 interface InstanceService {
   name: string;
@@ -27,11 +33,34 @@ interface InstanceService {
   running: boolean;
 }
 
-interface Instance {
-  name: string;
-  services: InstanceService[];
-  address?: string;
-}
+const EditInstance = ({ instance }: { instance: Instance }) => {
+  const pageName = "Instances";
+  // Get the page to set the icon
+  const page = getPage(pageName);
+
+  // Create a setter for the submit
+  const id = instance.id !== undefined ? instance.id : -1;
+  const onSubmit = useRecoilCallback(({ set }) => (instance: Instance) => {
+    set(instances(id), (prev) => ({ ...prev, ...instance }));
+  });
+
+  // Create the form with the default values as they currently are
+  const content = (
+    <SimpleForm
+      create={false}
+      defaultValues={instance}
+      errors={intanceFormFieldErrors}
+      onSubmit={onSubmit}
+      page={pageName}
+      fields={InstanceFormFields}
+    />
+  );
+
+  // Get the form with the update tag
+  return (
+    <EditDropdownItem form={content} icon={page?.icon} title={"profile"} />
+  );
+};
 
 const ProxyInfoPop = ({ proxy }: { proxy: Number }) => {
   return (
@@ -74,7 +103,13 @@ const InstanceRowInfoPop = ({ services }: { services: InstanceService[] }) => {
   );
 };
 
-const InstanceRowInfo = ({ name, services }: Instance) => {
+const InstanceRowInfo = ({
+  name,
+  services,
+}: {
+  name: string;
+  services: InstanceService[];
+}) => {
   return (
     <>
       <div>{name}</div>
@@ -83,7 +118,13 @@ const InstanceRowInfo = ({ name, services }: Instance) => {
   );
 };
 
-const InstanceRowAddress = ({ value }: { value?: string }) => {
+const InstanceRowAddress = ({ id }: { id: number }) => {
+  const [instance, setter] = useRecoilState(instances(id));
+  const [value, setValue] = useState(instance.host);
+  const onClick = () => {
+    setter({ ...instance, host: value });
+  };
+
   return (
     <Col xs="8">
       <InputGroup size="sm" className="address">
@@ -95,8 +136,13 @@ const InstanceRowAddress = ({ value }: { value?: string }) => {
           aria-label="Instance's address"
           aria-describedby="basic-addon2"
           value={value}
+          onChange={(e) => setValue(e.target.value)}
         />
-        <Button variant="outline-secondary" id="button-addon2">
+        <Button
+          variant="outline-secondary"
+          id="button-addon2"
+          onClick={onClick}
+        >
           <BsArrowRepeat />
         </Button>
       </InputGroup>
@@ -104,54 +150,60 @@ const InstanceRowAddress = ({ value }: { value?: string }) => {
   );
 };
 
-const InstanceRowOptions = ({ name }: { name: string }) => {
+const InstanceRowOptions = ({ instance }: { instance: Instance }) => {
+  const ids = useRecoilValue(instanceIds);
+
+  const deleteCallback = useRecoilCallback(
+    ({ set }) =>
+      (id: number | undefined) => {
+        set(
+          instanceIds,
+          ids.filter((curr) => curr !== id)
+        );
+      }
+  );
+
   const page = getPage("Instances");
   const note =
     "Instance services will be stopped and removed from the instance register.";
   return (
     <OptionsDropdown>
+      <EditInstance instance={instance} />
       {page && (
         <DeleteDropdownItem
-          onClick={() => {
-            return;
-          }}
           page={page}
           note={note}
-          name={name}
+          name={instance.name}
+          onClick={() => deleteCallback(instance.id)}
         />
       )}
     </OptionsDropdown>
   );
 };
 
-const InstanceRow = ({ name, address, services }: Instance) => {
-  return [
-    <InstanceRowInfo name={name} services={services} />,
-    <InstanceRowAddress value={address} />,
-    <InstanceRowOptions name={name} />,
+const InstanceRow = ({ id }: { id: number }) => {
+  const instance = useRecoilValue(instances(id));
+  const services: InstanceService[] = [];
+
+  const cells = [
+    <InstanceRowInfo name={instance.name} services={services} />,
+    <InstanceRowAddress id={id} />,
+    <InstanceRowOptions instance={instance} />,
   ];
+
+  return <Row cells={cells} />;
 };
 
 export const InstancesTable = () => {
-  const props: Instance = {
-    name: "Lab1",
-    address: "127.0.0.11",
-    services: [
-      {
-        name: "CoAP",
-        proxy: 5683,
-        interaction: InteractionOptions[0],
-        running: true,
-      },
-    ],
-  };
-
-  const rows = [InstanceRow(props), InstanceRow(props)];
+  const insts = useRecoilValue(instanceIds);
+  const rows = insts.map((instance, index) => (
+    <InstanceRow key={index} id={instance} />
+  ));
 
   const data = {
     headers: [`${rows.length} Instances`, "", ""],
-    rows: rows,
+    rows: [],
   };
 
-  return <Table data={data} />;
+  return <Table data={data} rows={rows} />;
 };

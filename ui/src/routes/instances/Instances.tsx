@@ -5,8 +5,6 @@ import { InstancesTable } from "./InstancesTable";
 import { InstancesUtils } from "./InstancesUtils";
 import InstancesHeader from "./InstancesHeader";
 
-const Page = "Instances";
-
 /*
 * This component is to create line charts.
 * Enable and modify this component to add visual information regarding
@@ -38,7 +36,7 @@ const Instances = () => {
   return (
     <main>
       <InstancesHeader view="Instances" />
-      <InstancesUtils view={Page} />
+      <InstancesUtils />
       <SearchBar filter="instances" />
       <InstancesTable />
     </main>

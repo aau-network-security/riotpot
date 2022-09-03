@@ -1,6 +1,6 @@
 import "./Table.scss";
 
-const Cell = ({ content }: { content: any }) => {
+export const Cell = ({ content }: { content: any }) => {
   return <td className="tableCell">{content}</td>;
 };
 
@@ -20,7 +20,7 @@ const Headers = ({ headers }: { headers: any }) => {
   );
 };
 
-const Row = ({ cells }: { cells: any }) => {
+export const Row = ({ cells }: { cells: any }) => {
   return (
     <tr className="tableRow">
       {cells.map((content: any, ind: Number) => {
@@ -30,22 +30,23 @@ const Row = ({ cells }: { cells: any }) => {
   );
 };
 
-const Body = ({ rows }: { rows: any[] }) => {
+const Body = ({ rows, children }: { rows: any[]; children: any[] }) => {
   return (
     <tbody>
       {rows.map((cells: any[], ind: Number) => {
         return <Row cells={cells} />;
       })}
+      {children}
     </tbody>
   );
 };
 
-const Table = ({ data }: { data: any }) => {
+export const Table = ({ data, rows }: { data: any; rows?: any }) => {
   return (
     <div className="table-container">
       <table>
         <Headers headers={data.headers} />
-        <Body rows={data.rows} />
+        <Body rows={data.rows}>{rows}</Body>
       </table>
     </div>
   );
