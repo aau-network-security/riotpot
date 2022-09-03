@@ -34,6 +34,27 @@ export const services = atom({
   effects_UNSTABLE: [persistAtom],
 });
 
+export const servicesFilter = selectorFamily({
+  key: "service/default",
+  get:
+    (id: string) =>
+    ({ get }) => {
+      const servs = get(services);
+      return servs.find((x: Service) => x.id === id);
+    },
+  set:
+    (id: string) =>
+    ({ get, set }, newValue) => {
+      const servs: any = get(services);
+      const servInd = servs.findIndex((x: Service) => x.id === id);
+
+      var cp = [...servs];
+      cp[servInd] = { ...cp[servInd], ...newValue };
+
+      return set(services, cp);
+    },
+});
+
 export const servicesList = selector({
   key: "servicesListSelector",
   get: ({ get }) => get(services),

@@ -33,7 +33,7 @@ const EditProfile = ({ profile }: { profile: Profile }) => {
   // Create the form with the default values as they currently are
   const content = (
     <SimpleForm
-      create={true}
+      create={false}
       defaultValues={profile}
       errors={profileFormFieldErrors}
       onSubmit={onSubmit}

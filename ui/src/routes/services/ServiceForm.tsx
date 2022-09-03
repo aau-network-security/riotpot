@@ -32,8 +32,9 @@ export const ServiceFormFields = [
   },
   {
     name: "network",
-    help: "Network layer protocol",
+    readOnly: true,
     type: "select",
+    help: "Network layer protocol",
     fieldattrs: {
       options: NetworkOptions,
     },
