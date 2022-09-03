@@ -14,7 +14,7 @@ import {
   serviceFormFieldErrors,
   servicesFilter,
 } from "../../recoil/atoms/services";
-import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import { useRecoilState, useSetRecoilState } from "recoil";
 import { removeFromList } from "../../recoil/atoms/common";
 import { ServiceFormFields } from "./ServiceForm";
 import { SimpleForm } from "../../components/forms/Form";
@@ -87,8 +87,11 @@ const serviceRow = (service: Service) => {
   ];
 };
 
-export const ServicesTable = () => {
-  const servicesList = useRecoilValue(services);
+export const ServicesTable = ({
+  servicesList,
+}: {
+  servicesList: Service[];
+}) => {
   const rows = servicesList.map((service: Service) => serviceRow(service));
 
   // Mock Data

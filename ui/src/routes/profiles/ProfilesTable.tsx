@@ -17,6 +17,9 @@ import {
 import { ProfileRowInfoPop } from "../instances/InstancesUtils";
 import { SimpleForm } from "../../components/forms/Form";
 import { ProfileFormFields } from "./ProfileForm";
+import { Link } from "react-router-dom";
+import { CgDetailsLess } from "react-icons/cg";
+import { Dropdown } from "react-bootstrap";
 
 const EditProfile = ({ profile }: { profile: Profile }) => {
   // Get the page to set the icon
@@ -48,6 +51,17 @@ const EditProfile = ({ profile }: { profile: Profile }) => {
   );
 };
 
+const ViewProfile = ({ profile }: { profile: Profile }) => {
+  return (
+    <Dropdown.Item>
+      <Link to={profile.id}>
+        <CgDetailsLess />
+        Details
+      </Link>
+    </Dropdown.Item>
+  );
+};
+
 const ProfileRowOptions = ({ profile }: { profile: Profile }) => {
   // Profiles
   const [profilesList, setProfilesList] = useRecoilState(profiles);
@@ -60,6 +74,7 @@ const ProfileRowOptions = ({ profile }: { profile: Profile }) => {
     "This profile will be unregistered. However, instances using this profile will not stop working";
   return (
     <OptionsDropdown>
+      <ViewProfile profile={profile} />
       <EditProfile profile={profile} />
       {page && (
         <DeleteDropdownItem

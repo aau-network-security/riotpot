@@ -29,13 +29,13 @@ export const profiles = atom({
 export const profilesFilter = selectorFamily({
   key: "profile/default",
   get:
-    (id: string) =>
+    (id: string | undefined) =>
     ({ get }) => {
       const profs = get(profiles);
       return profs.find((x: Profile) => x.id === id);
     },
   set:
-    (id: string) =>
+    (id: string | undefined) =>
     ({ get, set }, newValue) => {
       const profs: any = get(profiles);
       const profInd = profs.findIndex((x: Profile) => x.id === id);

@@ -9,6 +9,7 @@ import Navbar from "./components/navbar/Navbar";
 import Services from "./routes/services/Services";
 import Instances from "./routes/instances/Instances";
 import Profiles from "./routes/profiles/Profiles";
+import Profile from "./routes/profiles/Profile";
 
 /* Pages */
 
@@ -25,14 +26,17 @@ function App() {
           {/* Content */}
           <Col xs={7}>
             <Routes>
-              <Route path="instances" element={<Instances />}>
+              <Route path="instances">
+                <Route index element={<Instances />} />
                 <Route path=":id"></Route>
               </Route>
-              <Route path="services" element={<Services />}>
+              <Route path="services">
+                <Route index element={<Services />} />
                 <Route path=":id"></Route>
               </Route>
-              <Route path="profiles" element={<Profiles />}>
-                <Route path=":id"></Route>
+              <Route path="profiles">
+                <Route index element={<Profiles />} />
+                <Route path=":id" element={<Profile />}></Route>
               </Route>
               <Route path="settings"></Route>
               <Route

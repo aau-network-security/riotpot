@@ -31,14 +31,8 @@ const CreateButton = ({ icon, title, content }: CreateButtonProps) => {
 /**
  *This component creates a utils bar with access to transform the current view.
  */
-const UtilsBar = ({ buttons = [] }: { buttons?: any[] }) => {
-  return (
-    <div className="utils">
-      {buttons.map((btn) => {
-        return btn;
-      })}
-    </div>
-  );
+const UtilsBar = ({ buttons }: { buttons?: any }) => {
+  return <div className="utils">{buttons}</div>;
 };
 
 export { UtilsBar, CreateButton };
