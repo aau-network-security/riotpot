@@ -10,10 +10,11 @@ import { InteractionBadge, NetworkBadge } from "../../components/utils/Common";
 import { InteractionOption, NetworkOption } from "../../constants/globals";
 import {
   Instance,
-  InstanceService,
-  instanceServicesSelector,
+  InstanceProxyService,
+  instanceProxySelector,
 } from "../../recoil/atoms/instances";
-import { patchService } from "./InstanceAPI";
+import { Service } from "../../recoil/atoms/services";
+import { changeProxyStatus, patchProxy } from "./InstanceAPI";
 
 const ServiceInfoHelp = ({
   network,
@@ -45,28 +46,26 @@ const ServiceInfoHelp = ({
   );
 };
 
-const InstanceServiceInfo = ({ service }: { service: InstanceService }) => {
+const InstanceServiceInfo = ({ service }: { service: Service }) => {
   return (
-    <>
-      <span>
-        {service.name}
-        <ServiceInfoHelp {...service} />
-      </span>
-    </>
+    <span>
+      {service.name}
+      <ServiceInfoHelp {...service} />
+    </span>
   );
 };
 
 const InstanceServiceProxy = ({
   id,
-  service,
+  proxy,
 }: {
   id: number;
-  service: InstanceService;
+  proxy: InstanceProxyService;
 }) => {
-  const [getProxy, setProxy] = useState(service.proxy);
+  const [getProxy, setProxy] = useState(proxy.port);
 
   const onClick = () => {
-    patchService(id, service);
+    patchProxy(id, proxy);
   };
 
   return (
@@ -96,16 +95,16 @@ const InstanceServiceProxy = ({
 
 const InstanceServiceToggle = ({
   id,
-  service,
+  proxy,
 }: {
   id: number;
-  service: InstanceService;
+  proxy: InstanceProxyService;
 }) => {
-  const [running, setRunning] = useState(service.running);
+  const [status, setStatus] = useState(proxy.status);
 
-  const handler = (isRunning: boolean) => {
-    setRunning(isRunning);
-    patchService(id, { ...service, running: isRunning });
+  const handler = (isRunning: string) => {
+    setStatus(isRunning);
+    changeProxyStatus(id, proxy.id, proxy.status);
   };
 
   return (
@@ -113,16 +112,16 @@ const InstanceServiceToggle = ({
       <Button
         className="service-running running-true"
         variant="secondary"
-        active={running === true}
-        onClick={() => handler(true)}
+        active={status === "running"}
+        onClick={() => handler("running")}
       >
         <BsCheck />
       </Button>
       <Button
         className="service-running running-false"
         variant="secondary"
-        active={running === false}
-        onClick={() => handler(false)}
+        active={status === "stopped"}
+        onClick={() => handler("stopped")}
       >
         <BsX />
       </Button>
@@ -132,24 +131,24 @@ const InstanceServiceToggle = ({
 
 const InstanceServiceRow = ({
   instance,
-  service,
+  proxy,
 }: {
   instance: Instance;
-  service: InstanceService;
+  proxy: InstanceProxyService;
 }) => {
   const cells = [
-    <InstanceServiceInfo service={service} />,
-    <InstanceServiceProxy id={instance.id} service={service} />,
-    <InstanceServiceToggle id={instance.id} service={service} />,
+    <InstanceServiceInfo service={proxy.service} />,
+    <InstanceServiceProxy id={instance.id} proxy={proxy} />,
+    <InstanceServiceToggle id={instance.id} proxy={proxy} />,
   ];
 
   return <Row cells={cells} />;
 };
 
 const InstanceServicesTable = ({ instance }: { instance: Instance }) => {
-  const services = useRecoilValue(instanceServicesSelector(instance.id));
-  const rows = services.map((service, index) => (
-    <InstanceServiceRow key={index} instance={instance} service={service} />
+  const proxyList = useRecoilValue(instanceProxySelector(instance.id));
+  const rows = proxyList.map((proxy, index) => (
+    <InstanceServiceRow key={index} instance={instance} proxy={proxy} />
   ));
   const data = {
     headers: [`${rows.length} Services`, "", ""],

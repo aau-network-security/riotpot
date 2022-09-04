@@ -1,9 +1,8 @@
 import { atom, atomFamily, selectorFamily } from "recoil";
 import { Profile } from "./profiles";
 import { recoilPersist } from "recoil-persist";
-import { fetchServices } from "../../routes/instances/InstanceAPI";
-import { DefaultService } from "./services";
-import { InteractionOption, NetworkOption } from "../../constants/globals";
+import { fetchProxy } from "../../routes/instances/InstanceAPI";
+import { Service } from "./services";
 
 const { persistAtom } = recoilPersist();
 
@@ -53,47 +52,22 @@ export const instanceFormFields = atom({
   default: DefaultInstance as { [key: string]: any },
 });
 
-export type InstanceService = {
-  name: string;
-  interaction: InteractionOption;
-  network: NetworkOption;
-  host: string;
-  port: Number;
-  running: boolean;
-  proxy: number | undefined;
+export type InstanceProxyService = {
+  id: string;
+  port: number;
+  status: string;
+  service: Service;
 };
 
-const DefaultInstanceService = {
-  ...DefaultService,
-  running: false,
-  proxy: undefined,
-};
-
-/**
- * Instance services.
- * This atom represents the services registered in an instance.
- * The atom will be populated through the API, comparing the services registered
- * in the local storage to the ones received from the API.
- */
-export const instanceServices = atomFamily<InstanceService, number>({
-  key: "instanceServices",
-  default: DefaultInstanceService as InstanceService & { [key: string]: any },
-});
-
-export const instanceServicesIds = atom({
-  key: "instanceServicesIds",
-  default: [],
-});
-
-export const instanceServicesSelector = selectorFamily({
-  key: "getServicesAPI",
+export const instanceProxySelector = selectorFamily({
+  key: "getProxyAPI",
   get:
     (id: number) =>
     ({ get }) => {
       // Get the instance we are looking for
       const instance = get(instances(id));
 
-      // Return the services included in the instance from the API
-      return fetchServices(instance);
+      // Return the proxy included in the instance from the API
+      return fetchProxy(instance);
     },
 });
