@@ -39,6 +39,23 @@
             fill: $color-dim;
         }
     }
+
+    button.service-running{
+        *{
+            fill: $background-dark
+        }
+
+        &.active{
+            
+            &.running-false{
+                background-color: $color-red;
+            }
+
+            &.running-true{
+                background-color: $color-graph;
+            }
+        }
+    }
 }
 
 @include Info

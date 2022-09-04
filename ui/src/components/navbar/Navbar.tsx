@@ -7,7 +7,7 @@ const Navbar = () => {
   const location = useLocation();
   const { pathname } = location;
   const curr = pathname.split("/")[1];
-  const def = "/home";
+  const def = "/instances";
 
   return (
     <Nav
