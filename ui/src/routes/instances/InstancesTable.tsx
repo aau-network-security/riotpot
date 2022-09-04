@@ -1,12 +1,14 @@
 import { useRef, useState } from "react";
-import { Button, Col, Form, InputGroup } from "react-bootstrap";
+import { Button, Col, Dropdown, Form, InputGroup } from "react-bootstrap";
 import {
   AiFillCheckCircle,
   AiFillCloseCircle,
   AiOutlineInfoCircle,
 } from "react-icons/ai";
 import { BsArrowRepeat, BsGlobe } from "react-icons/bs";
+import { CgDetailsLess } from "react-icons/cg";
 import { FaNetworkWired } from "react-icons/fa";
+import { Link } from "react-router-dom";
 import { useRecoilCallback, useRecoilState, useRecoilValue } from "recoil";
 import { SimpleForm } from "../../components/forms/Form";
 import { Pop } from "../../components/pop/Pop";
@@ -59,6 +61,17 @@ const EditInstance = ({ instance }: { instance: Instance }) => {
   // Get the form with the update tag
   return (
     <EditDropdownItem form={content} icon={page?.icon} title={"profile"} />
+  );
+};
+
+const ViewInstance = ({ instance }: { instance: Instance }) => {
+  return (
+    <Dropdown.Item>
+      <Link to={`${instance.id}`}>
+        <CgDetailsLess />
+        Details
+      </Link>
+    </Dropdown.Item>
   );
 };
 
@@ -168,6 +181,7 @@ const InstanceRowOptions = ({ instance }: { instance: Instance }) => {
     "Instance services will be stopped and removed from the instance register.";
   return (
     <OptionsDropdown>
+      <ViewInstance instance={instance} />
       <EditInstance instance={instance} />
       {page && (
         <DeleteDropdownItem

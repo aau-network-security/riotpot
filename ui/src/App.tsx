@@ -10,6 +10,8 @@ import Services from "./routes/services/Services";
 import Instances from "./routes/instances/Instances";
 import Profiles from "./routes/profiles/Profiles";
 import Profile from "./routes/profiles/Profile";
+import Instance from "./routes/instances/Instance";
+import { SimpleBreadcrumb } from "./components/utils/Common";
 
 /* Pages */
 
@@ -25,10 +27,11 @@ function App() {
 
           {/* Content */}
           <Col xs={7}>
+            <SimpleBreadcrumb />
             <Routes>
               <Route path="instances">
                 <Route index element={<Instances />} />
-                <Route path=":id"></Route>
+                <Route path=":id" element={<Instance />}></Route>
               </Route>
               <Route path="services">
                 <Route index element={<Services />} />

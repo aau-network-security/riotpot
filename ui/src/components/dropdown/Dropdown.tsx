@@ -13,7 +13,7 @@ type DropdownLink = {
 type SimpleDropdownProps = {
   id?: string;
   icon: any;
-  links: DropdownLink[];
+  links?: DropdownLink[];
   children?: any;
 };
 
@@ -46,7 +46,7 @@ export const SimpleDropdown = ({
       </Dropdown.Toggle>
 
       <Dropdown.Menu>
-        {links.map((link) => {
+        {links?.map((link) => {
           return (
             <Dropdown.Item {...link}>
               <link.icon />

@@ -5,7 +5,7 @@ import { recoilPersist } from "recoil-persist";
 const { persistAtom } = recoilPersist();
 
 export type Instance = {
-  id: number | undefined;
+  id: number;
   name: string;
   host: string;
   description: string;
@@ -19,7 +19,7 @@ export const instanceIds = atom<number[]>({
 });
 
 export const DefaultInstance = {
-  id: undefined,
+  id: 0,
   name: "",
   host: "",
   description: "",

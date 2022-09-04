@@ -4,10 +4,12 @@ import { Badge, Button, Dropdown } from "react-bootstrap";
 import { getPage, InteractionOption, Page } from "../../constants/globals";
 import { FiEdit2, FiMoreHorizontal } from "react-icons/fi";
 import { SimpleDropdown } from "../dropdown/Dropdown";
-import { CgDetailsLess } from "react-icons/cg";
 import { RiDeleteBinLine } from "react-icons/ri";
 import { CenteredModal } from "../modal/Modal";
 import { useState } from "react";
+import Breadcrumb from "react-bootstrap/Breadcrumb";
+import useBreadcrumbs from "use-react-router-breadcrumbs";
+import { useLocation } from "react-router-dom";
 
 type BaseBadgeProps = {
   text: string;
@@ -42,14 +44,8 @@ export const Address = ({ host, port }: AddressProps) => {
 };
 
 export const OptionsDropdown = ({ children }: any) => {
-  const links = [
-    //{ text: "Edit", icon: FiEdit2 },
-    { text: "Details", icon: CgDetailsLess },
-  ];
-
   const props = {
     icon: <FiMoreHorizontal />,
-    links: links,
   };
 
   return <SimpleDropdown {...props}>{children}</SimpleDropdown>;
@@ -150,5 +146,31 @@ export const DeleteDropdownItem = ({
       </Dropdown.Item>
       <CenteredModal props={props}></CenteredModal>
     </>
+  );
+};
+
+export const SimpleBreadcrumb = () => {
+  const breadcrumbs = useBreadcrumbs();
+  const location = useLocation();
+
+  return (
+    <Breadcrumb>
+      {breadcrumbs.map(({ match, breadcrumb }) => {
+        // Remove the "Home" path from the breadcrumb
+        if (match.pathname === "/") {
+          return "";
+        }
+
+        return (
+          <Breadcrumb.Item
+            href={match.pathname}
+            key={match.pathname}
+            active={location.pathname === match.pathname}
+          >
+            {breadcrumb}
+          </Breadcrumb.Item>
+        );
+      })}
+    </Breadcrumb>
   );
 };
