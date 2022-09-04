@@ -140,9 +140,9 @@ func patchService(ctx *gin.Context) {
 	var errors []error
 
 	// Small function to check whether the name is already taken
-	validateName := func(name string) (n string, err error) {
+	validateName := func(id string, name string) (n string, err error) {
 		for _, service := range services.Services.GetServices() {
-			if name == service.GetName() {
+			if name == service.GetName() && id != service.GetID() {
 				err = fmt.Errorf("name already in use")
 				return
 			}
@@ -162,7 +162,8 @@ func patchService(ctx *gin.Context) {
 	id := ctx.Param("id")
 	sv, err := services.Services.GetService(id)
 	if err != nil {
-		errors = append(errors, err)
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
 	}
 
 	// Validate the port
@@ -172,7 +173,7 @@ func patchService(ctx *gin.Context) {
 	}
 
 	// Validate the name
-	validName, err := validateName(input.Name)
+	validName, err := validateName(id, input.Name)
 	if err != nil {
 		errors = append(errors, err)
 	}
