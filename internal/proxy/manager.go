@@ -57,6 +57,9 @@ func (pm *ProxyManagerItem) CreateProxy(network globals.Network, port int) (pe P
 
 	// Create the proxy
 	pe, err = NewProxyEndpoint(port, network)
+	if err != nil {
+		return
+	}
 
 	// Append the proxy to the list
 	pm.proxies = append(pm.proxies, pe)

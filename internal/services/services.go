@@ -18,6 +18,7 @@ type Service interface {
 	GetID() string
 	GetName() string
 	GetNetwork() globals.Network
+	GetInteraction() globals.Interaction
 	GetPort() int
 	GetAddress() string
 	GetHost() string
@@ -35,12 +36,13 @@ type AbstractService struct {
 	// require the methods described by `Service` on loading
 	Service
 
-	id      uuid.UUID
-	name    string
-	network globals.Network
-	port    int
-	host    string
-	locked  bool
+	id          uuid.UUID
+	name        string
+	network     globals.Network
+	port        int
+	host        string
+	locked      bool
+	interaction globals.Interaction
 }
 
 // Getters
@@ -54,6 +56,10 @@ func (as *AbstractService) GetName() string {
 
 func (as *AbstractService) GetNetwork() globals.Network {
 	return as.network
+}
+
+func (as *AbstractService) GetInteraction() globals.Interaction {
+	return as.interaction
 }
 
 func (as *AbstractService) GetPort() int {
@@ -121,6 +127,10 @@ func (aps *PluginServiceItem) GetNetwork() globals.Network {
 	return aps.service.GetNetwork()
 }
 
+func (aps *PluginServiceItem) GetInteraction() globals.Interaction {
+	return aps.service.GetInteraction()
+}
+
 func (aps *PluginServiceItem) GetPort() int {
 	return aps.service.GetPort()
 }
@@ -153,19 +163,20 @@ func (aps *PluginServiceItem) SetLocked(locked bool) (bool, error) {
 	return true, fmt.Errorf("the lock status of this service can not change")
 }
 
-func NewService(name string, port int, network globals.Network, host string) *AbstractService {
+func NewService(name string, port int, network globals.Network, host string, interaction globals.Interaction) *AbstractService {
 	return &AbstractService{
-		id:      uuid.New(),
-		name:    name,
-		port:    port,
-		network: network,
-		host:    host,
+		id:          uuid.New(),
+		name:        name,
+		port:        port,
+		network:     network,
+		host:        host,
+		interaction: interaction,
 	}
 }
 
 // Simple constructor for plugin services
 func NewPluginService(name string, port int, network globals.Network) Service {
 	return &PluginServiceItem{
-		service: NewService(name, port, network, "localhost"),
+		service: NewService(name, port, network, "localhost", globals.Low),
 	}
 }

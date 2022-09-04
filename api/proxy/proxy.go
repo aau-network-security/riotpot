@@ -29,7 +29,12 @@ type CreateProxy struct {
 
 type ChangeProxyStatus struct {
 	ID     string `json:"id" binding:"required" gorm:"primary_key"`
-	Status string `json:"status"`
+	Status string `json:"status" binding:"required"`
+}
+
+type ChangeProxyPort struct {
+	ID   string `json:"id" binding:"required" gorm:"primary_key"`
+	Port int    `json:"port" binding:"required"`
 }
 
 // Routes
@@ -48,6 +53,7 @@ var (
 		api.NewRoute("", "GET", getProxy),
 		api.NewRoute("", "PATCH", patchProxy),
 		api.NewRoute("", "DELETE", delProxy),
+		api.NewRoute("/port", "POST", changeProxyPort),
 		api.NewRoute("/status", "POST", changeProxyStatus),
 	}
 )
@@ -94,7 +100,7 @@ func createProxy(ctx *gin.Context) {
 	// Validate the post request to create a new proxy
 	var input CreateProxy
 	if err := ctx.ShouldBindJSON(&input); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error(), "msg": input})
 		return
 	}
 
@@ -166,6 +172,7 @@ func patchProxy(ctx *gin.Context) {
 
 	// Update the Port
 	pe.SetPort(validPort)
+
 	// Update the service
 	pe.SetService(validServ)
 
@@ -226,4 +233,33 @@ func changeProxyStatus(ctx *gin.Context) {
 
 	// Serialize the status and send it as the response
 	ctx.JSON(http.StatusOK, gin.H{"status": pe.GetStatus()})
+}
+
+// POST request to change the port of the proxy
+func changeProxyPort(ctx *gin.Context) {
+	// Validate the post request to update the port
+	var input ChangeProxyPort
+	if err := ctx.ShouldBindJSON(&input); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	pe, err := proxy.Proxies.GetProxy(input.ID)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	validPort, err := validators.ValidatePort(input.Port)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Update the Port
+	pe.SetPort(validPort)
+
+	// Serialize the proxy and send it as a response
+	pr := NewProxy(pe)
+	ctx.JSON(http.StatusOK, pr)
 }

@@ -13,19 +13,28 @@ import (
 )
 
 type GetService struct {
-	ID      string `json:"id" binding:"required" gorm:"primary_key"`
-	Name    string `json:"name"`
-	Port    int    `json:"port"`
-	Host    string `json:"host"`
-	Network string `json:"network"`
-	Locked  bool   `json:"locked"`
+	ID          string `json:"id" binding:"required" gorm:"primary_key"`
+	Name        string `json:"name"`
+	Port        int    `json:"port"`
+	Host        string `json:"host"`
+	Network     string `json:"network"`
+	Locked      bool   `json:"locked"`
+	Interaction string `json:"interaction"`
 }
 
 type CreateService struct {
-	Name    string `json:"name" binding:"required"`
-	Port    int    `json:"port" binding:"required"`
-	Host    string `json:"host" binding:"required"`
-	Network string `json:"network" binding:"required"`
+	Name        string `json:"name" binding:"required"`
+	Port        int    `json:"port" binding:"required"`
+	Host        string `json:"host" binding:"required"`
+	Network     string `json:"network" binding:"required"`
+	Interaction string `json:"interaction" binding:"required"`
+}
+
+type PatchService struct {
+	ID   string `json:"id" binding:"required" gorm:"primary_key"`
+	Name string `json:"name" binding:"required"`
+	Port int    `json:"port" binding:"required"`
+	Host string `json:"host" binding:"required"`
 }
 
 // Routes
@@ -59,11 +68,12 @@ var (
 func NewService(serv services.Service) (sv *GetService) {
 	if serv != nil {
 		sv = &GetService{
-			ID:      serv.GetID(),
-			Port:    serv.GetPort(),
-			Name:    serv.GetName(),
-			Host:    serv.GetHost(),
-			Network: serv.GetNetwork().String(),
+			ID:          serv.GetID(),
+			Port:        serv.GetPort(),
+			Name:        serv.GetName(),
+			Host:        serv.GetHost(),
+			Network:     serv.GetNetwork().String(),
+			Interaction: serv.GetInteraction().String(),
 		}
 	}
 	return
@@ -111,7 +121,13 @@ func createService(ctx *gin.Context) {
 		return
 	}
 
-	sv, err := services.Services.CreateService(input.Name, input.Port, nt, input.Host)
+	i, err := globals.ParseInteraction(input.Interaction)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	sv, err := services.Services.CreateService(input.Name, input.Port, nt, input.Host, i)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -137,7 +153,7 @@ func patchService(ctx *gin.Context) {
 	}
 
 	// Validate the post request to patch the proxy
-	var input GetService
+	var input PatchService
 	if err := ctx.ShouldBindJSON(&input); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -176,7 +192,7 @@ func patchService(ctx *gin.Context) {
 	sv.SetPort(validPort)
 	sv.SetName(validName)
 	sv.SetHost(input.Host)
-	sv.SetLocked(input.Locked)
+	//sv.SetLocked(input.Locked)
 
 	// Serialize the service and send it as a response
 	ret := NewService(sv)

@@ -97,7 +97,7 @@ func (tcpProxy *TCPProxy) GetListener() (listener net.Listener, err error) {
 }
 
 func (tcpProxy *TCPProxy) NewListener() (listener net.Listener, err error) {
-	listener, err = net.Listen(tcpProxy.GetProtocol().String(), fmt.Sprintf(":%d", tcpProxy.GetPort()))
+	listener, err = net.Listen(tcpProxy.GetNetwork().String(), fmt.Sprintf(":%d", tcpProxy.GetPort()))
 	return
 }
 

@@ -15,20 +15,20 @@
                 $ref: Proxy.yaml
   post:
     operationId: createProxy
-    description: Create a new proxy
+    summary: Create a new proxy
     tags:
       - Proxies
-    parameters:
-      - in: query
-        name: port
-        required: true
-        schema:
-          $ref: Px.yaml#/properties/port
-      - in: query
-        name: network
-        required: true
-        schema:
-          $ref: Px.yaml#/properties/network
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              port:
+                $ref: Px.yaml#/properties/port
+              network:
+                $ref: Px.yaml#/properties/network
     responses:
       "200":
         description: Returns the structure of the proxy created
@@ -66,17 +66,18 @@
     description: Updates a proxy with new values
     tags:
       - Proxies
-    parameters:
-      - in: query
-        name: port
-        required: false
-        schema:
-          $ref: Px.yaml#/properties/port
-      - in: query
-        name: service__id
-        required: false
-        schema:
-          type: string
+
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              port:
+                $ref: Px.yaml#/properties/port
+              service__id:
+                type: string
     responses:
       "200":
         description: Returns the instance of the proxy updated
@@ -106,12 +107,15 @@
     description: Changes the status
     tags:
       - Proxies
-    parameters:
-      - in: query
-        name: status
-        required: true
-        schema:
-          $ref: Proxy.yaml#/properties/status
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                $ref: Proxy.yaml#/properties/status
     responses:
       "200":
         description: Returns the current status of the proxy after the changes

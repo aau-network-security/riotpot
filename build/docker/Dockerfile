@@ -35,8 +35,8 @@ FROM golang:1.18 as stage
 WORKDIR /app
 
 # TODO: Copy the plugins
-COPY --from=stage cmd/riotpot/main.go ./
+COPY --from=stage cmd/riotpot ./
 USER 1000
 
 # Run RIoTPot
-ENTRYPOINT [ "./main.go" ]
+ENTRYPOINT [ "." ]

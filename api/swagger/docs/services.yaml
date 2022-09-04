@@ -18,27 +18,21 @@
     description: Create a new Service
     tags:
       - Services
-    parameters:
-      - in: query
-        name: port
-        required: true
-        schema:
-          $ref: Px.yaml#/properties/port
-      - in: query
-        name: network
-        required: true
-        schema:
-          $ref: Px.yaml#/properties/network
-      - in: query
-        name: name
-        required: true
-        schema:
-          $ref: Service.yaml#/properties/name
-      - in: query
-        name: host
-        required: true
-        schema:
-          $ref: Service.yaml#/properties/host
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            name:
+              $ref: Service.yaml#/properties/name
+            port:
+              $ref: Px.yaml#/properties/port
+            network:
+              $ref: Px.yaml#/properties/network
+            host:
+              $ref: Service.yaml#/properties/host
+            interaction:
+              $ref: Service.yaml#/properties/interaction
     responses:
       "200":
         description: Returns the structure of the proxy created
@@ -73,27 +67,17 @@
     description: Updates a service with new values
     tags:
       - Services
-    parameters:
-      - in: query
-        name: port
-        required: false
-        schema:
-          $ref: Px.yaml#/properties/port
-      - in: query
-        name: name
-        required: false
-        schema:
-          $ref: Service.yaml#/properties/name
-      - in: query
-        name: host
-        required: false
-        schema:
-          $ref: Service.yaml#/properties/host
-      - in: query
-        name: locked
-        required: false
-        schema:
-          $ref: Service.yaml#/properties/locked
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            name:
+              $ref: Service.yaml#/properties/name
+            port:
+              $ref: Px.yaml#/properties/port
+            host:
+              $ref: Service.yaml#/properties/host
     responses:
       "200":
         description: Returns the instance of the proxy updated

@@ -7,8 +7,9 @@ import (
 )
 
 type (
-	Status  int8
-	Network int8
+	Status      int8
+	Network     int8
+	Interaction int8
 )
 
 // Proxy status
@@ -93,6 +94,44 @@ func ParseNetwork(network string) (nt Network, err error) {
 
 	// Return the network and the error
 	return Network(i), nil
+}
+
+// Interaction Level
+const (
+	// Low level
+	Low Interaction = iota
+	High
+
+	// Value for Low
+	LowValue  = "low"
+	HighValue = "high"
+)
+
+func (i Interaction) String() string {
+	switch i {
+	case High:
+		return HighValue
+	case Low:
+		return LowValue
+	}
+
+	return strconv.Itoa(int(i))
+}
+
+func ParseInteraction(interaction string) (in Interaction, err error) {
+	switch interaction {
+	case High.String():
+		return High, nil
+	case Low.String():
+		return Low, nil
+	}
+
+	i, err := strconv.Atoi(interaction)
+	if err != nil {
+		return
+	}
+
+	return Interaction(i), nil
 }
 
 // API

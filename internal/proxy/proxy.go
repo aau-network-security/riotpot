@@ -118,7 +118,6 @@ func (pe *AbstractProxy) SafeSetPort(port int) (p int, err error) {
 // Set the port
 // NOTE: use the ValidatePort before assigning
 func (pe *AbstractProxy) SetPort(port int) int {
-
 	pe.port = port
 	return pe.port
 }
@@ -140,7 +139,7 @@ func (pe *AbstractProxy) GetService() services.Service {
 }
 
 // Returns the service
-func (pe *AbstractProxy) GetProtocol() globals.Network {
+func (pe *AbstractProxy) GetNetwork() globals.Network {
 	return pe.network
 }
 

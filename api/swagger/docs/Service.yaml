@@ -16,3 +16,7 @@ properties:
     description: >-
       Whether the service can be deleted. This property is fixated for
       Plugins
+  interaction:
+    type: string
+    example: low
+    description: Interaction level of the honeypot

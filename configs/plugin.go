@@ -26,8 +26,8 @@ var Plugin string
 
 var (
 	name    string
-	network globals.Network
 	port    int
+	network globals.Network
 )
 
 func init() {

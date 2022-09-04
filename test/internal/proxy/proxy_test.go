@@ -50,7 +50,7 @@ func TestStartProxy(t *testing.T) {
 	}
 
 	// Create a new abstract service
-	service := services.NewService("http", serverPort, network, "")
+	service := services.NewService("http", serverPort, network, "", globals.Low)
 
 	// Set the service
 	pr.SetService(service)
@@ -124,7 +124,7 @@ func TestStopProxy(t *testing.T) {
 	}
 
 	// Create a new abstract service
-	service := services.NewService("http", serverPort, network, "")
+	service := services.NewService("http", serverPort, network, "", globals.Low)
 
 	// Set the service
 	pr.SetService(service)
