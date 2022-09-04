@@ -31,7 +31,6 @@ type CreateService struct {
 }
 
 type PatchService struct {
-	ID   string `json:"id" binding:"required" gorm:"primary_key"`
 	Name string `json:"name" binding:"required"`
 	Port int    `json:"port" binding:"required"`
 	Host string `json:"host" binding:"required"`

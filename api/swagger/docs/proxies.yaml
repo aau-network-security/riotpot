@@ -49,6 +49,12 @@
     description: Get an instance of a registered proxy
     tags:
       - Proxies
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: Px.yaml#/properties/id
     responses:
       "200":
         description: Returns the instance of the proxy
@@ -66,6 +72,12 @@
     description: Updates a proxy with new values
     tags:
       - Proxies
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: Px.yaml#/properties/id
 
     requestBody:
       required: true
@@ -76,8 +88,11 @@
             properties:
               port:
                 $ref: Px.yaml#/properties/port
-              service__id:
-                type: string
+              service:
+                type: object
+                properties:
+                  id:
+                    type: string
     responses:
       "200":
         description: Returns the instance of the proxy updated
@@ -90,6 +105,12 @@
     description: Stops and deletes a registered proxy
     tags:
       - Proxies
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: Px.yaml#/properties/id
     responses:
       "200":
         description: OK
@@ -107,6 +128,12 @@
     description: Changes the status
     tags:
       - Proxies
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: Px.yaml#/properties/id
     requestBody:
       required: true
       content:

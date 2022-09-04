@@ -22,19 +22,24 @@ type GetProxy struct {
 	Service *service.GetService `json:"service"`
 }
 
+type PatchProxy struct {
+	Port    int                 `json:"port"`
+	Network string              `json:"network"`
+	Status  string              `json:"status"`
+	Service *service.GetService `json:"service"`
+}
+
 type CreateProxy struct {
 	Port    int    `json:"port" binding:"required"`
 	Network string `json:"network" binding:"required"`
 }
 
 type ChangeProxyStatus struct {
-	ID     string `json:"id" binding:"required" gorm:"primary_key"`
 	Status string `json:"status" binding:"required"`
 }
 
 type ChangeProxyPort struct {
-	ID   string `json:"id" binding:"required" gorm:"primary_key"`
-	Port int    `json:"port" binding:"required"`
+	Port int `json:"port" binding:"required"`
 }
 
 // Routes
@@ -141,16 +146,18 @@ func patchProxy(ctx *gin.Context) {
 	var errors []error
 
 	// Validate the post request to patch the proxy
-	var input GetProxy
+	var input PatchProxy
 	if err := ctx.ShouldBindJSON(&input); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	// Get the proxy to update
-	pe, err := proxy.Proxies.GetProxy(input.ID)
+	id := ctx.Param("id")
+	pe, err := proxy.Proxies.GetProxy(id)
 	if err != nil {
-		errors = append(errors, err)
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
 	}
 
 	// Validate the port and the service
@@ -204,7 +211,9 @@ func changeProxyStatus(ctx *gin.Context) {
 		return
 	}
 
-	pe, err := proxy.Proxies.GetProxy(input.ID)
+	// Get the proxy to update
+	id := ctx.Param("id")
+	pe, err := proxy.Proxies.GetProxy(id)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -244,7 +253,9 @@ func changeProxyPort(ctx *gin.Context) {
 		return
 	}
 
-	pe, err := proxy.Proxies.GetProxy(input.ID)
+	// Get the proxy to update
+	id := ctx.Param("id")
+	pe, err := proxy.Proxies.GetProxy(id)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

@@ -66,6 +66,21 @@ func (pm *ProxyManagerItem) CreateProxy(network globals.Network, port int) (pe P
 	return
 }
 
+func (pm *ProxyManagerItem) GetProxy(id string) (pe Proxy, err error) {
+	// Get all the proxies registered
+	proxies := pm.GetProxies()
+
+	for _, proxy := range proxies {
+		if proxy.GetID() == id {
+			pe = proxy
+			return
+		}
+	}
+
+	err = fmt.Errorf("proxy not found")
+	return
+}
+
 // Delete a proxy from teh registered list using the ID
 func (pm *ProxyManagerItem) DeleteProxy(id string) (err error) {
 	// Get all the proxies registered
