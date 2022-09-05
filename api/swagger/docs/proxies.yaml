@@ -69,7 +69,7 @@
               id: $request.path.id
   patch:
     operationId: updateProxy
-    description: Updates a proxy with new values
+    summary: Changes the proxy service
     tags:
       - Proxies
     parameters:
@@ -78,7 +78,6 @@
         required: true
         schema:
           $ref: Px.yaml#/properties/id
-
     requestBody:
       required: true
       content:
@@ -86,8 +85,6 @@
           schema:
             type: object
             properties:
-              port:
-                $ref: Px.yaml#/properties/port
               service:
                 type: object
                 properties:
@@ -150,3 +147,33 @@
           application/json:
             schema:
               $ref: Proxy.yaml#/properties/status
+
+/{id}/port:
+  description: Change the status of the proxy
+  post:
+    operationId: changeProxyPort
+    summary: Changes the port of the proxy
+    tags:
+      - Proxies
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: Px.yaml#/properties/id
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              port:
+                $ref: Px.yaml#/properties/port
+    responses:
+      "200":
+        description: Returns the current status of the proxy after the changes
+        content:
+          application/json:
+            schema:
+              $ref: Px.yaml#/properties/port

@@ -166,19 +166,23 @@ func patchProxy(ctx *gin.Context) {
 		errors = append(errors, err)
 	}
 
-	validPort, err := validators.ValidatePort(input.Port)
-	if err != nil {
-		errors = append(errors, err)
-	}
+	/*
+		[9/5/2022] TODO: Find a way to update the proxy using a buffer copy, and update every
+		field slowly.
+
+		validPort, err := validators.ValidatePort(input.Port)
+		if err != nil {
+			errors = append(errors, err)
+		}
+		// Update the Port
+		pe.SetPort(validPort)
+	*/
 
 	// If there are errors in the list, send a message to the client and return
 	if len(errors) > 0 {
 		ctx.JSON(http.StatusBadRequest, gin.H{"errors": errors})
 		return
 	}
-
-	// Update the Port
-	pe.SetPort(validPort)
 
 	// Update the service
 	pe.SetService(validServ)
@@ -241,7 +245,7 @@ func changeProxyStatus(ctx *gin.Context) {
 	}
 
 	// Serialize the status and send it as the response
-	ctx.JSON(http.StatusOK, gin.H{"status": pe.GetStatus()})
+	ctx.JSON(http.StatusOK, gin.H{"status": pe.GetStatus().String()})
 }
 
 // POST request to change the port of the proxy

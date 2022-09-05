@@ -42,9 +42,13 @@ paths:
     $ref: proxies.yaml#/~1{id}
   /proxies/{id}/status:
     $ref: proxies.yaml#/~1{id}~1status
+  /proxies/{id}/port:
+    $ref: proxies.yaml#/~1{id}~1port
 
   # Services
   /services:
     $ref: services.yaml#/~1
   /services/{id}:
     $ref: services.yaml#/~1{id}
+  /services/new:
+    $ref: services.yaml#/~1new

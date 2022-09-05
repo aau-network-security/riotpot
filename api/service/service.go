@@ -8,6 +8,7 @@ import (
 	"github.com/riotpot/api"
 	"github.com/riotpot/internal/globals"
 	lr "github.com/riotpot/internal/logger"
+	"github.com/riotpot/internal/proxy"
 	"github.com/riotpot/internal/services"
 	"github.com/riotpot/internal/validators"
 )
@@ -36,6 +37,14 @@ type PatchService struct {
 	Host string `json:"host" binding:"required"`
 }
 
+type ServiceProxy struct {
+	ID      string      `json:"id" binding:"required" gorm:"primary_key"`
+	Port    int         `json:"port"`
+	Network string      `json:"network"`
+	Status  string      `json:"status"`
+	Service *GetService `json:"service"`
+}
+
 // Routes
 var (
 	// General routes for the services
@@ -43,6 +52,7 @@ var (
 		// GET and POST services
 		api.NewRoute("", "GET", getServices),
 		api.NewRoute("", "POST", createService),
+		api.NewRoute("new/", "POST", newServiceAndProxy),
 	}
 
 	// Routes to manipulate a service
@@ -133,6 +143,52 @@ func createService(ctx *gin.Context) {
 	}
 
 	ret := NewService(sv)
+	ctx.JSON(http.StatusOK, ret)
+}
+
+func newServiceAndProxy(ctx *gin.Context) {
+	// Validate the post request to patch the proxy
+	var input CreateService
+	if err := ctx.ShouldBindJSON(&input); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	nt, err := globals.ParseNetwork(input.Network)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	i, err := globals.ParseInteraction(input.Interaction)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	sv, err := services.Services.CreateService(input.Name, input.Port, nt, input.Host, i)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Create a new proxy using the parameters from the service
+	pe, err := proxy.Proxies.CreateProxy(nt, input.Port)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	pe.SetService(sv)
+
+	ret := &ServiceProxy{
+		ID:      pe.GetID(),
+		Port:    pe.GetPort(),
+		Network: pe.GetNetwork().String(),
+		Status:  pe.GetStatus().String(),
+		Service: NewService(sv),
+	}
+
 	ctx.JSON(http.StatusOK, ret)
 }
 
