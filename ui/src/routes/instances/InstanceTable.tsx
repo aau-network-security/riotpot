@@ -14,7 +14,11 @@ import {
   instanceProxySelector,
 } from "../../recoil/atoms/instances";
 import { Service } from "../../recoil/atoms/services";
-import { changeProxyStatus, patchProxy } from "./InstanceAPI";
+import {
+  changeProxyStatus,
+  changeProxyPort,
+  patchService,
+} from "./InstanceAPI";
 
 const ServiceInfoHelp = ({
   network,
@@ -56,16 +60,16 @@ const InstanceServiceInfo = ({ service }: { service: Service }) => {
 };
 
 const InstanceServiceProxy = ({
-  id,
+  host,
   proxy,
 }: {
-  id: number;
+  host: string;
   proxy: InstanceProxyService;
 }) => {
   const [getProxy, setProxy] = useState(proxy.port);
 
-  const onClick = () => {
-    patchProxy(id, proxy);
+  const handler = () => {
+    changeProxyPort(host, proxy.id, getProxy);
   };
 
   return (
@@ -84,7 +88,7 @@ const InstanceServiceProxy = ({
         <Button
           variant="outline-secondary"
           id="button-addon2"
-          onClick={onClick}
+          onClick={() => handler()}
         >
           <BsArrowRepeat />
         </Button>
@@ -94,17 +98,19 @@ const InstanceServiceProxy = ({
 };
 
 const InstanceServiceToggle = ({
-  id,
+  host,
   proxy,
 }: {
-  id: number;
+  host: string;
   proxy: InstanceProxyService;
 }) => {
   const [status, setStatus] = useState(proxy.status);
 
   const handler = (isRunning: string) => {
-    setStatus(isRunning);
-    changeProxyStatus(id, proxy.id, proxy.status);
+    // Change the status of the thing
+    if (status !== isRunning) {
+      changeProxyStatus(host, proxy.id, isRunning, setStatus);
+    }
   };
 
   return (
@@ -138,8 +144,8 @@ const InstanceServiceRow = ({
 }) => {
   const cells = [
     <InstanceServiceInfo service={proxy.service} />,
-    <InstanceServiceProxy id={instance.id} proxy={proxy} />,
-    <InstanceServiceToggle id={instance.id} proxy={proxy} />,
+    <InstanceServiceProxy host={instance.host} proxy={proxy} />,
+    <InstanceServiceToggle host={instance.host} proxy={proxy} />,
   ];
 
   return <Row cells={cells} />;
@@ -147,7 +153,7 @@ const InstanceServiceRow = ({
 
 const InstanceServicesTable = ({ instance }: { instance: Instance }) => {
   const proxyList = useRecoilValue(instanceProxySelector(instance.id));
-  const rows = proxyList.map((proxy, index) => (
+  const rows = proxyList.map((proxy: any, index: number) => (
     <InstanceServiceRow key={index} instance={instance} proxy={proxy} />
   ));
   const data = {

@@ -68,6 +68,6 @@ export const instanceProxySelector = selectorFamily({
       const instance = get(instances(id));
 
       // Return the proxy included in the instance from the API
-      return fetchProxy(instance);
+      return fetchProxy(instance.host);
     },
 });
