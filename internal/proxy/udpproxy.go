@@ -93,6 +93,7 @@ func (udpProxy *UDPProxy) GetListener() (listener *net.UDPConn, err error) {
 			return
 		}
 		udpProxy.listener = listener
+		udpProxy.AbstractProxy.listener = listener
 	}
 
 	return

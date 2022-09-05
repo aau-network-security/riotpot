@@ -28,6 +28,7 @@ func (tcpProxy *TCPProxy) Start() (err error) {
 
 	// Get the listener or create a new one
 	listener, err := tcpProxy.GetListener()
+
 	if err != nil {
 		return
 	}
@@ -98,6 +99,7 @@ func (tcpProxy *TCPProxy) GetListener() (listener net.Listener, err error) {
 
 func (tcpProxy *TCPProxy) NewListener() (listener net.Listener, err error) {
 	listener, err = net.Listen(tcpProxy.GetNetwork().String(), fmt.Sprintf(":%d", tcpProxy.GetPort()))
+	tcpProxy.AbstractProxy.listener = listener
 	return
 }
 

@@ -57,13 +57,13 @@ type AbstractProxy struct {
 	wg sync.WaitGroup
 
 	// Generic listener
-	listener interface{ Close() }
+	listener interface{ Close() error }
 }
 
 // Function to stop the proxy from runing
 func (pe *AbstractProxy) Stop() (err error) {
 	// Stop the proxy if it is still alive
-	if pe.GetStatus() != globals.StoppedStatus {
+	if pe.GetStatus() == globals.RunningStatus {
 		close(pe.stop)
 		pe.listener.Close()
 		// Wait for all the connections and the server to stop

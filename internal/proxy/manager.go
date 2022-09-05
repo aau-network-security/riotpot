@@ -24,6 +24,7 @@ type ProxyManager interface {
 
 	// Methods for proxies the using ID field
 	GetProxy(id string) (Proxy, error)
+	SetProxy(pe Proxy) (Proxy, error)
 	DeleteProxy(id string) error
 
 	// Wrapper method to find a proxy using the port and protocol
@@ -73,6 +74,23 @@ func (pm *ProxyManagerItem) GetProxy(id string) (pe Proxy, err error) {
 	for _, proxy := range proxies {
 		if proxy.GetID() == id {
 			pe = proxy
+			return
+		}
+	}
+
+	err = fmt.Errorf("proxy not found")
+	return
+}
+
+func (pm *ProxyManagerItem) SetProxy(px Proxy) (pe Proxy, err error) {
+	// Get all the proxies registered
+	proxies := pm.GetProxies()
+
+	for ind, proxy := range proxies {
+		if proxy.GetID() == px.GetID() {
+			// Replace the index of the proxy with the new one
+			proxies[ind] = px
+			pm.proxies = proxies
 			return
 		}
 	}
