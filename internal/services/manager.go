@@ -163,7 +163,13 @@ func (se *ServiceManagerItem) DeleteService(id string) (err error) {
 	for ind, service := range services {
 
 		// Check if the service id is equal to the one received
-		if service.GetID() == id && !service.IsLocked() {
+		if service.GetID() == id {
+
+			if service.IsLocked() {
+				// If it was not found by this point, return an error
+				err = fmt.Errorf("service locked")
+				return
+			}
 
 			// Remove it from the slice by replacing it with the last item from the slice,
 			// and reducing the slice by 1 element

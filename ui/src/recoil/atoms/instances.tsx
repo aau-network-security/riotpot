@@ -1,8 +1,8 @@
-import { atom, atomFamily, selectorFamily } from "recoil";
+import { atom, atomFamily, selector, selectorFamily } from "recoil";
 import { Profile } from "./profiles";
 import { recoilPersist } from "recoil-persist";
 import { fetchProxy } from "../../routes/instances/InstanceAPI";
-import { Service } from "./services";
+import { DefaultService, Service } from "./services";
 
 const { persistAtom } = recoilPersist();
 
@@ -59,6 +59,13 @@ export type InstanceProxyService = {
   service: Service;
 };
 
+export const DefaultInstanceProxyService = {
+  id: "",
+  port: 0,
+  status: "stopped",
+  service: DefaultService,
+};
+
 export const instanceProxySelector = selectorFamily({
   key: "getProxyAPI",
   get:
@@ -70,4 +77,27 @@ export const instanceProxySelector = selectorFamily({
       // Return the proxy included in the instance from the API
       return fetchProxy(instance.host);
     },
+});
+
+export const instanceServiceIDs = atom<string[]>({
+  key: "instanceProxyServiceIDs",
+  default: [],
+});
+
+export const instanceService = atomFamily<InstanceProxyService, string>({
+  key: "instanceProxyService",
+  default: DefaultInstanceProxyService,
+});
+
+export const instanceProxyServiceSelector = selector({
+  key: "getProxyServices",
+  get: ({ get }) => {
+    const ids = get(instanceServiceIDs);
+    let services = [];
+    for (let id of ids) {
+      services.push(get(instanceService(id)));
+    }
+
+    return services;
+  },
 });

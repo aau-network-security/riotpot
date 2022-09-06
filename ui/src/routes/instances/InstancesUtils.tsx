@@ -129,7 +129,8 @@ const InstancesAddProfileDropdownMenu = React.forwardRef(
         <ul className="list-unstyled">
           {Children.toArray(props.children).filter(
             (child: any) =>
-              !value || child.props.profile.name.toLowerCase().startsWith(value)
+              !value ||
+              child.props.profile?.name.toLowerCase().startsWith(value)
           )}
         </ul>
       </div>

@@ -106,6 +106,17 @@ func (pm *ProxyManagerItem) DeleteProxy(id string) (err error) {
 
 	for ind, proxy := range proxies {
 		if proxy.GetID() == id {
+			// Attempt to remove the service and the proxy if the service is not locked
+			service := proxy.GetService()
+			if service != nil {
+				// Delete the service or return the error.
+				// An error may occur if the service could not be found or is locked!
+				err = services.Services.DeleteService(service.GetID())
+				if err != nil {
+					return
+				}
+			}
+
 			// Stop the proxy, just in case
 			proxy.Stop()
 			// Remove it from the slice by replacing it with the last item from the slice,
@@ -114,7 +125,6 @@ func (pm *ProxyManagerItem) DeleteProxy(id string) (err error) {
 
 			proxies[ind] = proxies[lastInd]
 			pm.proxies = proxies[:lastInd]
-
 			return
 		}
 	}

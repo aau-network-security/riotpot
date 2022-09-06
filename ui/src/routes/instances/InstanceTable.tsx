@@ -1,24 +1,75 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button, ButtonGroup, Col, Form, InputGroup } from "react-bootstrap";
 import { AiOutlineInfoCircle } from "react-icons/ai";
 import { BsArrowRepeat, BsCheck, BsX } from "react-icons/bs";
 import { FaNetworkWired } from "react-icons/fa";
-import { useRecoilValue } from "recoil";
+import { useRecoilCallback, useRecoilState, useRecoilValue } from "recoil";
 import { Pop } from "../../components/pop/Pop";
 import Table, { Row } from "../../components/table/Table";
-import { InteractionBadge, NetworkBadge } from "../../components/utils/Common";
-import { InteractionOption, NetworkOption } from "../../constants/globals";
+import {
+  DeleteDropdownItem,
+  InteractionBadge,
+  NetworkBadge,
+  OptionsDropdown,
+} from "../../components/utils/Common";
+import {
+  getPage,
+  InteractionOption,
+  NetworkOption,
+} from "../../constants/globals";
 import {
   Instance,
   InstanceProxyService,
-  instanceProxySelector,
+  instanceServiceIDs,
+  instanceService,
+  instanceProxyServiceSelector,
 } from "../../recoil/atoms/instances";
 import { Service } from "../../recoil/atoms/services";
 import {
   changeProxyStatus,
   changeProxyPort,
-  patchService,
+  deleteProxyService,
+  fetchProxy,
 } from "./InstanceAPI";
+
+const ProxyServicceRowOptions = ({
+  host,
+  proxyID,
+  serviceName,
+}: {
+  host: string;
+  proxyID: string;
+  serviceName: string;
+}) => {
+  const removeService = useRecoilCallback(({ set }) => (id: string) => {
+    set(instanceServiceIDs, (prev) => prev.filter((x) => x !== id));
+  });
+
+  const deleteCallback = (id: string) => {
+    const deleted = deleteProxyService(host, id);
+    deleted.then((data) => {
+      if ("success" in data) {
+        removeService(id);
+      }
+    });
+  };
+
+  const page = getPage("Services");
+  const note = "The service will be stopped and removed from the instance";
+
+  return (
+    <OptionsDropdown>
+      {page && (
+        <DeleteDropdownItem
+          page={page}
+          note={note}
+          name={serviceName}
+          onClick={() => deleteCallback(proxyID)}
+        />
+      )}
+    </OptionsDropdown>
+  );
+};
 
 const ServiceInfoHelp = ({
   network,
@@ -61,15 +112,21 @@ const InstanceServiceInfo = ({ service }: { service: Service }) => {
 
 const InstanceServiceProxy = ({
   host,
-  proxy,
+  proxyID,
 }: {
   host: string;
-  proxy: InstanceProxyService;
+  proxyID: string;
 }) => {
-  const [getProxy, setProxy] = useState(proxy.port);
+  const [getProxy, setProxy] = useRecoilState(instanceService(proxyID));
+  const [getProxyPort, setProxyPort] = useState(getProxy.port);
 
   const handler = () => {
-    changeProxyPort(host, proxy.id, getProxy);
+    const proxyPort = changeProxyPort(host, proxyID, getProxyPort);
+    proxyPort.then((data) => {
+      if ("port" in data) {
+        setProxy(data);
+      }
+    });
   };
 
   return (
@@ -82,8 +139,8 @@ const InstanceServiceProxy = ({
           type="number"
           min={1}
           max={65535}
-          defaultValue={getProxy}
-          onChange={(e) => setProxy(parseInt(e.target.value))}
+          defaultValue={getProxyPort}
+          onChange={(e) => setProxyPort(parseInt(e.target.value))}
         />
         <Button
           variant="outline-secondary"
@@ -144,24 +201,62 @@ const InstanceServiceRow = ({
 }) => {
   const cells = [
     <InstanceServiceInfo service={proxy.service} />,
-    <InstanceServiceProxy host={instance.host} proxy={proxy} />,
+    <InstanceServiceProxy host={instance.host} proxyID={proxy.id} />,
     <InstanceServiceToggle host={instance.host} proxy={proxy} />,
+    <ProxyServicceRowOptions
+      host={instance.host}
+      proxyID={proxy.id}
+      serviceName={proxy.service.name}
+    />,
   ];
 
   return <Row cells={cells} />;
 };
 
 const InstanceServicesTable = ({ instance }: { instance: Instance }) => {
-  const proxyList = useRecoilValue(instanceProxySelector(instance.id));
-  const rows = proxyList.map((proxy: any, index: number) => (
+  // Get all the proxy services set and create a row for each of them
+  const proxyServices = useRecoilValue(instanceProxyServiceSelector);
+  // Get the list of proxy service ids
+  const ids = useRecoilValue(instanceServiceIDs);
+
+  // Callback to add a service to the list.
+  // This is used to track and update the state of the proxies
+  const addProxyService = useRecoilCallback(
+    ({ set }) =>
+      (proxyService: InstanceProxyService) => {
+        // Set the new id in the list if it is not there yet
+        if (!ids.includes(proxyService.id)) {
+          set(instanceServiceIDs, [...ids, proxyService.id]);
+        }
+
+        set(instanceService(proxyService.id), proxyService);
+      }
+  );
+
+  // Fetch the list of proxy services only once
+  useEffect(() => {
+    // Populate the list of services
+    const proxyList = fetchProxy(instance.host);
+    // For each of the proxy received add it to the state
+    proxyList.then((proxies: InstanceProxyService[]) => {
+      proxies.forEach((x) => {
+        addProxyService(x);
+      });
+    });
+  }, []);
+
+  // Map the rows into a proxy service
+  const rows = proxyServices.map((proxy: any, index: number) => (
     <InstanceServiceRow key={index} instance={instance} proxy={proxy} />
   ));
+
+  // Send the data
   const data = {
-    headers: [`${rows.length} Services`, "", ""],
+    headers: [`${proxyServices.length} Services`, "", "", ""],
     rows: [],
   };
 
-  return <Table data={data} rows={rows} />;
+  return <Table data={data} rows={rows}></Table>;
 };
 
 export default InstanceServicesTable;

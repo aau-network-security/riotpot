@@ -2,9 +2,8 @@ import { InteractionOptions, NetworkOptions } from "../../constants/globals";
 import { Service } from "../../recoil/atoms/services";
 
 export const fetchProxy = async (host: string) => {
-  let response = [];
   try {
-    response = await fetch("http://" + host + "/api/proxies/")
+    const response = await fetch("http://" + host + "/api/proxies/")
       .then((response) => response.json())
       // Map the content of the response
       .then((data) =>
@@ -29,11 +28,11 @@ export const fetchProxy = async (host: string) => {
           return element;
         })
       );
+
+    return response;
   } catch (error) {
     console.log(error);
   }
-
-  return response;
 };
 
 export const patchService = async (host: string, service: Service) => {
@@ -81,11 +80,11 @@ export const patchService = async (host: string, service: Service) => {
 
 export const changeProxyPort = async (
   host: string,
-  proxyId: string,
+  proxyID: string,
   port: number
 ) => {
   try {
-    await fetch("http://" + host + "/api/proxies/" + proxyId + "/port", {
+    return await fetch("http://" + host + "/api/proxies/" + proxyID + "/port", {
       method: "POST",
       body: JSON.stringify({
         port: port,
@@ -135,26 +134,44 @@ export const changeProxyStatus = async (
 // Iterate trhough the services and add them to the host
 export const addFromProfile = async (host: string, services: Service[]) => {
   for (const service of services) {
-    try {
-      await fetch("http://" + host + "/api/services/new/", {
-        method: "POST",
-        body: JSON.stringify({
-          name: service.name,
-          host: service.host,
-          port: Number(service.port),
-          network: service.network.value,
-          interaction: service.interaction.value,
-        }),
-        headers: {
-          "Content-type": "application/json; charset=UTF-8",
-        },
-      })
-        .then((response) => response.json())
-        .catch((err) => {
-          console.log(err.message);
-        });
-    } catch (err) {
-      console.log(err);
-    }
+    addProxyService(host, service);
+  }
+};
+
+export const deleteProxyService = async (host: string, proxyID: string) => {
+  try {
+    return await fetch("http://" + host + "/api/proxies/" + proxyID + "/", {
+      method: "DELETE",
+    })
+      .then((response) => response.json())
+      .catch((err) => {
+        console.log(err.message);
+      });
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+export const addProxyService = async (host: string, service: Service) => {
+  try {
+    return await fetch("http://" + host + "/api/services/new/", {
+      method: "POST",
+      body: JSON.stringify({
+        name: service.name,
+        host: service.host,
+        port: Number(service.port),
+        network: service.network.value,
+        interaction: service.interaction.value,
+      }),
+      headers: {
+        "Content-type": "application/json; charset=UTF-8",
+      },
+    })
+      .then((response) => response.json())
+      .catch((err) => {
+        console.log(err.message);
+      });
+  } catch (err) {
+    console.log(err);
   }
 };

@@ -6,6 +6,7 @@ import { instances } from "../../recoil/atoms/instances";
 import InstanceServicesTable from "./InstanceTable";
 
 import "./Instances.scss";
+import InstanceUtils from "./InstanceUtils";
 
 const Instance = () => {
   let { id } = useParams();
@@ -17,6 +18,7 @@ const Instance = () => {
     <main>
       <Title title={instance.name} subTitle={instance.description} />
       <React.Suspense fallback="Loading...">
+        <InstanceUtils host={instance.host} />
         <InstanceServicesTable instance={instance} />
       </React.Suspense>
     </main>
