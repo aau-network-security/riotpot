@@ -10,7 +10,7 @@ import { getPage } from "../../constants/globals";
 
 import { Service } from "../../recoil/atoms/services";
 import { Profile, profiles } from "../../recoil/atoms/profiles";
-import { useRecoilCallback, useRecoilValue } from "recoil";
+import { useRecoilCallback, useRecoilValue, useResetRecoilState } from "recoil";
 import {
   instances,
   instanceIds,
@@ -20,14 +20,22 @@ import {
 } from "../../recoil/atoms/instances";
 import { SimpleForm } from "../../components/forms/Form";
 import { InstanceFormFields } from "./InstanceForm";
+import { addFromProfile } from "./InstanceAPI";
 
-const CustomInstanceDropdownItem = () => {
+const CustomInstanceDropdownItem = ({
+  show = false,
+  setShow,
+}: {
+  show?: boolean;
+  setShow: any;
+}) => {
   const pageName = "Instances";
   const page = getPage(pageName);
 
-  const [modalShow, setModalShow] = React.useState(false);
-
   const ids = useRecoilValue(instanceIds);
+  const defaultValues = useRecoilValue(instanceFormFields);
+  const resetFormFields = useResetRecoilState(instanceFormFields);
+
   const onSubmit = useRecoilCallback(({ set }) => (instance: Instance) => {
     const id = ids.length;
     // Set the new id in the list
@@ -36,12 +44,20 @@ const CustomInstanceDropdownItem = () => {
     const newInstnace = {
       ...instance,
       id: id,
+      profile: defaultValues.profile,
     };
 
+    // Set the new instance
     set(instances(id), (prev) => ({ ...prev, ...newInstnace }));
-  });
 
-  const defaultValues = useRecoilValue(instanceFormFields);
+    // Contact the API to create all the services
+    if (newInstnace.profile?.services) {
+      addFromProfile(newInstnace.host, newInstnace.profile.services);
+    }
+
+    // Reset the form fields
+    resetFormFields();
+  });
 
   const content = (
     <SimpleForm
@@ -56,19 +72,31 @@ const CustomInstanceDropdownItem = () => {
 
   const props = {
     title: "New Custom Instance",
-    onHide: () => setModalShow(false),
-    show: modalShow,
+    onHide: () => {
+      setShow(false);
+      resetFormFields();
+    },
+    show: show,
     content: content,
     icon: page?.icon,
   };
 
+  const profileIcon = getPage("Profiles");
+
   return (
     <>
-      <Dropdown.Item onClick={() => setModalShow(true)} id="custom add">
+      <Dropdown.Item onClick={() => setShow(true)} id="custom add">
         <AiOutlinePlus />
         Custom Instance
       </Dropdown.Item>
-      <CenteredModal props={props} />
+      <CenteredModal props={props}>
+        {defaultValues.profile && (
+          <span>
+            {profileIcon && <profileIcon.icon />}
+            {defaultValues.profile.name}
+          </span>
+        )}
+      </CenteredModal>
     </>
   );
 };
@@ -104,7 +132,6 @@ const InstancesAddProfileDropdownMenu = React.forwardRef(
               !value || child.props.profile.name.toLowerCase().startsWith(value)
           )}
         </ul>
-        <CustomInstanceDropdownItem />
       </div>
     );
   }
@@ -146,25 +173,23 @@ export const ProfileRowInfoPop = ({ services }: { services: Service[] }) => {
   );
 };
 
-const ProfileDropdownRow = ({ profile }: { profile: Profile }) => {
-  const ids = useRecoilValue(instanceIds);
-
-  const insertInstance = useRecoilCallback(
-    ({ set }) =>
-      (id: number, prof: Profile) => {
-        // Set the new id in the list
-        set(instanceIds, [...ids, id]);
-
-        // Set the instance in teh family
-        const newInstance = { name: prof.name, id: id, profile: prof };
-        set(instances(id), (prev) => ({ ...prev, ...newInstance }));
-      }
-  );
+const ProfileDropdownRow = ({
+  profile,
+  setShow,
+}: {
+  profile: Profile;
+  setShow: any;
+}) => {
+  const insertInstance = useRecoilCallback(({ set }) => (prof: Profile) => {
+    // Set the new id in the list
+    set(instanceFormFields, (prev) => ({ ...prev, profile: prof }));
+    setShow(true);
+  });
 
   return (
     <Dropdown.Item
       onClick={() => {
-        insertInstance(ids.length, profile);
+        insertInstance(profile);
       }}
     >
       {profile.name}
@@ -176,6 +201,7 @@ const ProfileDropdownRow = ({ profile }: { profile: Profile }) => {
 const AddButton = () => {
   // Get all the profiles
   const profs = useRecoilValue(profiles);
+  const [modalShow, setModalShow] = React.useState(false);
 
   return (
     <Dropdown drop="start">
@@ -184,8 +210,15 @@ const AddButton = () => {
       </Dropdown.Toggle>
       <Dropdown.Menu as={InstancesAddProfileDropdownMenu}>
         {profs.map((profile: Profile) => {
-          return <ProfileDropdownRow profile={profile} key={profile.id} />;
+          return (
+            <ProfileDropdownRow
+              profile={profile}
+              key={profile.id}
+              setShow={setModalShow}
+            />
+          );
         })}
+        <CustomInstanceDropdownItem show={modalShow} setShow={setModalShow} />
       </Dropdown.Menu>
     </Dropdown>
   );

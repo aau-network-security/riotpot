@@ -131,3 +131,30 @@ export const changeProxyStatus = async (
     console.log(err);
   }
 };
+
+// Iterate trhough the services and add them to the host
+export const addFromProfile = async (host: string, services: Service[]) => {
+  for (const service of services) {
+    try {
+      await fetch("http://" + host + "/api/services/new/", {
+        method: "POST",
+        body: JSON.stringify({
+          name: service.name,
+          host: service.host,
+          port: Number(service.port),
+          network: service.network.value,
+          interaction: service.interaction.value,
+        }),
+        headers: {
+          "Content-type": "application/json; charset=UTF-8",
+        },
+      })
+        .then((response) => response.json())
+        .catch((err) => {
+          console.log(err.message);
+        });
+    } catch (err) {
+      console.log(err);
+    }
+  }
+};

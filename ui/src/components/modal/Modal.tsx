@@ -16,7 +16,13 @@ type ModalProps = {
  * This component is used for regular modals
  * {title, icon, content} : {title: string, icon: any, content: any}
  */
-const CenteredModal = ({ props }: { props: ModalProps }) => {
+const CenteredModal = ({
+  props,
+  children,
+}: {
+  props: ModalProps;
+  children?: any;
+}) => {
   return (
     <Modal
       {...props}
@@ -30,7 +36,10 @@ const CenteredModal = ({ props }: { props: ModalProps }) => {
           {props.title}
         </Modal.Title>
       </Modal.Header>
-      <Modal.Body>{props.content}</Modal.Body>
+      <Modal.Body>
+        {children}
+        {props.content}
+      </Modal.Body>
       <Modal.Footer></Modal.Footer>
     </Modal>
   );
