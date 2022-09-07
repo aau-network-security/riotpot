@@ -36,8 +36,5 @@ workspace*.code-*
 # whatever the rules are, include all the `.md` files
 !*.md
 
-# Remove the riotpot binary
-riotpot
-
 # Remove the local samples
 local
