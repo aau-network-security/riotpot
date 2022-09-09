@@ -217,7 +217,7 @@ const InstanceServicesTable = ({ instance }: { instance: Instance }) => {
   // Get all the proxy services set and create a row for each of them
   const proxyServices = useRecoilValue(instanceProxyServiceSelector);
   // Get the list of proxy service ids
-  const ids = useRecoilValue(instanceServiceIDs);
+  let ids = useRecoilValue(instanceServiceIDs);
 
   // Callback to add a service to the list.
   // This is used to track and update the state of the proxies
@@ -226,7 +226,8 @@ const InstanceServicesTable = ({ instance }: { instance: Instance }) => {
       (proxyService: InstanceProxyService) => {
         // Set the new id in the list if it is not there yet
         if (!ids.includes(proxyService.id)) {
-          set(instanceServiceIDs, [...ids, proxyService.id]);
+          ids = [...ids, proxyService.id];
+          set(instanceServiceIDs, ids);
         }
 
         set(instanceService(proxyService.id), proxyService);
