@@ -1,0 +1,76 @@
+{
+  "services": [
+    {
+      "name": "blea",
+      "host": "asdasd",
+      "port": "1231",
+      "network": { "value": "tcp", "label": "TCP" },
+      "interaction": { "value": "high", "label": "High" },
+      "id": "35d17e5-c5d6-6ac4-e8a3-5d738e74182"
+    },
+    {
+      "id": "32425b0-706-76d8-5840-aec6c02be72",
+      "name": "123132",
+      "network": { "value": "tcp", "label": "TCP" },
+      "interaction": { "value": "high", "label": "High" },
+      "host": "asd",
+      "port": "1"
+    }
+  ],
+  "profiles": [
+    {
+      "id": "4b1408-78fa-61a7-b3b1-76c3eca8d5a",
+      "name": "Wi-Fi module",
+      "description": "A description",
+      "services": [
+        {
+          "name": "blea",
+          "host": "asdasd",
+          "port": "1231",
+          "network": { "value": "tcp", "label": "TCP" },
+          "interaction": { "value": "high", "label": "High" },
+          "id": "35d17e5-c5d6-6ac4-e8a3-5d738e74182"
+        },
+        {
+          "id": "32425b0-706-76d8-5840-aec6c02be72",
+          "name": "123132",
+          "network": { "value": "tcp", "label": "TCP" },
+          "interaction": { "value": "high", "label": "High" },
+          "host": "asd",
+          "port": "1"
+        }
+      ]
+    }
+  ],
+  "instances": [
+    {
+      "id": 0,
+      "name": "a",
+      "host": "localhost:2022",
+      "description": "a",
+      "profile": {
+        "id": "4b1408-78fa-61a7-b3b1-76c3eca8d5a",
+        "name": "Wi-Fi module",
+        "description": "A description",
+        "services": [
+          {
+            "name": "blea",
+            "host": "asdasd",
+            "port": "1231",
+            "network": { "value": "tcp", "label": "TCP" },
+            "interaction": { "value": "high", "label": "High" },
+            "id": "35d17e5-c5d6-6ac4-e8a3-5d738e74182"
+          },
+          {
+            "id": "32425b0-706-76d8-5840-aec6c02be72",
+            "name": "123132",
+            "network": { "value": "tcp", "label": "TCP" },
+            "interaction": { "value": "high", "label": "High" },
+            "host": "asd",
+            "port": "1"
+          }
+        ]
+      }
+    }
+  ]
+}

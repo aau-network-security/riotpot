@@ -12,6 +12,7 @@ import Profiles from "./routes/profiles/Profiles";
 import Profile from "./routes/profiles/Profile";
 import Instance from "./routes/instances/Instance";
 import { SimpleBreadcrumb } from "./components/utils/Common";
+import { Settings } from "./routes/settings/Settings";
 
 /* Pages */
 
@@ -41,7 +42,7 @@ function App() {
                 <Route index element={<Profiles />} />
                 <Route path=":id" element={<Profile />}></Route>
               </Route>
-              <Route path="settings"></Route>
+              <Route path="settings" element={<Settings />}></Route>
               <Route
                 path="*"
                 element={
