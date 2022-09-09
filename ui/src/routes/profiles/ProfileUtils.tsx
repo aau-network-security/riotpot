@@ -103,16 +103,19 @@ const ServiceDropdownItems = ({ id }: { id: string }) => {
   const insertService = useRecoilCallback(() => (service: Service) => {
     // Copy the original content
     var cp = { ...profile };
-    cp.services = [...cp.services, service];
+    let serviceIDs = cp.services.map((x: Service) => x.id);
 
-    // Place the profile with the updated values
-    setProfile(cp);
+    if (!serviceIDs.includes(service.id)) {
+      cp.services = [...cp.services, service];
+      // Place the profile with the updated values
+      setProfile(cp);
+    }
   });
 
   const removeService = useRecoilCallback(() => (service: Service) => {
     // Copy the original content
     var cp = { ...profile };
-    cp.services = cp.services.filter((serv: Service) => serv !== service);
+    cp.services = cp.services.filter((serv: Service) => serv.id !== service.id);
 
     // Place the profile with the updated values
     setProfile(cp);
