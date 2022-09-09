@@ -71,13 +71,14 @@ const LoadStateButton = () => {
   };
 
   return (
-    <>
+    <div>
+      <h3>Upload</h3>
       <Form.Label>Load the state from a JSON file</Form.Label>
       <InputGroup className="mb-3">
         <Form.Control type="file" onChange={handleChange} />
-        <Button onClick={() => loadState(files)}>Load</Button>
+        <Button onClick={() => loadState(files)}>Upload</Button>
       </InputGroup>
-    </>
+    </div>
   );
 };
 
@@ -95,10 +96,18 @@ export const Settings = () => {
 
   return (
     <>
-      <Form.Label>Download the the current state to a JSON file</Form.Label>
-      <Form.Group>
-        <Button onClick={() => saveState()}>Save State</Button>
-      </Form.Group>
+      <div>
+        <h1>State</h1>
+        <small>Manage the current state</small>
+      </div>
+      <br />
+      <div>
+        <h3>Download</h3>
+        <Form.Label>Download the the current state to a JSON file</Form.Label>
+        <Form.Group>
+          <Button onClick={() => saveState()}>Download State</Button>
+        </Form.Group>
+      </div>
       <br />
       <LoadStateButton />
     </>
