@@ -10,7 +10,7 @@ GO_BIN_DIR=$(LCL_GO_PATH)/bin
 LOCAL_BUILD_ENABLED=False
 
 # docker cmd below
-.PHONY:  docker-build-doc riotpot-doc riotpot-up riotpot-prod-up riotpot-prod-down riotpot-build riotpot-build-plugins riotpot-builder riotpot-build-local set_container_build set_local_build go_install
+.PHONY:  riotpot-install docker-build-doc riotpot-doc riotpot-up riotpot-prod-up riotpot-prod-down riotpot-build riotpot-build-plugins riotpot-builder riotpot-build-local set_container_build set_local_build go_install
 prepare_configurations:
 	cp configs/samples/configuration-template.yml configs/samples/configuration.yml
 set_local_build:
@@ -51,3 +51,11 @@ riotpot-build-local: \
 	riotpot-build \
 	riotpot-build-local-plugin \
 	go install ./riotpot
+
+riotpot-install: 
+	riotpot-build \
+	riotpot-build-local-plugin \
+	go install ./riotpot
+
+riotpot-ui:
+	@cd ui && npm start 
