@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button, Col, Dropdown, Form, InputGroup } from "react-bootstrap";
 import {
   AiFillCheckCircle,
@@ -23,9 +23,11 @@ import { getPage, InteractionOption } from "../../constants/globals";
 import {
   Instance,
   instanceIds,
+  InstanceProxyService,
   instances,
   intanceFormFieldErrors,
 } from "../../recoil/atoms/instances";
+import { fetchProxy } from "./InstanceAPI";
 import { InstanceFormFields } from "./InstanceForm";
 
 interface InstanceService {
@@ -197,10 +199,28 @@ const InstanceRowOptions = ({ instance }: { instance: Instance }) => {
 
 const InstanceRow = ({ id }: { id: number }) => {
   const instance = useRecoilValue(instances(id));
-  const services: InstanceService[] = [];
+  const [state, setstate] = useState<InstanceService[]>([]);
+
+  // Fetch the list of proxy services only once
+  useEffect(() => {
+    // Populate the list of services
+    const proxyList = fetchProxy(instance.host);
+    // For each of the proxy received add it to the state
+    proxyList.then((proxies: InstanceProxyService[]) => {
+      const prox = proxies.map((x: InstanceProxyService) => {
+        return {
+          name: x.service.name,
+          proxy: x.service.port,
+          interaction: x.service.interaction,
+          running: x.status === "running",
+        };
+      });
+      setstate(prox);
+    });
+  }, []);
 
   const cells = [
-    <InstanceRowInfo name={instance.name} services={services} />,
+    <InstanceRowInfo name={instance.name} services={state} />,
     <InstanceRowAddress id={id} />,
     <InstanceRowOptions instance={instance} />,
   ];
