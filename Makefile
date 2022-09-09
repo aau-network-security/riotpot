@@ -40,17 +40,15 @@ riotpot-build-plugins: $(PLUGINS_DIR)/*
 	done
 riotpot-build-local-plugin: $(PLUGINS_DIR)/*
 	for folder in $^ ; do \
-		go build -buildmode=plugin -o ${GO_BIN_DIR}/$${folder}/plugin.so $${folder}/*.go; \
+		go build -buildmode=plugin -o ./$${folder}/plugin.so ./$${folder}/*.go; \
 	done
 
 riotpot-builder: \
-	set_container_build \
 	riotpot-build \
 	riotpot-build-plugins
 riotpot-build-local: \
 	riotpot-build \
 	riotpot-build-local-plugin \
-	go install ./riotpot
 
 riotpot-install: 
 	riotpot-build \

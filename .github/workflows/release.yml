@@ -3,47 +3,46 @@ name: release
 on:
   push:
     paths-ignore:
-      - '**.md'
+      - "**.md"
   pull_request:
     paths-ignore:
-      - '**.md'
+      - "**.md"
 
 jobs:
   build:
     strategy:
       matrix:
-        go-version: [1.16]
+        go-version: [1.18]
         os: [ubuntu-latest]
     runs-on: ${{ matrix.os }}
     steps:
+      - name: Checkout
+        uses: actions/checkout@v2
 
-    - name: Checkout
-      uses: actions/checkout@v2
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ matrix.go-version }}
 
-    - name: Set up Go
-      uses: actions/setup-go@v2
-      with:
-        go-version: ${{ matrix.go-version }}
+      - name: Cache Go modules
+        uses: actions/cache@v1
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
 
-    - name: Cache Go modules
-      uses: actions/cache@v1
-      with:
-        path: ~/go/pkg/mod
-        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-        restore-keys: |
-          ${{ runner.os }}-go-
+      - name: Build
+        if: github.event_name == 'push' && (matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest')
+        run: cd cmd/riotpot && go build -o bin/ -v
 
-    - name: Build
-      if:  github.event_name == 'push' && (matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest')
-      run: cd cmd/riotpot && go build -o bin/ -v
-
-    # Autoreleaser https://goreleaser.com/ci/actions/
-    # it MAY need secrets! more: https://docs.github.com/en/actions/reference/encrypted-secrets
-    - name: Run GoReleaser
-      uses: goreleaser/goreleaser-action@v2
-      with:
-        version: latest
-        workdir: cmd/riotpot
-        args: release --rm-dist
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # Autoreleaser https://goreleaser.com/ci/actions/
+      # it MAY need secrets! more: https://docs.github.com/en/actions/reference/encrypted-secrets
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v2
+        with:
+          version: latest
+          workdir: cmd/riotpot
+          args: release --rm-dist
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
