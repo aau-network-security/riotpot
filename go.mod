@@ -3,6 +3,7 @@ module github.com/riotpot
 go 1.18
 
 require (
+	github.com/gin-contrib/cors v1.4.0
 	github.com/google/uuid v1.3.0
 	github.com/plgd-dev/go-coap/v2 v2.6.0
 	github.com/stretchr/testify v1.8.0
@@ -15,7 +16,6 @@ require (
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/gin-contrib/cors v1.4.0 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/go-playground/locales v0.14.0 // indirect
 	github.com/go-playground/universal-translator v0.18.0 // indirect
@@ -46,6 +46,7 @@ require (
 	github.com/pion/udp v0.1.1 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/plgd-dev/kit/v2 v2.0.0-20211006190727-057b33161b90 // indirect
+	github.com/rakyll/statik v0.1.7
 	github.com/rs/zerolog v1.28.0
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect
 	github.com/xdg-go/scram v1.1.1 // indirect

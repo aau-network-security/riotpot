@@ -11,11 +11,15 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/rakyll/statik/fs"
 	"github.com/riotpot/api"
 	"github.com/riotpot/api/proxy"
 	"github.com/riotpot/api/service"
 	"github.com/riotpot/internal/globals"
+	"github.com/riotpot/internal/logger"
 	"github.com/rs/zerolog"
+
+	_ "github.com/riotpot/statik"
 )
 
 type Routers []api.Router
@@ -59,9 +63,14 @@ func setupApi() *gin.Engine {
 		router.AddToGroup(root)
 	}
 
+	statikFS, err := fs.New()
+	if err != nil {
+		logger.Log.Fatal().Err(err)
+	}
+
 	// Serve the Swagger UI files in the root of the api
 	// TODO: [7/24/2022] Use Pakr or Statik to bundle non-golang files into the binary
-	root.Static("swagger", "../../api/swagger")
+	root.StaticFS("swagger", statikFS)
 
 	return router
 }

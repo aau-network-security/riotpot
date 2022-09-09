@@ -17,8 +17,6 @@ set_local_build:
 	@sed -i -e 's/local_build_on: 0/local_build_on: 1/g' configs/samples/configuration.yml
 set_container_build:
 	@sed -i -e 's/local_build_on: 1/local_build_on: 0/g' configs/samples/configuration.yml
-go_install:
-	@cd cmd/riotpot && go install && cd ../../
 docker-build-doc:
 	docker build -f $(DOCKER)Dockerfile.documentation . -t $(APPNAME)/v1
 riotpot-doc: docker-build-doc
@@ -35,7 +33,7 @@ riotpot-all:
 	riotpot-doc
 	riotpot-up
 riotpot-build:
-	go build -o riotpot cmd/riotpot/main.go;
+	go build -o riotpot ./cmd/riotpot/.
 riotpot-build-plugins: $(PLUGINS_DIR)/*
 	for folder in $^ ; do \
 		go build -buildmode=plugin -o $${folder}/plugin.so $${folder}/*.go; \
@@ -50,8 +48,6 @@ riotpot-builder: \
 	riotpot-build \
 	riotpot-build-plugins
 riotpot-build-local: \
-	prepare_configurations \
-	set_local_build \
 	riotpot-build \
 	riotpot-build-local-plugin \
-	go_install
+	go install ./riotpot

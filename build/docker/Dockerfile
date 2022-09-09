@@ -17,12 +17,12 @@ RUN go mod download
 
 # Copy everything into the image
 # Copy only the app files in the image
-COPY internal internal/
-COPY tools tools/
-COPY pkg pkg/
+COPY api api/
 COPY cmd cmd/
-COPY configs configs/
-COPY build/docker/entrypoint.sh ./
+#COPY configs configs/
+COPY internal internal/
+COPY pkg pkg/
+COPY tools tools/
 
 # Run the command from the Makefile to build all the plugins
 # and build the project
@@ -35,7 +35,7 @@ FROM golang:1.18 as stage
 WORKDIR /app
 
 # TODO: Copy the plugins
-COPY --from=stage cmd/riotpot ./
+COPY --from=stage $WORKING_DIR/pkg pkg/
 USER 1000
 
 # Run RIoTPot
