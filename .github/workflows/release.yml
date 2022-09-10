@@ -1,4 +1,4 @@
-name: release
+name: goreleaser
 
 on:
   push:
@@ -20,6 +20,9 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
+
+      - name: Fetch all tags
+        run: git fetch --force --tags
 
       - name: Set up Go
         uses: actions/setup-go@v3
@@ -44,7 +47,7 @@ jobs:
         uses: goreleaser/goreleaser-action@v3
         with:
           distribution: goreleaser
-          version: "gsoc_2022"
+          version: latest
           workdir: cmd/riotpot
           args: release --rm-dist
         env:
