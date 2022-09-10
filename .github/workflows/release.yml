@@ -17,10 +17,10 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set up Go
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v3
         with:
           go-version: ${{ matrix.go-version }}
 
@@ -39,8 +39,9 @@ jobs:
       # Autoreleaser https://goreleaser.com/ci/actions/
       # it MAY need secrets! more: https://docs.github.com/en/actions/reference/encrypted-secrets
       - name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@v2
+        uses: goreleaser/goreleaser-action@v3
         with:
+          distribution: goreleaser
           version: latest
           workdir: cmd/riotpot
           args: release --rm-dist
