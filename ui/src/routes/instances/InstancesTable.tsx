@@ -217,6 +217,7 @@ const InstanceRow = ({ id }: { id: number }) => {
       });
       setstate(prox);
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const cells = [
