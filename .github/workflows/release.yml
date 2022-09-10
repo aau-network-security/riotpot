@@ -5,6 +5,7 @@ on:
     paths-ignore:
       - "**.md"
       - "ui"
+      - "release-ui.yml"
   pull_request:
     paths-ignore:
       - "**.md"
