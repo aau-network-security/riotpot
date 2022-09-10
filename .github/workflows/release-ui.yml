@@ -18,12 +18,12 @@ jobs:
         node-version: [18.x]
     steps:
       - uses: actions/checkout@v3
+      - run: cd ui
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
-      - run: cd ui
       - run: npm ci
       - run: npm run build --if-present
       - run: npm test -- --watch=false --browsers=ChromeHeadless
