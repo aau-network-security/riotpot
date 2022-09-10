@@ -4,7 +4,7 @@ on:
   push:
     paths-ignore:
       - "**.md"
-      - "ui"
+      - "./ui/**"
       - "**/release-ui.yml"
   pull_request:
     paths-ignore:
