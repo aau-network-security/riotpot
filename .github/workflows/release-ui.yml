@@ -29,8 +29,6 @@ jobs:
         with:
           path: "ui/node_modules"
           key: node-modules-${{ hashFiles('ui/package.json') }}
-      - run: npm ci
-        working-directory: ./ui
       - run: npm run build --if-present
         working-directory: ./ui
       - run: npx semantic-release
