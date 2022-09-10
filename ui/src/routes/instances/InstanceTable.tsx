@@ -244,6 +244,7 @@ const InstanceServicesTable = ({ instance }: { instance: Instance }) => {
         addProxyService(x);
       });
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Map the rows into a proxy service

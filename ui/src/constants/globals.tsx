@@ -1,5 +1,4 @@
 import { BiCog, BiChip, BiServer } from "react-icons/bi";
-import { VscHome } from "react-icons/vsc";
 import { RiProfileLine } from "react-icons/ri";
 import { IconType } from "react-icons/lib";
 
