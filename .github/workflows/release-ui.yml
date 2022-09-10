@@ -21,7 +21,6 @@ jobs:
         node-version: [18.x]
     steps:
       - uses: actions/checkout@v3
-      - run: CI=false
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
@@ -29,5 +28,6 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache-dependency-path: "ui/package-lock.json"
       - run: npm ci
+      - run: unset CI
       - run: npm run build --if-present
       - run: npx semantic-release
