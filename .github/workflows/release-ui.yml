@@ -13,12 +13,14 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: "ui"
     strategy:
       matrix:
         node-version: [18.x]
     steps:
       - uses: actions/checkout@v3
-      - run: cd ui
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
@@ -26,6 +28,4 @@ jobs:
           cache: "npm"
           cache-dependency-path: "**/package-lock.json"
       - run: npm run build --if-present
-        working-directory: ./ui
       - run: npx semantic-release
-        working-directory: ./ui
