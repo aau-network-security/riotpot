@@ -4,7 +4,6 @@ on:
   push:
     paths-ignore:
       - "**.md"
-
     branches:
       - "gsoc_2022"
   pull_request:
@@ -24,12 +23,8 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
-
-      - name: Cache
-        uses: actions/cache@v3
-        with:
-          path: "ui/node_modules"
-          key: node-modules-${{ hashFiles('ui/package.json') }}
+          cache: "npm"
+          cache-dependency-path: "**/package-lock.json"
       - run: npm run build --if-present
         working-directory: ./ui
       - run: npx semantic-release
