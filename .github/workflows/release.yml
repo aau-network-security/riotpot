@@ -44,7 +44,7 @@ jobs:
         uses: goreleaser/goreleaser-action@v3
         with:
           distribution: goreleaser
-          version: "{{.Tag || .Branch}}"
+          version: "{{.Branch}}"
           workdir: cmd/riotpot
           args: release --rm-dist
         env:
