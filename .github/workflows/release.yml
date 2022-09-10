@@ -4,6 +4,7 @@ on:
   push:
     paths-ignore:
       - "**.md"
+      - "ui"
   pull_request:
     paths-ignore:
       - "**.md"

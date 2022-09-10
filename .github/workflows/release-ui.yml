@@ -4,6 +4,7 @@ on:
   push:
     paths-ignore:
       - "**.md"
+
     branches:
       - "gsoc_2022"
   pull_request:
