@@ -64,7 +64,7 @@ services:
       - "5683:5683"
       - "27017:27017"
     env_file:
-    - ../build/env/.env
+    - ../../build/env/.env
     networks:
       honeypot:
       default:
@@ -95,23 +95,5 @@ services:
     container_name: ocpp
     <<: *protocol
 
-
-  ##########################################
-  # EXTRA
-  ##########################################
-  # Profile: `extra`
-
-  # Attacker container.
-  # This container is meant to interact with the 
-  attacker:
-    build:
-      context: ..
-      dockerfile: ./build/docker/Dockerfile.attacker
-    stdin_open: true  # docker -i
-    tty: true         # docker -t
-    volumes:
-      - ../test/pkg/services/mqtt:/riotpot/
-    networks:
-      honeypot:
-    profiles:
-      - extra
+networks:
+  honeypot:

@@ -1,0 +1,33 @@
+x-protocol:
+  &protocol
+  depends_on:
+    - riotpot
+  networks:
+    honeypot:
+    default:
+
+services:  
+  riotpot:
+    container_name: riotpot
+    build:
+      context: ../..
+      dockerfile: ./build/docker/Dockerfile
+    restart: always # restart riotpot when it crashes
+    env_file:
+    - ../../build/env/.env
+    ports:
+      - "2022:2022"
+      - "8080:8080"
+    networks:
+      honeypot:
+      default:
+
+  http:
+    image: httpd
+    container_name: http
+    ports:
+      - "80:80"
+    <<: *protocol
+
+networks:
+  honeypot:

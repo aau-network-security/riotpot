@@ -57,7 +57,6 @@ func (tcpProxy *TCPProxy) Start() (err error) {
 
 			// If there was an error, close the connection to the server and return
 			if servErr != nil {
-				server.Close()
 				return
 			}
 			defer server.Close()

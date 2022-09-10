@@ -1,16 +1,12 @@
 FROM golang:1.18 as builder
 LABEL maintainer="Shreyas Srinivasa <shsr@es.aau.dk>"
 
-ENV GO111MODULE=on
-ENV APP_NAME=riotpot
-ENV WORKING_DIR=$GOPATH/src/github.com/aau/$APP_NAME
-
 # Set the working directory to golang working space
-WORKDIR $WORKING_DIR
+WORKDIR /app
 
 # Copy the dependencies into the image
-COPY go.mod .
-COPY go.sum .
+COPY go.mod ./
+COPY go.sum ./
 
 # download all the dependencies
 RUN go mod download
@@ -19,24 +15,28 @@ RUN go mod download
 # Copy only the app files in the image
 COPY api api/
 COPY cmd cmd/
-#COPY configs configs/
 COPY internal internal/
 COPY pkg pkg/
 COPY tools tools/
+
+# Copy static files
+COPY statik/ statik/
+
+ADD Makefile .
+RUN make riotpot-builder
 
 # Run the command from the Makefile to build all the plugins
 # and build the project
 # -- Comment this line when on development if you know you have a ready to go version built --
 # Disclaimer: if you comment this line, be 100% sure that the binary can be run on linux
-COPY Makefile .
-RUN make builder
+FROM gcr.io/distroless/base-debian10
 
-FROM golang:1.18 as stage
-WORKDIR /app
+WORKDIR /
 
+# Copy the dependencies into the image
 # TODO: Copy the plugins
-COPY --from=stage $WORKING_DIR/pkg pkg/
-USER 1000
+COPY --from=builder /riotpot /riotpot
+EXPOSE 2022
 
 # Run RIoTPot
-ENTRYPOINT [ "." ]
+ENTRYPOINT [ "/riotpot" ]

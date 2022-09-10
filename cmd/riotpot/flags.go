@@ -48,7 +48,7 @@ func setupApi() *gin.Engine {
 	// - Credentials share
 	// - Preflight requests cached for 12 hours
 	router.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:3000", "http://127.0.0.1"}, // TODO: Change this to wherever the front-end is located!
+		AllowOrigins:     []string{"http://localhost:3000", "http://127.0.0.1", "http://0.0.0.0"}, // TODO: Change this to wherever the front-end is located!
 		AllowMethods:     []string{"OPTIONS", "PUT", "PATCH", "GET", "DELETE"},
 		AllowHeaders:     []string{"Origin", "Content-Type"},
 		ExposeHeaders:    []string{"Content-Length"},
