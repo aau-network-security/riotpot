@@ -6,6 +6,8 @@ on:
       - "**.md"
       - "./ui/**"
       - "**/release-ui.yml"
+    branches:
+      - "gsoc_2022"
   pull_request:
     paths-ignore:
       - "**.md"
@@ -51,6 +53,6 @@ jobs:
           distribution: goreleaser
           version: latest
           workdir: cmd/riotpot
-          args: release --rm-dist
+          args: release --rm-dist --nightly
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
