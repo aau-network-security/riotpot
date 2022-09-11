@@ -53,6 +53,6 @@ jobs:
           distribution: goreleaser
           version: latest
           workdir: cmd/riotpot
-          args: release --rm-dist --nightly
+          args: release --rm-dist
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
