@@ -47,10 +47,6 @@ services:
       context: ../..
       dockerfile: ./build/docker/Dockerfile
     restart: always # restart riotpot when it crashes
-    depends_on:
-      - database
-    links:
-      - database
     ports:
       # Ports under 60 might see errors when unquoted
       # https://stackoverflow.com/questions/58810789/quotes-on-docker-compose-yml-ports-make-any-difference
@@ -59,10 +55,11 @@ services:
       - "23:23"
       # - "80:80"
       - "502:502"
-      - "8080:8080"
       - "1883:1883"
-      - "5683:5683"
+      - "2022:2022" # API, Required for the UI
       - "27017:27017"
+      - "5683:5683"
+      - "8080:8080"
     env_file:
     - ../../build/env/.env
     networks:
