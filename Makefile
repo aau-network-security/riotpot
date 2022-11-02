@@ -18,7 +18,7 @@ riotpot-all:
 	riotpot-doc
 	riotpot-up
 riotpot-build:
-	go build -o /riotpot ./cmd/riotpot/.
+	go build -o ./riotpot ./cmd/riotpot/.
 riotpot-build-plugins: $(PLUGINS_DIR)/*
 	for folder in $^ ; do \
 		go build -buildmode=plugin -o $${folder}/plugin.so $${folder}/*.go; \
@@ -28,3 +28,4 @@ riotpot-builder: \
 	riotpot-build-plugins
 riotpot-ui:
 	@cd ui && serve -s build
+	
