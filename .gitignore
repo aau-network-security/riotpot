@@ -21,6 +21,7 @@ bin/
 .idea/
 .vscode/
 .DS_Store
+.dccache
 ## VSCode workspace file
 workspace*.code-*
 
