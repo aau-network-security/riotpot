@@ -75,21 +75,29 @@ services:
   mqtt:
     image: eclipse-mosquitto
     container_name: mqtt
+    ports:
+      - "1883:1883"
     <<: *protocol
 
   http:
     image: httpd
     container_name: http
+    ports:
+      - "80:80"
     <<: *protocol
 
   modbus:
     image: oitc/modbus-server
     container_name: modbus
+    ports:
+      - "502:502"
     <<: *protocol
 
   ocpp:
     image: ldonini/ocpp1.6-central-system # v1.6
     container_name: ocpp
+    ports:
+      - "443:443"
     <<: *protocol
 
 networks:
