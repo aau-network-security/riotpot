@@ -17,6 +17,7 @@ import (
 	"github.com/riotpot/api/service"
 	"github.com/riotpot/internal/globals"
 	"github.com/riotpot/internal/logger"
+	"github.com/riotpot/pkg"
 	"github.com/rs/zerolog"
 
 	_ "github.com/riotpot/statik"
@@ -35,8 +36,9 @@ var (
 )
 
 var (
-	debug  = flag.Bool("debug", true, "Set log level to debug")
-	runApi = flag.Bool("api", true, "Whether to start the API")
+	debug   = flag.Bool("debug", true, "Set log level to debug")
+	runApi  = flag.Bool("api", true, "Whether to start the API")
+	plugins = flag.Bool("plugins", true, "Whether to load the low-interaction honeypot plugins")
 )
 
 func setupApi() *gin.Engine {
@@ -79,6 +81,11 @@ func ParseFlags() {
 	// Set the logging level to debug
 	if *debug {
 		zerolog.SetGlobalLevel(zerolog.DebugLevel)
+	}
+
+	// Load the plugins
+	if *plugins {
+		pkg.LoadPlugins()
 	}
 
 	// Starts the API

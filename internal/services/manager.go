@@ -5,64 +5,15 @@ package services
 
 import (
 	"fmt"
-	"path/filepath"
-	"plugin"
 
 	"github.com/riotpot/internal/globals"
 	lr "github.com/riotpot/internal/logger"
-	"github.com/riotpot/tools/errors"
 	"golang.org/x/exp/slices"
 )
 
 var (
-	pluginPath = "pkg/plugin/*/*.so"
-	Services   = NewServiceManager(pluginPath)
+	Services = NewServiceManager()
 )
-
-// Function to get an stored service plugin.
-// Note: the symbol used to get the plugin is "Name", which must be present in
-// the plugin, and return type `Service` interface.
-// based on: https://echorand.me/posts/getting-started-with-golang-plugins/
-func getServicePlugin(path string) Service {
-
-	// Open the plugin within the path
-	pg, err := plugin.Open(path)
-	errors.Raise(err)
-
-	// check the name of the function that exports the service
-	// The plugin *Must* contain a variable called `Plugin`.
-	s, err := pg.Lookup("Plugin")
-	errors.Raise(err)
-
-	// log the name of the plugin being loaded
-	fmt.Printf("Loading plugin: %s...\n", *s.(*string))
-
-	// check if the reference symbol exists in the plugin
-	rf, err := pg.Lookup(*s.(*string))
-	errors.Raise(err)
-
-	// Load the service in a variable as the interface Service.
-	newservice := rf.(func() Service)()
-
-	return newservice
-}
-
-// Get the plugin services included in the app
-func pluginServices(pathLike string) (services []Service, err error) {
-	// Get the paths to the plugins
-	paths, err := filepath.Glob(pathLike)
-	if err != nil {
-		return
-	}
-
-	// Get the actual plugin and add it to the slice
-	for _, path := range paths {
-		service := getServicePlugin(path)
-		services = append(services, service)
-	}
-
-	return
-}
 
 func RemovableService(service Service) (isRemovable bool) {
 	// Add here the interfaces of services that should not be removable
@@ -77,7 +28,7 @@ func RemovableService(service Service) (isRemovable bool) {
 
 type ServiceManager interface {
 	// Register services
-	addService(services ...Service) (serv []Service, err error)
+	AddServices(services ...Service) (serv []Service, err error)
 
 	CreateService(name string, port int, network globals.Network, host string, interaction globals.Interaction) (Service, error)
 
@@ -87,11 +38,14 @@ type ServiceManager interface {
 	// Get the list of services by their name
 	GetServices() []Service
 
+	// Get the list of plugin IDs registered
+	GetPluginIDs() []string
+
 	// Get a single service
 	GetService(id string) (Service, error)
 
 	// Start the plugin services
-	Start(ids ...string) ([]Service, error)
+	Start(ids ...string) ([]Service, []error)
 }
 
 type ServiceManagerItem struct {
@@ -102,7 +56,7 @@ type ServiceManagerItem struct {
 }
 
 // Add a service to the services map if it did not exist
-func (se *ServiceManagerItem) addService(services ...Service) (serv []Service, err error) {
+func (se *ServiceManagerItem) AddServices(services ...Service) (serv []Service, err error) {
 	// Returns a list of ID strings
 	getServicesIDs := func(services []Service) (servs []string) {
 		for _, service := range services {
@@ -205,44 +159,37 @@ func (se *ServiceManagerItem) GetService(id string) (ret Service, err error) {
 	return
 }
 
-func (se *ServiceManagerItem) Start(ids ...string) (servs []Service, err error) {
+// Start each of the given Plugin Services by ID.
+// Returns both arrays of errors and the started services
+func (se *ServiceManagerItem) Start(ids ...string) (servs []Service, err []error) {
 	for _, id := range ids {
-		service, e := se.GetService(id)
+		serv, e := se.GetService(id)
 		if e != nil {
-			err = e
-			return
+			err = append(err, e)
 		}
 
-		i, ok := service.(*PluginServiceItem)
-		// If the service is not
+		i, ok := serv.(PluginService)
+		// If the service is not a plugin return an error
 		if !ok {
-			err = fmt.Errorf("service %s is can not be started", service.GetName())
-			return
+			err = append(err, fmt.Errorf("service %s can not be started", serv.GetName()))
 		}
 
 		// Run the service
-		i.Run()
-		servs = append(servs, i)
+		go i.Run()
+
+		lr.Log.Log().Msg(fmt.Sprintf("Service %s started", serv.GetName()))
+		servs = append(servs, serv)
 	}
 
 	return
 }
 
 // Create a new pointer to a supervisor
-func NewServiceManager(pluginPath string) (manager ServiceManager) {
+func NewServiceManager() (manager ServiceManager) {
 	// Initialise the manager
 	manager = &ServiceManagerItem{
 		services: []Service{},
 	}
-
-	// Discover the services available to riotpot (running and stopped)
-	services, err := pluginServices(pluginPath)
-	if err != nil {
-		lr.Log.Fatal().Err(err).Msgf("One or more services could not be found")
-	}
-
-	// Add/register the plugin services
-	manager.addService(services...)
 
 	return
 }
