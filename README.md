@@ -1,7 +1,7 @@
 <div align="center">
-  <img src="assets/aau_logo.png" height="100">
+  <img src="docs/assets/aau_logo.png" height="100">
   <p align="center">
-    <h2 align="center">RiotPot</h2>
+    <h2 align="center">RIoTPot</h2>
   </p>
   <p align="center">
     <!-- Workflow status -->
@@ -26,15 +26,34 @@ ___
 
 ## 1. Description
 
-RIoTPot is an interoperable high interaction honeypot, primarily focused on the emulation IoT and OT protocols, although, it is also capable of emulating other services. Alongside, it also supports low and hybrid interaction modes.
+RIoTPot is a hybrid interaction honeypot, primarily focused on the emulation IoT and OT protocols, although, it is also capable of emulating other services. 
+In essence, RIoTPot acts as a proxy service for other honeypots included in the system. 
+Therefore, you can run any honeypot and other services alongside RIoTPot. 
+In addition, there is an UI web-application that you can use to manage your routing.
 
-Services are loaded in the honeypot in form of plugins and containers making RIoTPot a modular, and very transportable honeypot. The services are loaded at runtime, meaning that the weight of the honeypot will vary on premises, and the services loaded e.g. HTTP, will only be used when required. As consequence, we highly recommend building your own binary customized to your own needs. Refer to the following section, Installation, for more information. Plugins are locally emulated binaries which mimic the protocol behavior. On the other hand, docker containers of a particular service acts as a sandboxed plugin.
+Moreover, riotpot comes with multiple low-interaction services ready to use. 
+Since these services are written as [plugins](https://pkg.go.dev/plugin), they are only supported on Linux, however, you can start riotpot without them.
+The following table contains the list of services included in riotpot by defaul, their internal port, and proxy port.
+
+<center>
+
+| Service | Internal Port | Proxy Port |
+|---------|---------------|------------|
+| Coap | 25683 | 5683 |
+| Echo | 20007 | 7 |
+| HTTP | 28080 | 8080 |
+| Modbus | 20502 | 502 |
+| MQTT | 21883 | 1883 |
+| SSH | 20022 | 22 |
+| Telnet | 20023 | 23 | 
+
+</center>
 
 ### 1.1 Architecture
 
 RIoTPot has a modular architecture that facilitates extensibility of the honeypot. The honeypot further offers a hybrid-interaction capability where users can choose the desired interaction levels for the protocols simulated. The image below shows the high/level architecture of RIoTPot.
 
-![alt text](assets/architecture.jpg "Architecture")
+![alt text](docs/assets/architecture.jpg "Architecture")
 
 The architecture contains 6 components.
 
@@ -184,7 +203,7 @@ $ docker ps
 
 One can also setup the Containerized RIoTPot through config file located at, `config/samples/configuration.yml`
 
-![Config file](assets/configuration_file.png)
+![Config file](docs/assets/configuration_file.png)
 
 By editing the `boot_plugins` tag, services to run as binaries inside can be provided, see `emulators` tag in the same configuration file to input allowed service plugins only
 

@@ -6,11 +6,11 @@ require (
 	github.com/gin-contrib/cors v1.4.0
 	github.com/google/uuid v1.3.0
 	github.com/plgd-dev/go-coap/v2 v2.6.0
-	github.com/stretchr/testify v1.8.0
+	github.com/stretchr/testify v1.8.1
 	github.com/traetox/pty v0.0.0-20141209045113-df6c8cd2e0e6
-	github.com/xiegeo/modbusone v0.2.4-0.20200428173500-797d647e237d
-	go.mongodb.org/mongo-driver v1.10.1
-	golang.org/x/crypto v0.0.0-20220829220503-c86fa9a7ed90
+	github.com/xiegeo/modbusone v1.0.1
+	go.mongodb.org/mongo-driver v1.11.0
+	golang.org/x/crypto v0.1.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
@@ -20,7 +20,7 @@ require (
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/go-playground/locales v0.14.0 // indirect
 	github.com/go-playground/universal-translator v0.18.0 // indirect
-	github.com/go-playground/validator/v10 v10.11.0 // indirect
+	github.com/go-playground/validator/v10 v10.11.1 // indirect
 	github.com/goccy/go-json v0.9.11 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/leodido/go-urn v1.2.1 // indirect
@@ -39,7 +39,7 @@ require (
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect
 	github.com/xdg-go/scram v1.1.1 // indirect
 	github.com/xdg-go/stringprep v1.0.3 // indirect
-	golang.org/x/text v0.3.7 // indirect
+	golang.org/x/text v0.4.0 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
@@ -47,15 +47,15 @@ require (
 require (
 	github.com/gin-gonic/gin v1.8.1
 	github.com/golang/snappy v0.0.4 // indirect
-	github.com/klauspost/compress v1.15.9 // indirect
+	github.com/klauspost/compress v1.15.12 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/pion/transport v0.13.1 // indirect
 	github.com/rakyll/statik v0.1.7
 	github.com/rs/zerolog v1.28.0
 	github.com/youmark/pkcs8 v0.0.0-20201027041543-1326539a0a0a // indirect
 	go.uber.org/atomic v1.10.0 // indirect
-	golang.org/x/exp v0.0.0-20220827204233-334a2380cb91
-	golang.org/x/net v0.0.0-20220826154423-83b083e8dc8b // indirect
-	golang.org/x/sync v0.0.0-20220819030929-7fc1605a5dde // indirect
-	golang.org/x/sys v0.0.0-20220829200755-d48e67d00261 // indirect
+	golang.org/x/exp v0.0.0-20221106115401-f9659909a136
+	golang.org/x/net v0.1.0 // indirect
+	golang.org/x/sync v0.1.0 // indirect
+	golang.org/x/sys v0.2.0 // indirect
 )

@@ -5,27 +5,29 @@ DOCKER=build/docker/
 PLUGINS_DIR=pkg/plugin
 
 # docker cmd below
-.PHONY:  riotpot-install docker-build-doc riotpot-doc riotpot-up riotpot-build riotpot-build-plugins riotpot-builder
+.PHONY:  docker-build-doc docker-doc-up up down up-all build build-plugins build-all ui
 docker-build-doc:
 	docker build -f $(DOCKER)Dockerfile.documentation . -t $(APPNAME)/v1
-riotpot-doc: docker-build-doc
+docker-doc-up: docker-build-doc
 	docker run -p 6060:6060 -it $(APPNAME)/v1
-riotpot-up:
-	docker-compose -p riotpot -f ${DEPLOY}docker-compose.yml up -d --build
-riotpot-down:
-	docker-compose -p riotpot -f ${DEPLOY}docker-compose.yml down -v
-riotpot-all:
+up:
+	docker-compose -p riotpot -f ${DOCKER}docker-compose.yaml up -d --build
+down:
+	docker-compose -p riotpot -f ${DOCKER}docker-compose.yaml down -v
+up-all:
 	riotpot-doc
 	riotpot-up
-riotpot-build:
-	go build -o ./riotpot ./cmd/riotpot/.
-riotpot-build-plugins: $(PLUGINS_DIR)/*
+build:
+	go build -gcflags='all=-N -l' -o ./bin ./cmd/riotpot/.
+build-plugins: $(PLUGINS_DIR)/*
 	for folder in $^ ; do \
-		go build -buildmode=plugin -o $${folder}/plugin.so $${folder}/*.go; \
+		result=$${folder%%+(/)}; \
+		result=$${result##*/}; \
+		result=$${result:-/}; \
+		go build -buildmode=plugin --mod=vendor -gcflags='all=-N -l' -o bin/plugins/$${result}.so $${folder}/*.go; \
 	done
-riotpot-builder: \
-	riotpot-build \
-	riotpot-build-plugins
-riotpot-ui:
+build-all: \
+	build \
+	build-plugins
+ui:
 	@cd ui && serve -s build
-	

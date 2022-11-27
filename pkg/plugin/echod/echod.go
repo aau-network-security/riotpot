@@ -22,7 +22,7 @@ func init() {
 	Plugin = "Echod"
 }
 
-func Echod() services.PluginService {
+func Echod() services.Service {
 	mx := services.NewPluginService(name, port, network)
 
 	return &Echo{
