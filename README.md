@@ -46,7 +46,7 @@ __Configuration & Orchestration__
 The configuration module provides RIoTPot with all the required parameters at startup. This includes the user preferences for specific protocols and profile simulation and the desired interaction level. The orchestration module is responsible for the network management from the core to the high-interaction protocol services simulated on containers. The received attack traffic is forwarded to the respective container that hosts the protocol on which the attack was targeted. Furthermore, the orchestra tor also facilitates the communication to the containers if they are hosted on a cloud-based environment.  
 
 __Attack Capture and Noise Filter__
-The  attack capture and  noise filter  module filters out the suspicious traffic received from Internet-wide scanners like Shodan and Censys. This helps the administrator to concentrate on attacks that are not from benign sources.
+The  attack capture and  noise filter  module filters out the suspicious traffic received from Internet-wide scanners like Criminalip, Shodan, Censys. This helps the administrator to concentrate on attacks that are not from benign sources.
 
 __Hybrid-Interaction (Low and High-Interaction modes)__
 RIoTPot is implemented in Go language \cite{go} and facilitates the modular architecture and development through packages. The packages act as plug-ins that can be added to the honeypot to extend the protocols simulated. RIoTPot offers a hybrid-interaction model with a preference of low- or high-interaction. 
@@ -59,17 +59,17 @@ The attack database stores all the attack traffic received on the honeypot. The 
 The Noise filter module of RIoTPot filters the attacks from internet scanning engines to reduce alert fatigue.
 With this feature, attacks are labelled as __*benign*__ when they originate from sources like Shodan. The 
 list of scanning services filtered by RIoTPot is below:
- 1. Shodan (https://www.shodan.io/)
- 2. Censys (https://censys.io/)
- 3. Project Sonar (https://www.rapid7.com/research/project-sonar/)
- 4. LeakIX (https://leakix.net/)
- 5. ShadowServer (https://www.shadowserver.org/)
- 6. RWTH Aachen (http://researchscan.comsys.rwth-aachen.de/)
- 7. Quadmetrics (https://www.quadmetrics.com/)
- 8. BinaryEdge (https://www.binaryedge.io/})
- 9. ipip.net (https://en.ipip.net/)
- 10. Arbor Observatory (https://www.arbor-observatory.com/)
- 11. CriminalIP (https://security.criminalip.com/)
+ 1. Criminalip (https://www.criminalip.io/)
+ 2. Shodan (https://www.shodan.io/)
+ 3. Censys (https://censys.io/)
+ 4. Project Sonar (https://www.rapid7.com/research/project-sonar/)
+ 5. LeakIX (https://leakix.net/)
+ 6. ShadowServer (https://www.shadowserver.org/)
+ 7. RWTH Aachen (http://researchscan.comsys.rwth-aachen.de/)
+ 8. Quadmetrics (https://www.quadmetrics.com/)
+ 9. BinaryEdge (https://www.binaryedge.io/})
+ 10. ipip.net (https://en.ipip.net/)
+ 11. Arbor Observatory (https://www.arbor-observatory.com/)
  12. BitSight (https://www.bitsight.com/)
  13. InterneTT (http://www.internettl.org/)
  14. ONYPHE (https://www.onyphe.io/)
