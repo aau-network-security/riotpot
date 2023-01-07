@@ -76,7 +76,7 @@ The API endpoints can be accessed through your browser at the location `localhos
 
 <div align="center" style="margin: 2em 0">
     <div style="max-width: 60%; text-align: justify; display: flex; flex-direction: column;">
-        <img src="docs/assets/new-architecture.png" style="background-color: #EDF2F4; border-radius: 4px; margin: 1em 0; box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);">
+        <img src="docs/assets/architecture.png" style="background-color: #EDF2F4; border-radius: 4px; margin: 1em 0; box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);">
         <div>
         <b>Figure 1.</b> RIoTPot Architecture, including the main application, external services and the webapp UI to manage RIoTPot instances.
         </div>
