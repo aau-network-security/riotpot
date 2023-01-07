@@ -232,7 +232,7 @@ The container can be setup in three simple steps:
     ```
 
 2. Navigate to the folder in where you have downloaded the RIoTPot source.
-3. With Docker running: ff you have Make installed, run the following command. Otherwise run a docker-compose command using the docker-compose file included in the `build/docker` folder.
+3. With Docker running: if you have Make installed, run the following command. Otherwise run a docker-compose command using the docker-compose file included in the `build/docker` folder.
     - With make
   
     ```bash
