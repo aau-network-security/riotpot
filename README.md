@@ -59,17 +59,18 @@ The logic used to determine how to handle the incomming attack is implemented in
 To manage services, middlewares and proxies, RIoTPot ships with a REST API [^api].
 The API endpoints can be accessed through your browser at the location `localhost:2022/api/swagger`, showing a [Swagger](https://swagger.io/) interface that allows you to manage the honeypot in real-time.
 
-> **_NOTE[^proxies]:_** Internal and surrounding services are not accessible through the Internet.
-> Internal services are integrated and only accessible to RIoTPot.
-> These services are loaded on-start and can not be deleted, but they can be stopped.
-> Surrounding services **must** be in the same network as RIoTPot.
-> External services **must** whitelist RIoTPot **only**.
+[^proxies]: **_NOTE:_**
+    Internal and surrounding services are not accessible through the Internet.
+    Internal services are integrated and only accessible to RIoTPot.
+    These services are loaded on-start and can not be deleted, but they can be stopped.
+    Surrounding services **must** be in the same network as RIoTPot.
+    External services **must** whitelist RIoTPot **only**.
 
-> **_NOTE[^middlewares]:_** Middlewares are currently under development.
+[^middlewares]: **_NOTE:_** Middlewares are currently under development.
 
-> **_NOTE[^api]:_** The RIoTPot API **must not** be exposed to the Internet.
-> Regardless, the API currently only accepts connections from the localhost.
-> This may be changed in the future, providing a whitelist of hosts and standard authentication.
+[^api]: **_NOTE:_** The RIoTPot API **must not** be exposed to the Internet.
+    Regardless, the API currently only accepts connections from the localhost.
+    This may be changed in the future, providing a whitelist of hosts and standard authentication.
 
 **Figure 1** shows the RIoTPot architecture, including the two main applications that constitute RIoTPot (RIoTPot itself, and RIoTPot UI) and their components, and a section to enclose external (or adjacent) services.
 
@@ -87,10 +88,10 @@ Each RIoTPot instance exposes registered proxies (based on their port) on demand
 To serve a proxy, it **must** have a binded service and the proxy port **must** be available (currently, RIoTPot does not accept multiple services running in the same port).
 When a proxy has been binded and served, attackers will be able to send messages to RIoTPot on that port, relying the messages to the binded service and back to the attacker[^reversed].
 
-> **_NOTE[^os]:_** While the base application is interoperable, internal services (plugins) can only be used in [Linux, FreeBSD and macOS environments](https://pkg.go.dev/plugin).
-> We plan to overcome this limitation by replacing plugins with micro-services communicating through [gRPC](https://grpc.io/).
+[^os]: **_NOTE:_** While the base application is interoperable, internal services (plugins) can only be used in [Linux, FreeBSD and macOS environments](https://pkg.go.dev/plugin).
+    We plan to overcome this limitation by replacing plugins with micro-services communicating through [gRPC](https://grpc.io/).
 
-> **_NOTE[^reversed]:_** For ethical and security reasons, RIoTPot does not allow unsolicited requests to the outside, i.e., reversed shells and the like are not allowed.
+[^reversed]: **_NOTE:_** For ethical and security reasons, RIoTPot does not allow unsolicited requests to the outside, i.e., reversed shells and the like are not allowed.
 
 For ease of access, multiple instances of RIoTPot can be managed from the RIoTPot UI webapp.
 In addition to managing the proxies registered in each instance, the UI allows you to create, use and edit `profiles`.
