@@ -2,7 +2,7 @@
 # RIoTPoT
 
 <!-- markdownlint-disable MD033 -->
-<center style="box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25); background-color: #EDF2F4; border-radius: 4px; margin: 2em 0;">
+<div align="center" style="box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25); background-color: #EDF2F4; border-radius: 4px; margin: 2em 0;">
   <img src="docs/assets/aau_logo.png" height="100px;" style="margin: 1em 0; padding: 1em;">
   <div>
     <!-- Workflow status -->
@@ -19,7 +19,7 @@
         <img src="https://img.shields.io/github/release/RIoTPot/project-layout.svg?style=flat-square">
     </a>
   </div>
-</center>
+</div>
 
 RIoTPot is a hybrid interaction honeypot, primarily focused on the emulation IoT and OT protocols, although, it is also capable of emulating other services.
 In essence, RIoTPot acts as a proxy service for other honeypots included in the system.
@@ -30,7 +30,7 @@ Moreover, RIoTPot comes with multiple low-interaction services ready to use.
 Since these services are written as [plugins](https://pkg.go.dev/plugin), they are only supported on Linux; however, you can start RIoTPot without them.
 The following table contains the list of services included in RIoTPot by defaul, their internal port, and proxy port.
 
-<center>
+<div align="center">
 
 | Service | Internal Port | Proxy Port |
 | ------- | ------------- | ---------- |
@@ -42,7 +42,7 @@ The following table contains the list of services included in RIoTPot by defaul,
 | SSH     | 20022         | 22         |
 | Telnet  | 20023         | 23         |
 
-</center>
+</div>
 
 > ## Table of Contents
 >
@@ -73,14 +73,14 @@ The API endpoints can be accessed through your browser at the location `localhos
 
 **Figure 1** shows the RIoTPot architecture, including the two main applications that constitute RIoTPot (RIoTPot itself, and RIoTPot UI) and their components, and a section to enclose external (or adjacent) services.
 
-<center style="margin: 2em 0">
+<div align="center" style="margin: 2em 0">
     <div style="max-width: 60%; text-align: justify; display: flex; flex-direction: column;">
         <img src="docs/assets/new-architecture.png" style="background-color: #EDF2F4; border-radius: 4px; margin: 1em 0; box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);">
         <div>
         <b>Figure 1.</b> RIoTPot Architecture, including the main application, external services and the webapp UI to manage RIoTPot instances.
         </div>
     </div>
-</center>
+</div>
 
 RIoTPot is written in [Golang](https://go.dev/)[^os].
 Each RIoTPot instance exposes registered proxies (based on their port) on demand.
@@ -196,7 +196,7 @@ The following table summarises the list of services and applications packed in t
 <blockquote>
 <details>
 <summary><b>Services</b></summary>
-<center>
+<div align="center">
 
 | Service | Image                  | Port | Details                                    |
 | ------- | ---------------------- | ---- | ------------------------------------------ |
@@ -205,18 +205,18 @@ The following table summarises the list of services and applications packed in t
 | Modbus  | oitc/modbus-server     | 502  | Modbus Server                              |
 | OCPP    | ocpp1.6-central-system | 443  | OCPP v1.6 (used in cars charging stations) |
 
-</center>
+</div>
 </details>
 
 <details>
 <summary><b>Applications</b></summary>
-<center>
+<div align="center">
 
 | Application | Image           | Details                                                   |
 | ----------- | --------------- | --------------------------------------------------------- |
 | TCPDump     | kaazing/tcpdump | Packet recorder. It stores network traffic in .pcap files |
 
-</center>
+</div>
 </details>
 </blockquote>
 
