@@ -165,7 +165,7 @@ It is important to keep this folder structure for RIoTPot to work as intended.
 
 </details>
 
-<details open>
+<details>
     <summary><b>Docker (Virtualisation)</b></summary>
 
 > **_Info_:** This guide is meant for advanced users who prefer to use RIoTPot in a virtual environment.
