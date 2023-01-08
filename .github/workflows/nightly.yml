@@ -1,9 +1,7 @@
-name: Releaser
-
+name: "Daily build"
 on:
-  pull_request:
-    paths-ignore:
-      - "**.md"
+  schedule:
+    - cron: "0 0 * * *"
 
 jobs:
   riotpot:
@@ -16,6 +14,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
+          ref: staging
           fetch-depth: 0
 
       - name: Fetch all tags
@@ -58,6 +57,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
+          ref: staging
           fetch-depth: 0
 
       - name: Use Node.js ${{ matrix.node-version }}
@@ -102,11 +102,12 @@ jobs:
         working-directory: artifacts
         run: zip -r riotpot.zip riotpot
 
-      - name: Release Main Latest
+      # Nightly
+      - name: Release Nightly
         uses: softprops/action-gh-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        if: startsWith(github.ref, 'refs/tags/') && github.ref_name == 'main' && github.event_name == 'pull_request'
         with:
-          name: latest
+          name: nightly
           files: artifacts/riotpot.zip
+          prerelease: true

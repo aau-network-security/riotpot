@@ -23,7 +23,7 @@ up-all:
 	riotpot-doc
 	riotpot-up
 build:
-	go build -gcflags='all=-N -l' -o ./bin ./cmd/riotpot/.
+	go build -gcflags='all=-N -l' -o ./bin/ ./cmd/riotpot/.
 build-plugins: $(PLUGINS_DIR)/*
 	exclude=${exclude_plugins_list}; \
 	for folder in $^ ; do \

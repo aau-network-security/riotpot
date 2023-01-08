@@ -66,9 +66,11 @@ The API endpoints can be accessed through your browser at the location `localhos
     Surrounding services **must** be in the same network as RIoTPot.
     External services **must** whitelist RIoTPot **only**.
 
-[^middlewares]: **_NOTE:_** Middlewares are currently under development.
+[^middlewares]: **_NOTE:_**
+    Middlewares are currently under development.
 
-[^api]: **_NOTE:_** The RIoTPot API **must not** be exposed to the Internet.
+[^api]: **_NOTE:_**
+    The RIoTPot API **must not** be exposed to the Internet.
     Regardless, the API currently only accepts connections from the localhost.
     This may be changed in the future, providing a whitelist of hosts and standard authentication.
 
@@ -112,8 +114,13 @@ Overall, you have three options.
 
 > **_Info_:** This guide is meant for users with no special needs, who want a simple out-of-the-box experience.
 
-Each release comes in a folder named `bin` with an executable (also) named `riotpot`, a `plugins` folder filled with multiple services (or low-interaction honeypots), and a folder named `ui` containing the UI server files.
-It is important to keep this folder structure for RIoTPot to work as intended.
+Each release comes in a folder named `riotpot` with an executable (also) named `riotpot`, a `plugins` folder filled with multiple services (or low-interaction honeypots), and a folder named `ui` containing the UI server files.
+It is important to keep the internal folder structure for RIoTPot to work as intended.
+
+    📁 riotpot
+        ┕ riotpot
+        ┕ 📁 plugins
+        ┕ 📁 ui
 
 ---
 

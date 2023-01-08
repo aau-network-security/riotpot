@@ -24,7 +24,6 @@ COPY statik/ statik/
 
 ADD Makefile .
 
-RUN mkdir bin
 RUN make build-all
 
 # Run the command from the Makefile to build all the plugins
