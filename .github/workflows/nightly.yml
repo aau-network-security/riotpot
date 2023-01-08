@@ -1,4 +1,4 @@
-name: "Daily build"
+name: Nightly
 on:
   schedule:
     - cron: "0 0 * * *"
