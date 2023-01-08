@@ -2,7 +2,7 @@ FROM golang:1.18 as builder
 LABEL maintainer="Shreyas Srinivasa <shsr@es.aau.dk>"
 
 # Set the working directory to golang working space
-WORKDIR /app
+WORKDIR /riotpot
 
 # Copy the dependencies into the image
 COPY go.mod ./
@@ -23,7 +23,9 @@ COPY tools tools/
 COPY statik/ statik/
 
 ADD Makefile .
-RUN make riotpot-builder
+
+RUN mkdir bin
+RUN make build-all
 
 # Run the command from the Makefile to build all the plugins
 # and build the project
@@ -31,12 +33,12 @@ RUN make riotpot-builder
 # Disclaimer: if you comment this line, be 100% sure that the binary can be run on linux
 FROM gcr.io/distroless/base-debian10
 
-WORKDIR /
+ENV GIN_MODE=release
+
+WORKDIR /riotpot
 
 # Copy the dependencies into the image
-# TODO: Copy the plugins
-COPY --from=builder /riotpot /riotpot
+COPY --from=builder /riotpot/bin/ ./
 EXPOSE 2022
 
-# Run RIoTPot
-ENTRYPOINT [ "/riotpot" ]
+ENTRYPOINT ["./riotpot"]

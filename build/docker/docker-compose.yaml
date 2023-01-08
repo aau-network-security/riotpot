@@ -23,6 +23,7 @@ services:
   # in the network
   tcpdump:
     image: kaazing/tcpdump
+    container_name: tcpdump
     network_mode: "host"
     volumes:
       - ../tcpdump:/tcpdump
@@ -65,6 +66,17 @@ services:
     networks:
       honeypot:
       default:
+      ui:
+
+  ui:
+    container_name: ui
+    build:
+      context: ../..
+      dockerfile: ./build/docker/Dockerfile.ui
+    ports:
+      - "3000:3000"
+    networks:
+      ui:
 
   ##########################################
   # PROTOCOLS
@@ -102,3 +114,4 @@ services:
 
 networks:
   honeypot:
+  ui:

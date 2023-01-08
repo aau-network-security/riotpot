@@ -1,8 +1,13 @@
+SHELL := /bin/bash
+
 # Makefile
 APPNAME=riotpot
-DEPLOY=deployments/
 DOCKER=build/docker/
 PLUGINS_DIR=pkg/plugin
+EXCLUDE_PLUGINS= sshd
+
+##
+exclude_plugins_list := $(subst ., ,$(EXCLUDE_PLUGINS))
 
 # docker cmd below
 .PHONY:  docker-build-doc docker-doc-up up down up-all build build-plugins build-all ui
@@ -20,11 +25,14 @@ up-all:
 build:
 	go build -gcflags='all=-N -l' -o ./bin ./cmd/riotpot/.
 build-plugins: $(PLUGINS_DIR)/*
+	exclude=${exclude_plugins_list}; \
 	for folder in $^ ; do \
 		result=$${folder%%+(/)}; \
 		result=$${result##*/}; \
 		result=$${result:-/}; \
-		go build -buildmode=plugin --mod=vendor -gcflags='all=-N -l' -o bin/plugins/$${result}.so $${folder}/*.go; \
+		if ! [[ $${exclude[*]} =~ "$${result}" ]]; then \
+			go build -buildmode=plugin --mod=mod -gcflags='all=-N -l' -o bin/plugins/$${result}.so $${folder}/*.go; \
+		fi \
 	done
 build-all: \
 	build \

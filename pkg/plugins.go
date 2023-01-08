@@ -12,7 +12,7 @@ import (
 )
 
 var (
-	pluginPath   = "bin/plugins/*.so"
+	pluginPath   = "plugins/*.so"
 	pluginOffset = 20_000
 )
 

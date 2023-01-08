@@ -112,7 +112,7 @@ Overall, you have three options.
 
 > **_Info_:** This guide is meant for users with no special needs, who want a simple out-of-the-box experience.
 
-Each release comes in a folder named `riotpot` with an executable (also) named `riotpot`, a `plugins` folder filled with multiple services (or low-interaction honeypots), and a folder named `ui` containing the UI server files.
+Each release comes in a folder named `bin` with an executable (also) named `riotpot`, a `plugins` folder filled with multiple services (or low-interaction honeypots), and a folder named `ui` containing the UI server files.
 It is important to keep this folder structure for RIoTPot to work as intended.
 
 ---
