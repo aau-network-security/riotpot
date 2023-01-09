@@ -7,6 +7,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/gin-contrib/cors"
@@ -36,12 +37,13 @@ var (
 )
 
 var (
-	debug   = flag.Bool("debug", true, "Set log level to debug")
-	runApi  = flag.Bool("api", true, "Whether to start the API")
-	plugins = flag.Bool("plugins", true, "Whether to load the low-interaction honeypot plugins")
+	debug        = flag.Bool("debug", true, "Set log level to debug")
+	runApi       = flag.Bool("api", true, "Whether to start the API")
+	plugins      = flag.Bool("plugins", true, "Whether to load the low-interaction honeypot plugins")
+	allowedHosts = flag.String("whitelist", "http://127.0.0.1,http://localhost:3000", "List of allowed hosts to contact the API")
 )
 
-func setupApi() *gin.Engine {
+func setupApi(allowedHosts []string) *gin.Engine {
 	// Create a router
 	router := gin.Default()
 
@@ -50,7 +52,7 @@ func setupApi() *gin.Engine {
 	// - Credentials share
 	// - Preflight requests cached for 12 hours
 	router.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:3000", "http://127.0.0.1", "http://0.0.0.0"}, // TODO: Change this to wherever the front-end is located!
+		AllowOrigins:     allowedHosts,
 		AllowMethods:     []string{"OPTIONS", "PUT", "PATCH", "GET", "DELETE"},
 		AllowHeaders:     []string{"Origin", "Content-Type"},
 		ExposeHeaders:    []string{"Content-Length"},
@@ -71,7 +73,6 @@ func setupApi() *gin.Engine {
 	}
 
 	// Serve the Swagger UI files in the root of the api
-	// TODO: [7/24/2022] Use Pakr or Statik to bundle non-golang files into the binary
 	root.StaticFS("swagger", statikFS)
 
 	return router
@@ -91,7 +92,10 @@ func ParseFlags() {
 	// Starts the API
 	if *runApi {
 		// Serve the API
-		api := setupApi()
-		api.Run(fmt.Sprintf("%s:%s", globals.ApiHost, globals.ApiPort))
+		whitelist := strings.Split(*allowedHosts, ",")
+		api := setupApi(whitelist)
+
+		apiAddress := fmt.Sprintf("%s:%s", globals.ApiHost, globals.ApiPort)
+		api.Run(apiAddress)
 	}
 }

@@ -38,6 +38,8 @@ WORKDIR /riotpot
 
 # Copy the dependencies into the image
 COPY --from=builder /riotpot/bin/ ./
+
+# API, required for the UI.
 EXPOSE 2022
 
-ENTRYPOINT ["./riotpot"]
+CMD ["./riotpot"]

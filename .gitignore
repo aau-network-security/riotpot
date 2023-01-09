@@ -32,7 +32,7 @@ workspace*.code-*
 *.so
 
 # TCPdump
-/tcpdump/
+build/tcpdump/
 
 # whatever the rules are, include all the `.md` files
 !*.md

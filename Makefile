@@ -4,10 +4,7 @@ SHELL := /bin/bash
 APPNAME=riotpot
 DOCKER=build/docker/
 PLUGINS_DIR=pkg/plugin
-EXCLUDE_PLUGINS= sshd
-
-##
-exclude_plugins_list := $(subst ., ,$(EXCLUDE_PLUGINS))
+EXCLUDE_PLUGINS= sshd modbusd echod coapd telnetd mqttd httpd
 
 # docker cmd below
 .PHONY:  docker-build-doc docker-doc-up up down up-all build build-plugins build-all ui
@@ -25,7 +22,7 @@ up-all:
 build:
 	go build -gcflags='all=-N -l' -o ./bin/ ./cmd/riotpot/.
 build-plugins: $(PLUGINS_DIR)/*
-	exclude=${exclude_plugins_list}; \
+	IFS=' ' read -r -a exclude <<< "${EXCLUDE_PLUGINS}"; \
 	for folder in $^ ; do \
 		result=$${folder%%+(/)}; \
 		result=$${result##*/}; \

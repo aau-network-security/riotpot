@@ -46,7 +46,7 @@ services:
     container_name: riotpot
     build:
       context: ../..
-      dockerfile: ./build/docker/Dockerfile
+      dockerfile: ./build/docker/Dockerfile.riotpot
     restart: always # restart riotpot when it crashes
     ports:
       # Ports under 60 might see errors when unquoted
@@ -54,15 +54,15 @@ services:
       - "7:7"
       # - "22:22"
       - "23:23"
-      # - "80:80"
+      - "80:80"
       - "502:502"
       - "1883:1883"
-      - "2022:2022" # API, Required for the UI
+      - "2022:2022" # Required for the REST API
       - "27017:27017"
       - "5683:5683"
       - "8080:8080"
-    env_file:
-    - ../../build/env/.env
+    environment:
+      - API_HOST=0.0.0.0
     networks:
       honeypot:
       default:
