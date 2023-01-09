@@ -9,14 +9,15 @@ import (
 )
 
 var (
-	settings = cfg.Settings{}
+	settings = cfg.Configuration{}
 	path     = "./configuration_test.yml"
 )
 
 // Test loading and saving configuration from a file to another
+// TODO: Since the test is broken the real function has not been tested. Change this.
 func TestLoadAndSaveConf(t *testing.T) {
 	// load the configuration
-	err := settings.Load(path)
+	err := settings.Load()
 	if err != nil {
 		t.Error(err)
 	}
@@ -30,7 +31,7 @@ func TestLoadAndSaveConf(t *testing.T) {
 	t.Logf("%s\n", string(out))
 
 	// save the configuration
-	err = settings.Save(path)
+	err = settings.Save()
 	if err != nil {
 		t.Error(err)
 	}

@@ -1,0 +1,54 @@
+openapi: 3.0.2
+
+info:
+  title: RIoTPoT API
+  version: "1.0"
+  contact:
+    email: ricardoyaben@gmail.com
+    name: Ricardo Yaben
+  license:
+    name: MIT
+    url: https://choosealicense.com/licenses/mit/
+
+servers:
+  - url: http://{host}:{port}/api
+    description: API path for riotpot
+    variables:
+      host:
+        default: "localhost"
+      port:
+        enum:
+          - "2022"
+        default: "2022"
+
+tags:
+  - name: Proxies
+  - name: Services
+
+components:
+  schemas:
+    Px:
+      $ref: Px.yaml
+    Proxy:
+      $ref: Proxy.yaml
+    Service:
+      $ref: Service.yaml
+
+paths:
+  # Proxies
+  /proxies:
+    $ref: proxies.yaml#/~1
+  /proxies/{id}:
+    $ref: proxies.yaml#/~1{id}
+  /proxies/{id}/status:
+    $ref: proxies.yaml#/~1{id}~1status
+  /proxies/{id}/port:
+    $ref: proxies.yaml#/~1{id}~1port
+
+  # Services
+  /services:
+    $ref: services.yaml#/~1
+  /services/{id}:
+    $ref: services.yaml#/~1{id}
+  /services/new:
+    $ref: services.yaml#/~1new

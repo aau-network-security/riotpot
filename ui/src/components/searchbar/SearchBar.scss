@@ -1,0 +1,27 @@
+@import "../../styles";
+
+@mixin searchBar {
+    div.searchBar{
+        position: relative;
+
+        .icon{
+            position: absolute;
+            box-sizing:border-box;
+            transform: translateY(-50%);
+            top:50%;
+            left: .5rem;
+        }
+
+        input{
+            @include component;
+            background: none;
+            color: $color;
+            padding-left: 2rem;
+            padding-top: 5px;
+            padding-bottom: 5px;
+            width: -webkit-fill-available;
+        }
+    }
+}
+
+@include searchBar;

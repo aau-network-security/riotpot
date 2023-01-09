@@ -21,6 +21,7 @@ bin/
 .idea/
 .vscode/
 .DS_Store
+.dccache
 ## VSCode workspace file
 workspace*.code-*
 
@@ -33,11 +34,8 @@ workspace*.code-*
 # TCPdump
 /tcpdump/
 
-# Keys for the SSH connections
-configs/keys/*
-
 # whatever the rules are, include all the `.md` files
 !*.md
 
-# Remove the riotpot binary
-riotpot
+# Remove the local samples
+local

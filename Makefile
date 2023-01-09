@@ -1,34 +1,41 @@
+SHELL := /bin/bash
+
 # Makefile
 APPNAME=riotpot
-CURRENT_DIR=`pwd`
-PACKAGE_DIRS=`go list -e ./... | egrep -v "binary_output_dir|.git|mocks"`
-DEPLOY=deployments/
 DOCKER=build/docker/
 PLUGINS_DIR=pkg/plugin
+EXCLUDE_PLUGINS= sshd
+
+##
+exclude_plugins_list := $(subst ., ,$(EXCLUDE_PLUGINS))
 
 # docker cmd below
-.PHONY:  docker-build-doc riotpot-doc riotpot-up riotpot-prod-up riotpot-prod-down riotpot-build riotpot-build-plugins riotpot-builder
+.PHONY:  docker-build-doc docker-doc-up up down up-all build build-plugins build-all ui
 docker-build-doc:
 	docker build -f $(DOCKER)Dockerfile.documentation . -t $(APPNAME)/v1
-riotpot-doc: docker-build-doc
+docker-doc-up: docker-build-doc
 	docker run -p 6060:6060 -it $(APPNAME)/v1
-riotpot-up:
-	docker-compose -p riotpot -f ${DEPLOY}docker-compose.yml up -d --build
-riotpot-down:
-	docker-compose -p riotpot -f ${DEPLOY}docker-compose.yml down -v
-riotpot-prod-up:
-	docker-compose -p riotpot -f ${DEPLOY}docker-compose.prod.yml up -d --build
-riotpot--prod-down:
-	docker-compose -p riotpot -f ${DEPLOY}docker-compose.prod.yml down -v
-riotpot-all:
+up:
+	docker-compose -p riotpot -f ${DOCKER}docker-compose.yaml up -d --build
+down:
+	docker-compose -p riotpot -f ${DOCKER}docker-compose.yaml down -v
+up-all:
 	riotpot-doc
 	riotpot-up
-riotpot-build:
-	go build -o riotpot cmd/riotpot/main.go;
-riotpot-build-plugins: $(PLUGINS_DIR)/*
+build:
+	go build -gcflags='all=-N -l' -o ./bin/ ./cmd/riotpot/.
+build-plugins: $(PLUGINS_DIR)/*
+	exclude=${exclude_plugins_list}; \
 	for folder in $^ ; do \
-		go build -buildmode=plugin -o $${folder}/plugin.so $${folder}/*.go; \
+		result=$${folder%%+(/)}; \
+		result=$${result##*/}; \
+		result=$${result:-/}; \
+		if ! [[ $${exclude[*]} =~ "$${result}" ]]; then \
+			go build -buildmode=plugin --mod=mod -gcflags='all=-N -l' -o bin/plugins/$${result}.so $${folder}/*.go; \
+		fi \
 	done
-riotpot-builder: \
-	riotpot-build \
-	riotpot-build-plugins
+build-all: \
+	build \
+	build-plugins
+ui:
+	@cd ui && serve -s build

@@ -1,0 +1,45 @@
+@import "../../styles";
+
+@mixin table{
+    table{
+        @include component;
+        border-collapse: separate !important;
+        border-spacing: 0;
+        width: -webkit-fill-available;
+
+        thead{
+            background: $background-light;
+            border-bottom: 1px solid $border-dark;
+            border-radius: $radius $radius 0px 0px;
+        }
+
+        tr.tableRow{
+            &:not(:last-child){
+                td.tableCell{
+                    border-bottom: 1px solid $border-dark;
+                }
+            }
+        }
+
+        tr.tableHeaders{
+            th.tableCell{
+                border-bottom: 1px solid $border-dark;
+
+                &:first-child{
+                    border-radius: 2px 0 0 0;
+                }
+
+                &:last-child{
+                    border-radius: 0 2px 0 0;
+                }
+            }
+        }
+        
+        td.tableCell, th.tableCell {
+            text-align: left;
+            padding: 10px;
+        }
+    }
+}
+
+@include table

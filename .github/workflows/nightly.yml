@@ -1,0 +1,113 @@
+name: Nightly
+on:
+  schedule:
+    - cron: "0 0 * * *"
+
+jobs:
+  riotpot:
+    strategy:
+      matrix:
+        go-version: [1.18]
+        os: [ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: staging
+          fetch-depth: 0
+
+      - name: Fetch all tags
+        run: git fetch --force --tags
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: ${{ matrix.go-version }}
+
+      - name: Cache Go modules
+        uses: actions/cache@v3
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+
+      - name: Build application
+        run: make build-all
+
+      - name: Archive production artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: riotpot
+          path: bin
+          if-no-files-found: error
+
+  ui:
+    defaults:
+      run:
+        working-directory: ./ui
+    strategy:
+      matrix:
+        node-version: [19.x]
+        os: [ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    needs: riotpot
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: staging
+          fetch-depth: 0
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          cache: "npm"
+          node-version: ${{ matrix.node-version }}
+          cache-dependency-path: "ui/package-lock.json"
+
+      # Create the build folder
+      - run: npm ci
+      - run: CI=false npm run build --if-present
+
+      # Move the new build folder so we can add it as a folder to the artifact
+      - name: Move build
+        working-directory: ./ui
+        run: |
+          mkdir -p riotpot-ui/ui
+          mv build/* riotpot-ui/ui
+
+      # Create a release
+      - name: Archive production artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: riotpot
+          path: ui/riotpot-ui
+          if-no-files-found: error
+
+  release:
+    permissions:
+      contents: write
+    needs: ui
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all workflow run artifacts
+        uses: actions/download-artifact@v3
+        id: download
+        with:
+          path: artifacts
+
+      - name: Zip content
+        working-directory: artifacts
+        run: zip -r riotpot.zip riotpot
+
+      # Nightly
+      - name: Release Nightly
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          name: nightly
+          files: artifacts/riotpot.zip
+          prerelease: true

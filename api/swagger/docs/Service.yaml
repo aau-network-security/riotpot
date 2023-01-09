@@ -1,0 +1,22 @@
+type: object
+allOf:
+  - $ref: Px.yaml
+properties:
+  name:
+    type: string
+    example: Service1
+    description: Name of the service
+  host:
+    type: string
+    example: 0.0.0.0
+    description: Address in where the service is situated
+  locked:
+    type: boolean
+    example: false
+    description: >-
+      Whether the service can be deleted. This property is fixated for
+      Plugins
+  interaction:
+    type: string
+    example: low
+    description: Interaction level of the honeypot

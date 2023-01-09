@@ -1,0 +1,61 @@
+@import "../../styles";
+
+@mixin Info{
+    small.info{
+        gap: 5px;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        padding: 5px 0px;
+        cursor: pointer;
+
+        &:hover{
+            color: $color-hover;
+
+            svg {
+                fill: $color-hover;
+            }
+        }
+    }
+
+    div.address{
+        div, span, input{
+            @include component;
+            background: transparent;
+            border-color: $border-dark;
+        }
+    }
+
+    span.proxy-info{
+        @include component;
+        border-color: $border-dark;
+        gap: 10px;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        padding: 0 5px;
+
+        svg{
+            fill: $color-dim;
+        }
+    }
+
+    button.service-running{
+        *{
+            fill: $background-dark
+        }
+
+        &.active{
+            
+            &.running-false{
+                background-color: $color-red;
+            }
+
+            &.running-true{
+                background-color: $color-graph;
+            }
+        }
+    }
+}
+
+@include Info
