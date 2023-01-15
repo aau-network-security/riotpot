@@ -215,7 +215,7 @@ func handler() modbusone.ProtocolHandler {
 		// It might be that an "slave" wants to report an error
 		// we want to gather that information as well.
 		OnErrorImp: func(req modbusone.PDU, errRep modbusone.PDU) {
-			fmt.Printf("error received: %v from req: %v\n", errRep, req)
+			logger.Log.Error().Msgf("error received: %v from req: %v\n", errRep, req)
 		},
 	}
 }

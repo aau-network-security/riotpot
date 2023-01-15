@@ -18,7 +18,6 @@ workspace*.code-*
 
 # Transit folders
 /vendor/
-/statik/
 /bin/
 
 # whatever the rules are, include all the `.md` files

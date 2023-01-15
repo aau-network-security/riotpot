@@ -1,7 +1,6 @@
 package plugins
 
 import (
-	"fmt"
 	"path/filepath"
 	"plugin"
 
@@ -31,7 +30,7 @@ func getServicePlugin(path string) services.Service {
 	logger.Log.Fatal().Err(err)
 
 	// log the name of the plugin being loaded
-	fmt.Printf("Loading plugin: %s...\n", *s.(*string))
+	logger.Log.Info().Msgf("Loading plugin: %s...\n", *s.(*string))
 
 	// check if the reference symbol exists in the plugin
 	rf, err := pg.Lookup(*s.(*string))

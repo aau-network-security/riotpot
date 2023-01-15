@@ -64,7 +64,6 @@ func (t *Telnet) Run() (err error) {
 
 func (t *Telnet) serve(ch chan net.Conn, listener net.Listener) {
 	// open an infinite loop to receive connections
-	fmt.Printf("[%s] Started listenning for connections in port %d\n", t.GetName(), t.GetPort())
 	for {
 		// Accept the client connection
 		client, err := listener.Accept()

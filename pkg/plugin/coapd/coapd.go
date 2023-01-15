@@ -19,9 +19,8 @@ import (
 	"github.com/plgd-dev/go-coap/v2/message/codes"
 	"github.com/plgd-dev/go-coap/v2/mux"
 	"github.com/riotpot/internal/globals"
+	"github.com/riotpot/internal/logger"
 	"github.com/riotpot/internal/services"
-
-	lr "github.com/riotpot/internal/logger"
 )
 
 var Plugin string
@@ -91,7 +90,7 @@ func (c *Coap) loggingMiddleware(next mux.Handler) mux.Handler {
 func (c *Coap) observeHandler(w mux.ResponseWriter, req *mux.Message) {
 	path, err := req.Options.Path()
 	if err != nil {
-		fmt.Print(err)
+		logger.Log.Error().Err(err)
 	}
 
 	// divide the path query into /<topic/sub>/?<flag>=<query>
@@ -124,7 +123,7 @@ func (c *Coap) observeHandler(w mux.ResponseWriter, req *mux.Message) {
 		// subscription.
 		obs, err := req.Options.Observe()
 		if err != nil {
-			fmt.Print(err)
+			logger.Log.Error().Err(err)
 		}
 
 		topic := c.Profile.GetOrCreateTopic(path, "number")
@@ -164,7 +163,7 @@ func (c *Coap) observeHandler(w mux.ResponseWriter, req *mux.Message) {
 	}
 
 	if err != nil {
-		lr.Log.Error().Err(err).Msg("Error on transmitter")
+		logger.Log.Error().Err(err).Msg("Error on transmitter")
 	}
 }
 
@@ -220,7 +219,7 @@ func (c *Coap) discovery(cc mux.Client, token []byte, path string, flag string, 
 		buf = append(buf, make([]byte, n)...)
 		opts, _, err = opts.SetContentFormat(buf, message.AppLinkFormat)
 		if err != nil {
-			lr.Log.Error().Err(err).Msg("Error on transmitter")
+			logger.Log.Error().Err(err).Msg("Error on transmitter")
 		}
 	}
 
@@ -263,7 +262,7 @@ func (c *Coap) post(cc mux.Client, token []byte, path string) error {
 		buf = append(buf, make([]byte, n)...)
 		opts, _, err = opts.SetContentFormat(buf, message.AppLinkFormat)
 		if err != nil {
-			lr.Log.Error().Err(err).Msg("Error on transmitter")
+			logger.Log.Error().Err(err).Msg("Error on transmitter")
 		}
 	}
 
@@ -348,7 +347,7 @@ func (c *Coap) periodicTransmitter(cc mux.Client, token []byte, topic Topic) {
 			msg := c.msg(topic)
 			err := c.get(cc, token, msg, obs)
 			if err != nil {
-				lr.Log.Error().Err(err).Msg("Error on transmitter. Shutting down.")
+				logger.Log.Error().Err(err).Msg("Error on transmitter. Shutting down.")
 				return
 			}
 
