@@ -34,13 +34,13 @@ The following table contains the list of services included in RIoTPot by defaul,
 
 | Service | Internal Port | Proxy Port |
 | ------- | ------------- | ---------- |
-| Coap    | 25683         | 5683       |
 | Echo    | 20007         | 7          |
-| HTTP    | 28080         | 8080       |
-| Modbus  | 20502         | 502        |
-| MQTT    | 21883         | 1883       |
 | SSH     | 20022         | 22         |
 | Telnet  | 20023         | 23         |
+| HTTP    | 28080         | 80         |
+| Modbus  | 20502         | 502        |
+| MQTT    | 21883         | 1883       |
+| CoAP    | 25683         | 5683       |
 
 </div>
 
