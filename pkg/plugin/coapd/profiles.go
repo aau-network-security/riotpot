@@ -14,7 +14,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/riotpot/tools/errors"
+	"github.com/riotpot/internal/logger"
 	"gopkg.in/yaml.v3"
 )
 
@@ -33,9 +33,9 @@ type Profile struct {
 
 func (p *Profile) Load(path string) {
 	data, err := os.ReadFile(path)
-	errors.Raise(err)
+	logger.Log.Error().Err(err)
 	err = yaml.Unmarshal(data, &p)
-	errors.Raise(err)
+	logger.Log.Error().Err(err)
 }
 
 // Method that provides a getter for topics and anso creates the topic

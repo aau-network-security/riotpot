@@ -1,4 +1,4 @@
-package pkg
+package plugins
 
 import (
 	"fmt"
@@ -6,9 +6,8 @@ import (
 	"plugin"
 
 	"github.com/riotpot/internal/logger"
-	proxies "github.com/riotpot/internal/proxy"
+	"github.com/riotpot/internal/proxy"
 	"github.com/riotpot/internal/services"
-	"github.com/riotpot/tools/errors"
 )
 
 var (
@@ -24,19 +23,19 @@ func getServicePlugin(path string) services.Service {
 
 	// Open the plugin within the path
 	pg, err := plugin.Open(path)
-	errors.Raise(err)
+	logger.Log.Fatal().Err(err)
 
 	// check the name of the function that exports the service
 	// The plugin *Must* contain a variable called `Plugin`.
 	s, err := pg.Lookup("Plugin")
-	errors.Raise(err)
+	logger.Log.Fatal().Err(err)
 
 	// log the name of the plugin being loaded
 	fmt.Printf("Loading plugin: %s...\n", *s.(*string))
 
 	// check if the reference symbol exists in the plugin
 	rf, err := pg.Lookup(*s.(*string))
-	errors.Raise(err)
+	logger.Log.Error().Err(err)
 
 	// Load the service in a variable as the interface Service.
 	newservice := rf.(func() services.Service)()
@@ -88,13 +87,13 @@ func LoadPlugins() (errors []error) {
 
 	// Create proxies for each of the started plugins
 	for _, service := range plugins {
-		proxy, err := proxies.Proxies.CreateProxy(service.GetNetwork(), service.GetPort()-pluginOffset)
+		px, err := proxy.Proxies.CreateProxy(service.GetNetwork(), service.GetPort()-pluginOffset)
 		if err != nil {
 			logger.Log.Error().Err(err)
 		}
 
 		// Add the service to the proxy
-		proxy.SetService(service)
+		px.SetService(service)
 	}
 
 	return

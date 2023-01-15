@@ -18,7 +18,7 @@ import (
 	"github.com/riotpot/api/service"
 	"github.com/riotpot/internal/globals"
 	"github.com/riotpot/internal/logger"
-	"github.com/riotpot/pkg"
+	"github.com/riotpot/internal/plugins"
 	"github.com/rs/zerolog"
 
 	_ "github.com/riotpot/statik"
@@ -39,7 +39,7 @@ var (
 var (
 	debug        = flag.Bool("debug", true, "Set log level to debug")
 	runApi       = flag.Bool("api", true, "Whether to start the API")
-	plugins      = flag.Bool("plugins", true, "Whether to load the low-interaction honeypot plugins")
+	loadPlugins  = flag.Bool("plugins", true, "Whether to load the low-interaction honeypot plugins")
 	allowedHosts = flag.String("whitelist", "http://127.0.0.1,http://localhost:3000", "List of allowed hosts to contact the API")
 )
 
@@ -85,8 +85,8 @@ func ParseFlags() {
 	}
 
 	// Load the plugins
-	if *plugins {
-		pkg.LoadPlugins()
+	if *loadPlugins {
+		plugins.LoadPlugins()
 	}
 
 	// Starts the API

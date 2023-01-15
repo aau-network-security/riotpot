@@ -14,7 +14,7 @@ var Plugin string
 const (
 	name    = "HTTP"
 	network = globals.TCP
-	port    = 8080
+	port    = 80
 )
 
 func init() {
@@ -49,7 +49,6 @@ func (h *Http) Run() (err error) {
 }
 
 func (h *Http) serve(srv *http.Server) {
-	fmt.Printf("[%s] Started listenning for connections in port %d\n", h.GetName(), h.GetPort())
 	if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 		lr.Log.Fatal().Err(err)
 	}

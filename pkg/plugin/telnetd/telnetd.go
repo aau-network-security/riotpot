@@ -7,10 +7,10 @@ import (
 	"net"
 
 	"github.com/riotpot/internal/globals"
+	"github.com/riotpot/internal/logger"
 	lr "github.com/riotpot/internal/logger"
 	"github.com/riotpot/internal/services"
 	"github.com/riotpot/pkg/fake/shell"
-	"github.com/riotpot/tools/errors"
 )
 
 var Plugin string
@@ -50,7 +50,7 @@ func (t *Telnet) Run() (err error) {
 
 	// start a service in the `telnet` port
 	listener, err := net.Listen(t.GetNetwork().String(), port)
-	errors.Raise(err)
+	logger.Log.Error().Err(err)
 
 	// build a channel stack to receive connections to the service
 	conn := make(chan net.Conn)
