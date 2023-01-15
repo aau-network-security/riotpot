@@ -109,5 +109,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           name: nightly
+          tag_name: nightly
           files: artifacts/riotpot.zip
           prerelease: true
