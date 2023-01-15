@@ -127,8 +127,8 @@ It is important to keep the internal folder structure for RIoTPot to work as int
 1. First, download the release of your choice from the [releases](https://github.com/aau-network-security/riotpot/releases) page. Choose the one you need for your Operative System (OS).
 2. Extact the `riotpot` folder.
 3. Run the `riotpot` binary. This will start RIoTPot with the API enabled, all the plugins ready to use, and the UI server.
-    - The UI is accessible through the address `localhost:3000` or `local.riotpot.ui`
-    - The API is accessible through the address `localhost:2022/api/swagger` or `local.riotpot.hp/api/swagger`
+    - The UI is accessible through the address `localhost:3000`
+    - The API is accessible through the address `localhost:2022/api/swagger`
 
 </details>
 
@@ -253,5 +253,8 @@ The container can be setup in three simple steps:
     # With docker-compose
     docker-compose -p riotpot -f build/docker/docker-compose.yaml up -d --build
     ```
+
+> **_Info:_** Using Docker has it's own perks, such as minglin with the DNS without touching your local files.
+> You can now reach the API at `http://riotpot.hp:2022/api/swagger` and the ui at `http://riotpot.ui:3000`
 
 </details>

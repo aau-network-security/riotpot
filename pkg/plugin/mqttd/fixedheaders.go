@@ -5,6 +5,7 @@ import (
 	"io"
 	"net"
 
+	"github.com/riotpot/internal/logger"
 	"github.com/riotpot/tools/arrays"
 )
 
@@ -14,7 +15,7 @@ func NewFixedHeader(conn *net.Conn) *FixedHeader {
 
 	n, _ := io.ReadFull(*conn, b)
 	if n != len(b) {
-		fmt.Print("read header failed\n")
+		logger.Log.Error().Msg("read header failed\n")
 		return nil
 	}
 

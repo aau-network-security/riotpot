@@ -6,8 +6,8 @@ import (
 	"net"
 
 	"github.com/riotpot/internal/globals"
+	"github.com/riotpot/internal/logger"
 	"github.com/riotpot/internal/services"
-	"github.com/riotpot/tools/errors"
 )
 
 var Plugin string
@@ -41,7 +41,7 @@ func (e *Echo) Run() (err error) {
 
 	// start a service in the `echo` port
 	listener, err := net.Listen(e.GetNetwork().String(), port)
-	errors.Raise(err)
+	logger.Log.Error().Err(err)
 
 	// build a channel stack to receive connections to the service
 	conn := make(chan net.Conn)
@@ -50,9 +50,6 @@ func (e *Echo) Run() (err error) {
 	// handle the connections from the channel
 	e.handlePool(conn)
 
-	// Close the channel for stopping the service
-	fmt.Print("[x] Service stopped...\n")
-
 	return
 }
 
@@ -60,7 +57,6 @@ func (e *Echo) Run() (err error) {
 // inspired on https://gist.github.com/paulsmith/775764#file-echo-go
 func (e *Echo) serve(ch chan net.Conn, listener net.Listener) {
 	// open an infinite loop to receive connections
-	fmt.Printf("[%s] Started listenning for connections in port %d\n", e.GetName(), e.GetPort())
 	for {
 		// Accept the client connection
 		client, err := listener.Accept()
