@@ -3,14 +3,15 @@ package main
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net"
 	"sync"
 
 	"github.com/riotpot/internal/globals"
+	"github.com/riotpot/internal/logger"
+	"github.com/riotpot/internal/plugins"
 	"github.com/riotpot/internal/services"
 	"github.com/riotpot/pkg/fake/shell"
-	"github.com/riotpot/tools/errors"
+
 	"github.com/traetox/pty"
 	"golang.org/x/crypto/ssh"
 )
@@ -31,13 +32,13 @@ func init() {
 func Sshd() services.Service {
 
 	mx := services.NewPluginService(name, port, network)
-	pKey, err := ioutil.ReadFile("riopot_rsa")
-	errors.Raise(err)
+	pKey := plugins.NewPrivateKey(plugins.DefaultKey)
+	pem := pKey.GetPEM()
 
 	return &SSH{
 		Service:    mx,
 		wg:         sync.WaitGroup{},
-		privateKey: pKey,
+		privateKey: pem,
 	}
 }
 
@@ -49,20 +50,22 @@ type SSH struct {
 
 func (s *SSH) Run() (err error) {
 
-	// Pre load the configuration for the ssh server
+	// Preload the configuration for the ssh server
 	config := &ssh.ServerConfig{
 		PasswordCallback: s.auth,
 	}
 
 	// Add a private key for the connections
-	config.AddHostKey(s.PrivateKey())
+	priv := s.PrivateKey()
+	config.AddHostKey(priv)
 
 	// convert the port number to a string that we can use it in the server
-	var port = fmt.Sprintf(":%d", s.GetPort())
+	port := fmt.Sprintf(":%d", s.GetPort())
 
-	// start a service in the `echo` port
 	listener, err := net.Listen(s.GetNetwork().String(), port)
-	errors.Raise(err)
+	if err != nil {
+		return
+	}
 	defer listener.Close()
 
 	// build a channel stack to receive connections to the service
@@ -85,43 +88,33 @@ func (s *SSH) auth(c ssh.ConnMetadata, pass []byte) (perms *ssh.Permissions, err
 
 func (s *SSH) serve(listener net.Listener, config *ssh.ServerConfig) {
 	// open an infinite loop to receive connections
-	fmt.Printf("[%s] Started listenning for connections in port %d\n", s.GetName(), s.GetPort())
 	for {
 		// Accept the client connection
 		client, err := listener.Accept()
 		if err != nil {
-			return
+			logger.Log.Error().Err(err)
+			continue
 		}
-		defer client.Close()
 
 		// upgrade the connections to ssh
 		sshConn, chans, reqs, err := ssh.NewServerConn(client, config)
 		if err != nil {
-			fmt.Printf("Failed to handshake (%s)", err)
+			logger.Log.Error().Err(err)
 			continue
 		}
 
 		sshItem := NewSshConn(sshConn)
-		defer sshConn.Close()
-		defer sshConn.Conn.Close()
 
-		s.wg.Add(1)
 		// Discard all global out-of-band Requests
 		go ssh.DiscardRequests(reqs)
 		// Handle all the channels open by the connection
-		s.handleChannels(sshItem, chans)
-		s.wg.Wait()
+		go s.handleChannels(sshItem, chans)
 	}
 }
 
 func (s *SSH) handleChannels(sshItem SSHConn, chans <-chan ssh.NewChannel) {
 	for conn := range chans {
-		//TODO: this line crashes the app when the connection is lost!!!
-		// NOTE: As of [6/21/2022] this line has not been fixed yet.
-		// Fix it ASAP!
-		// ☟ ☟ ☟
 		go s.handleChannel(sshItem, conn)
-		// ☝ ☝ ☝
 	}
 }
 
@@ -136,7 +129,7 @@ func (s *SSH) handleChannel(sshItem SSHConn, channel ssh.NewChannel) {
 	// Accept the channel creation request
 	conn, requests, err := channel.Accept()
 	if err != nil {
-		fmt.Printf("Could not accept channel (%s)", err)
+		logger.Log.Error().Err(err)
 		return
 	}
 
@@ -146,23 +139,23 @@ func (s *SSH) handleChannel(sshItem SSHConn, channel ssh.NewChannel) {
 }
 
 // Out-of-band requests handler
-// inspired in: https://github.com/traetox/sshForShits/
 func (s *SSH) oob(sshItem SSHConn, requests <-chan *ssh.Request, conn ssh.Channel) {
+
 	for req := range requests {
+
 		switch req.Type {
 		case "shell":
-			if len(req.Payload) == 0 {
-				req.Reply(true, nil)
-			} else {
-				req.Reply(false, nil)
+			if len(req.Payload) > 0 {
+				logger.Log.Error().Msgf("Shell command ignored", req.Payload)
 			}
 
 			// Give a shell to the client
 			err := s.attachShell(sshItem, conn)
 			if err != nil {
-				return
+				logger.Log.Error().Err(err)
 			}
 
+			req.Reply(err == nil, nil)
 		case "pty-req":
 			// Responding 'ok' here will let the client
 			// know we have a pty ready for input
@@ -172,7 +165,7 @@ func (s *SSH) oob(sshItem SSHConn, requests <-chan *ssh.Request, conn ssh.Channe
 		case "env":
 			continue // no response
 		default:
-			fmt.Printf("unkown request: %s (reply: %v, data: %x)", req.Type, req.WantReply, req.Payload)
+			logger.Log.Info().Msgf("Unkown request: %s (reply: %v, data: %x)", req.Type, req.WantReply, req.Payload)
 		}
 	}
 }
@@ -210,7 +203,9 @@ func (s *SSH) attachShell(sshItem SSHConn, conn ssh.Channel) (err error) {
 func (s *SSH) PrivateKey() (key ssh.Signer) {
 	// Gets the signer from a key
 	key, err := ssh.ParsePrivateKey(s.privateKey)
-	errors.Raise(err)
+	if err != nil {
+		logger.Log.Fatal().Err(err)
+	}
 
 	return
 }

@@ -7,8 +7,8 @@ import (
 	"sync"
 
 	"github.com/riotpot/internal/globals"
+	"github.com/riotpot/internal/logger"
 	"github.com/riotpot/internal/services"
-	"github.com/riotpot/tools/errors"
 )
 
 var Plugin string
@@ -44,7 +44,7 @@ func (m *Mqtt) Run() (err error) {
 
 	// start a service in the `mqtt` port
 	listener, err := net.Listen(m.GetNetwork().String(), port)
-	errors.Raise(err)
+	logger.Log.Error().Err(err)
 
 	// build a channel stack to receive connections to the service
 	conn := make(chan net.Conn)
@@ -66,7 +66,6 @@ func (m *Mqtt) serve(ch chan net.Conn, listener net.Listener) {
 	defer m.wg.Done()
 
 	// open an infinite loop to receive connections
-	fmt.Printf("[%s] Started listenning for connections in port %d\n", m.GetName(), m.GetPort())
 	for {
 		// Accept the client connection
 		client, err := listener.Accept()

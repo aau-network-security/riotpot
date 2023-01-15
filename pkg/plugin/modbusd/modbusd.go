@@ -6,8 +6,8 @@ import (
 	"net"
 
 	"github.com/riotpot/internal/globals"
+	"github.com/riotpot/internal/logger"
 	"github.com/riotpot/internal/services"
-	"github.com/riotpot/tools/errors"
 	"github.com/xiegeo/modbusone"
 )
 
@@ -54,7 +54,7 @@ func (m *Modbus) Run() (err error) {
 
 	// start a service in the `echo` port
 	listener, err := net.Listen("tcp", port)
-	errors.Raise(err)
+	logger.Log.Error().Err(err)
 
 	// build a channel stack to receive connections to the service
 	conn := make(chan net.Conn)
@@ -67,7 +67,6 @@ func (m *Modbus) Run() (err error) {
 // inspired on https://gist.github.com/paulsmith/775764#file-echo-go
 func (m *Modbus) serve(ch chan net.Conn, listener net.Listener) {
 	// open an infinite loop to receive connections
-	fmt.Printf("[%s] Started listenning for connections in port %d\n", m.GetName(), m.GetPort())
 	for {
 		// Accept the client connection
 		client, err := listener.Accept()
