@@ -1,5 +1,5 @@
 
-# RIoTPoT
+# RIoTPot
 
 <!-- markdownlint-disable MD033 -->
 <div align="center" style="box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25); background-color: #EDF2F4; border-radius: 4px; margin: 2em 0;">
@@ -250,8 +250,5 @@ The container can be setup in three simple steps:
     # With docker-compose
     docker-compose -p riotpot -f build/docker/docker-compose.yaml up -d --build
     ```
-
-> **_Info:_** Using Docker has it's own perks, such as minglin with the DNS without touching your local files.
-> You can now reach the API at `http://riotpot.hp:2022/api/swagger` and the ui at `http://riotpot.ui:3000`
 
 </details>
