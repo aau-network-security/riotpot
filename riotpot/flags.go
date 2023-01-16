@@ -19,6 +19,7 @@ import (
 	"github.com/riotpot/internal/globals"
 	"github.com/riotpot/internal/logger"
 	"github.com/riotpot/internal/plugins"
+	"github.com/riotpot/ui"
 	"github.com/rs/zerolog"
 
 	_ "github.com/riotpot/statik"
@@ -41,6 +42,7 @@ var (
 	runApi       = flag.Bool("api", true, "Whether to start the API")
 	loadPlugins  = flag.Bool("plugins", true, "Whether to load the low-interaction honeypot plugins")
 	allowedHosts = flag.String("whitelist", "http://127.0.0.1,http://localhost:3000", "List of allowed hosts to contact the API")
+	loadUi       = flag.Bool("ui", true, "Whether to start the UI")
 )
 
 func setupApi(allowedHosts []string) *gin.Engine {
@@ -60,11 +62,11 @@ func setupApi(allowedHosts []string) *gin.Engine {
 		MaxAge:           12 * time.Hour,
 	}))
 
-	root := router.Group(globals.ApiEndpoint)
+	api := router.Group(globals.ApiEndpoint)
 
 	// Add the proxy routes
 	for _, router := range routers {
-		router.AddToGroup(root)
+		router.AddToGroup(api)
 	}
 
 	statikFS, err := fs.New()
@@ -73,7 +75,7 @@ func setupApi(allowedHosts []string) *gin.Engine {
 	}
 
 	// Serve the Swagger UI files in the root of the api
-	root.StaticFS("swagger", statikFS)
+	api.StaticFS("swagger", statikFS)
 
 	return router
 }
@@ -93,9 +95,14 @@ func ParseFlags() {
 	if *runApi {
 		// Serve the API
 		whitelist := strings.Split(*allowedHosts, ",")
-		api := setupApi(whitelist)
+		router := setupApi(whitelist)
+
+		// Starts the UI
+		if *loadUi {
+			ui.AddRoutes(router)
+		}
 
 		apiAddress := fmt.Sprintf("%s:%s", globals.ApiHost, globals.ApiPort)
-		api.Run(apiAddress)
+		router.Run(apiAddress)
 	}
 }

@@ -26,7 +26,7 @@ services:
     container_name: tcpdump
     network_mode: "host"
     volumes:
-      - ../../tcpdump:/tcpdump
+      - ${PWD}/tcpdump:/tcpdump
     # Run tcdump in autorotating mode, with gzip compression
     # The files will be rotated every 24h or 500MB and named
     # after the timestamp when the file is created.
@@ -45,8 +45,8 @@ services:
   riotpot:
     container_name: riotpot
     build:
-      context: ../..
-      dockerfile: ./build/docker/Dockerfile.riotpot
+      context: ${PWD}/
+      dockerfile: build/docker/Dockerfile.riotpot
     restart: always # restart riotpot when it crashes
     ports:
       # Ports under 60 might see errors when unquoted
@@ -66,17 +66,6 @@ services:
     networks:
       honeypot:
       default:
-      ui:
-
-  ui:
-    container_name: ui
-    build:
-      context: ../..
-      dockerfile: ./build/docker/Dockerfile.ui
-    ports:
-      - "3000:3000"
-    networks:
-      ui:
 
   ##########################################
   # PROTOCOLS
