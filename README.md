@@ -1,5 +1,5 @@
 
-# RIoTPoT
+# RIoTPot
 
 <!-- markdownlint-disable MD033 -->
 <div align="center" style="box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25); background-color: #EDF2F4; border-radius: 4px; margin: 2em 0;">
@@ -34,13 +34,13 @@ The following table contains the list of services included in RIoTPot by defaul,
 
 | Service | Internal Port | Proxy Port |
 | ------- | ------------- | ---------- |
-| Coap    | 25683         | 5683       |
 | Echo    | 20007         | 7          |
-| HTTP    | 28080         | 8080       |
-| Modbus  | 20502         | 502        |
-| MQTT    | 21883         | 1883       |
 | SSH     | 20022         | 22         |
 | Telnet  | 20023         | 23         |
+| HTTP    | 28080         | 80         |
+| Modbus  | 20502         | 502        |
+| MQTT    | 21883         | 1883       |
+| CoAP    | 25683         | 5683       |
 
 </div>
 
@@ -56,29 +56,28 @@ The RIoTPot architecture is based on proxy connections to internal and surroundi
 For this, the honeypot manages a number of user-defined `proxies` that relays connections between services and RIoTPot [^proxies].
 This way, RIoTPot can decide how and where to route incomming attacks.
 The logic used to determine how to handle the incomming attack is implemented in the form of `middlewares` [^middlewares].
-To manage services, middlewares and proxies, RIoTPot ships with a REST API [^api].
-The API endpoints can be accessed through your browser at the location `localhost:2022/api/swagger`, showing a [Swagger](https://swagger.io/) interface that allows you to manage the honeypot in real-time.
+To manage services, middlewares and proxies, RIoTPot ships with a REST API [^api] and a webapp UI [^ui] out-of-the-box.
+The UI can be accessed through your browser at `localhost:2022` and you can fiddle with API endpoints at `localhost:2022/api/swagger` showing a [Swagger](https://swagger.io/) interface.
 
-[^proxies]: **_NOTE:_**
-    Internal and surrounding services are not accessible through the Internet.
+[^proxies]: Internal and surrounding services are not accessible through the Internet.
     Internal services are integrated and only accessible to RIoTPot.
     These services are loaded on-start and can not be deleted, but they can be stopped.
     Surrounding services **must** be in the same network as RIoTPot.
     External services **must** whitelist RIoTPot **only**.
 
-[^middlewares]: **_NOTE:_**
-    Middlewares are currently under development.
+[^middlewares]: Middlewares are currently under development.
 
-[^api]: **_NOTE:_**
-    The RIoTPot API **must not** be exposed to the Internet.
+[^api]: The RIoTPot API **must not** be exposed to the Internet.
     Regardless, the API currently only accepts connections from the localhost.
     This may be changed in the future, providing a whitelist of hosts and standard authentication.
+
+[^ui]: Although the Web interface can be used as a separate component, it is embeded with the RIoTPot binary.
 
 **Figure 1** shows the RIoTPot architecture, including the two main applications that constitute RIoTPot (RIoTPot itself, and RIoTPot UI) and their components, and a section to enclose external (or adjacent) services.
 
 <div align="center" style="margin: 2em 0">
     <div style="max-width: 60%; text-align: justify; display: flex; flex-direction: column;">
-        <img src="docs/assets/architecture.png" style="background-color: #EDF2F4; border-radius: 4px; margin: 1em 0; box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);">
+        <img src="docs/assets/architecture.png">
         <div>
         <b>Figure 1.</b> RIoTPot Architecture, including the main application, external services and the webapp UI to manage RIoTPot instances.
         </div>
@@ -90,16 +89,17 @@ Each RIoTPot instance exposes registered proxies (based on their port) on demand
 To serve a proxy, it **must** have a binded service and the proxy port **must** be available (currently, RIoTPot does not accept multiple services running in the same port).
 When a proxy has been binded and served, attackers will be able to send messages to RIoTPot on that port, relying the messages to the binded service and back to the attacker[^reversed].
 
-[^os]: **_NOTE:_** While the base application is interoperable, internal services (plugins) can only be used in [Linux, FreeBSD and macOS environments](https://pkg.go.dev/plugin).
+[^os]: While the base application is interoperable, internal services (plugins) can only be used in [Linux, FreeBSD and macOS environments](https://pkg.go.dev/plugin).
     We plan to overcome this limitation by replacing plugins with micro-services communicating through [gRPC](https://grpc.io/).
 
-[^reversed]: **_NOTE:_** For ethical and security reasons, RIoTPot does not allow unsolicited requests to the outside, i.e., reversed shells and the like are not allowed.
+[^reversed]: For ethical and security reasons, RIoTPot does not allow unsolicited requests to the outside, i.e., reversed shells and the like are not allowed.
 
 For ease of access, multiple instances of RIoTPot can be managed from the RIoTPot UI webapp.
 In addition to managing the proxies registered in each instance, the UI allows you to create, use and edit `profiles`.
-Each profile contains a number of proxies named after protocols or other services making a RIoTPot instance resemble, for example, a real-life device.
+Each profile contains a number of proxies named after protocols or other services making a RIoTPot instance resemble a real-life devices (e.g. a home assistant).
 In few words, profiles speed up the process of setting up and provision a RIoTPot instance with specific configurations.
 The UI is written using the React fonrt-end JavaScript library (we use Typescript for this project) and [Recoil](https://recoiljs.org/) state management library.
+Since RIoTPot is rather small, for the moment, it does not use a database.
 
 ## 2. How to use RIoTPot
 
@@ -114,21 +114,19 @@ Overall, you have three options.
 
 > **_Info_:** This guide is meant for users with no special needs, who want a simple out-of-the-box experience.
 
-Each release comes in a folder named `riotpot` with an executable (also) named `riotpot`, a `plugins` folder filled with multiple services (or low-interaction honeypots), and a folder named `ui` containing the UI server files.
+Each release comes in a folder named `riotpot` with an executable binary (also) named `riotpot` and a `plugins` folder filled with multiple services (or low-interaction honeypots).
 It is important to keep the internal folder structure for RIoTPot to work as intended.
 
     📁 riotpot
         ┕ riotpot
         ┕ 📁 plugins
-        ┕ 📁 ui
 
 ---
 
 1. First, download the release of your choice from the [releases](https://github.com/aau-network-security/riotpot/releases) page. Choose the one you need for your Operative System (OS).
 2. Extact the `riotpot` folder.
 3. Run the `riotpot` binary. This will start RIoTPot with the API enabled, all the plugins ready to use, and the UI server.
-    - The UI is accessible through the address `localhost:3000`
-    - The API is accessible through the address `localhost:2022/api/swagger`
+    - The API and UI are accessible through the address `localhost:2022`
 
 </details>
 
@@ -161,14 +159,13 @@ It is important to keep the internal folder structure for RIoTPot to work as int
     ```
 
 2. Navigate to the folder in where you have downloaded the RIoTPot source.
-3. If you have installed [Make](https://www.gnu.org/software/make/), we have included multiple command helpers to assist you building the project. To put it simple, you can run two simple commands that will build the RIoTPot binary, the plugins (and place them in the right folder), and then serve the UI.
+3. If you have installed [Make](https://www.gnu.org/software/make/), we have included multiple command helpers to assist you building the project. To put it simple, you can run two simple commands that will build the RIoTPot binary and the plugins (and place them in the right folder).
 
     ```bash
+    # Build the server
+    make build-ui
     # Builds RIoTPot and the plugins
-    make build-all
-    
-    # Starts the UI server
-    make ui
+    make riotpot-build
     ```
 
 </details>
@@ -253,8 +250,5 @@ The container can be setup in three simple steps:
     # With docker-compose
     docker-compose -p riotpot -f build/docker/docker-compose.yaml up -d --build
     ```
-
-> **_Info:_** Using Docker has it's own perks, such as minglin with the DNS without touching your local files.
-> You can now reach the API at `http://riotpot.hp:2022/api/swagger` and the ui at `http://riotpot.ui:3000`
 
 </details>

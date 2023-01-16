@@ -1,8 +1,29 @@
+FROM node:19.4.0-alpine as ui
+
+# set working directory
+WORKDIR /app
+
+# add `/app/node_modules/.bin` to $PATH
+ENV PATH /app/node_modules/.bin:$PATH
+
+# install app dependencies
+COPY ui/package*.json ./
+RUN npm install --silent
+RUN npm install react-scripts -g --silent
+
+# add app
+COPY ui/ .
+
+# Creates the build
+RUN npm run build --production
+
 FROM golang:1.18 as builder
-LABEL maintainer="Shreyas Srinivasa <shsr@es.aau.dk>"
 
 # Set the working directory to golang working space
 WORKDIR /riotpot
+
+# Copy the files from the previous build into the ui folder
+COPY --from=ui app ui/
 
 # Copy the dependencies into the image
 COPY go.mod ./

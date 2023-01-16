@@ -7,7 +7,7 @@ PLUGINS_DIR=pkg/plugin
 EXCLUDE_PLUGINS= modbusd coapd mqttd
 
 # docker cmd below
-.PHONY:  docker-build-doc docker-doc-up up down up-all build build-plugins build-all ui
+.PHONY:  docker-build-doc docker-doc-up up down up-all build build-plugins build-all build-ui serve-ui
 docker-build-doc:
 	docker build -f $(DOCKER)Dockerfile.documentation . -t $(APPNAME)/v1
 docker-doc-up: docker-build-doc
@@ -21,6 +21,7 @@ up-all:
 	riotpot-up
 build:
 	@go build -gcflags='all=-N -l' -o ./bin/ ./cmd/riotpot/.
+	@echo "Finished building Binary"
 build-plugins: $(PLUGINS_DIR)/*
 	@IFS=' ' read -r -a exclude <<< "${EXCLUDE_PLUGINS}"; \
 	for folder in $^ ; do \
@@ -31,8 +32,12 @@ build-plugins: $(PLUGINS_DIR)/*
 			go build -buildmode=plugin --mod=mod -gcflags='all=-N -l' -o bin/plugins/$${result}.so $${folder}/*.go; \
 		fi \
 	done
+	@echo "Finished building plugins"
+build-ui:
+	@npm --prefix=./ui run build
+	@echo "Finished building UI"
 build-all: \
 	build \
 	build-plugins
-ui:
-	@cd ui && serve -s build
+serve-ui:
+	@serve -s ./ui/build
