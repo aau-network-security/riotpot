@@ -41,7 +41,7 @@ var (
 	debug        = flag.Bool("debug", true, "Set log level to debug")
 	runApi       = flag.Bool("api", true, "Whether to start the API")
 	loadPlugins  = flag.Bool("plugins", true, "Whether to load the low-interaction honeypot plugins")
-	allowedHosts = flag.String("whitelist", "http://127.0.0.1,http://localhost:3000", "List of allowed hosts to contact the API")
+	allowedHosts = flag.String("whitelist", "http://127.0.0.1:2022", "List of allowed hosts to contact the API")
 	loadUi       = flag.Bool("ui", true, "Whether to start the UI")
 )
 

@@ -26,7 +26,7 @@ services:
     container_name: tcpdump
     network_mode: "host"
     volumes:
-      - ${PWD}/tcpdump:/tcpdump
+      - ${PWD:-../..}/tcpdump:/tcpdump
     # Run tcdump in autorotating mode, with gzip compression
     # The files will be rotated every 24h or 500MB and named
     # after the timestamp when the file is created.
@@ -45,8 +45,8 @@ services:
   riotpot:
     container_name: riotpot
     build:
-      context: ${PWD}/
-      dockerfile: build/docker/Dockerfile.riotpot
+      context: ${PWD:-../..}/
+      dockerfile: build/docker/Dockerfile
     restart: always # restart riotpot when it crashes
     ports:
       # Ports under 60 might see errors when unquoted
@@ -57,11 +57,11 @@ services:
       - "80:80"     # HTTP
       - "502:502"   # Modbus
       - "1883:1883" # MQTT
-      - "5683:5683" # CoAP\
+      - "5683:5683" # CoAP
 
       # Required for the REST API
       # Note: only available to localhost
-      - "localhost:2022:2022"
+      - "127.0.0.1:2022:2022"
     environment:
       - API_HOST=0.0.0.0
     networks:
