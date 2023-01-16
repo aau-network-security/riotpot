@@ -52,6 +52,12 @@ func (tcpProxy *TCPProxy) Start() (err error) {
 			}
 			defer client.Close()
 
+			// Apply the middlewares to the connection before dialing the server
+			_, err = tcpProxy.middlewares.Apply(client)
+			if err != nil {
+				return
+			}
+
 			// Get a connection to the server for each new connection with the client
 			server, servErr := net.DialTimeout(globals.TCP.String(), tcpProxy.service.GetAddress(), 1*time.Second)
 
@@ -65,9 +71,6 @@ func (tcpProxy *TCPProxy) Start() (err error) {
 			tcpProxy.wg.Add(1)
 
 			go func() {
-				// Apply the middlewares to the connection
-				tcpProxy.middlewares.Apply(client)
-
 				// Handle the connection between the client and the server
 				// NOTE: The handlers will defer the connections
 				tcpProxy.handle(client, server)

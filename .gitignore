@@ -19,6 +19,7 @@ workspace*.code-*
 # Transit folders
 /vendor/
 /bin/
+/tcpdump/
 
 # whatever the rules are, include all the `.md` files
 !*.md

@@ -34,13 +34,13 @@ The following table contains the list of services included in RIoTPot by defaul,
 
 | Service | Internal Port | Proxy Port |
 | ------- | ------------- | ---------- |
-| Coap    | 25683         | 5683       |
 | Echo    | 20007         | 7          |
-| HTTP    | 28080         | 8080       |
-| Modbus  | 20502         | 502        |
-| MQTT    | 21883         | 1883       |
 | SSH     | 20022         | 22         |
 | Telnet  | 20023         | 23         |
+| HTTP    | 28080         | 80         |
+| Modbus  | 20502         | 502        |
+| MQTT    | 21883         | 1883       |
+| CoAP    | 25683         | 5683       |
 
 </div>
 
@@ -78,7 +78,7 @@ The API endpoints can be accessed through your browser at the location `localhos
 
 <div align="center" style="margin: 2em 0">
     <div style="max-width: 60%; text-align: justify; display: flex; flex-direction: column;">
-        <img src="docs/assets/architecture.png" style="background-color: #EDF2F4; border-radius: 4px; margin: 1em 0; box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);">
+        <img src="docs/assets/architecture-1.png" style="background-color: #EDF2F4; border-radius: 4px; margin: 1em 0; box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);">
         <div>
         <b>Figure 1.</b> RIoTPot Architecture, including the main application, external services and the webapp UI to manage RIoTPot instances.
         </div>
