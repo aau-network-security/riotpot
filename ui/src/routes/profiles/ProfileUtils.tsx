@@ -6,7 +6,14 @@ import {
   Ref,
   useState,
 } from "react";
-import { Col, Dropdown, Form, FormControl } from "react-bootstrap";
+import {
+  Row,
+  Col,
+  Dropdown,
+  Form,
+  FormControl,
+  ListGroup,
+} from "react-bootstrap";
 import { AiOutlinePlus } from "react-icons/ai";
 import { useRecoilCallback, useRecoilState, useRecoilValue } from "recoil";
 import { CustomToggle } from "../../components/dropdown/Dropdown";
@@ -51,11 +58,13 @@ const ServiceCheckRow = ({
         onChange={onChange}
         checked={ch}
       />
-      <Col>
-        {service.name}
-        <NetworkBadge {...service.network} />
-        <InteractionBadge {...service.interaction} />
-      </Col>
+      <Row>
+        <Col className="service">{service.name}</Col>
+        <Col className="badges">
+          <NetworkBadge {...service.network} />
+          <InteractionBadge {...service.interaction} />
+        </Col>
+      </Row>
     </Dropdown.Item>
   );
 };
@@ -85,12 +94,12 @@ const ProfileAddServiceDropdownMenu = forwardRef(
           onChange={(e) => setValue(e.target.value)}
           value={value}
         />
-        <ul className="list-unstyled">
+        <ListGroup className="list-unstyled">
           {Children.toArray(props.children).filter(
             (child: any) =>
               !value || child.props.service.name.toLowerCase().startsWith(value)
           )}
-        </ul>
+        </ListGroup>
       </div>
     );
   }

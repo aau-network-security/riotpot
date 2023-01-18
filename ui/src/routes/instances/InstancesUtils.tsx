@@ -142,7 +142,7 @@ const ProfilePop = ({ service }: { service: Service }) => {
   return (
     <Row>
       <Col className="profile">{service.name}</Col>
-      <Col className="badges" sm={5}>
+      <Col className="badges">
         <NetworkBadge {...service.network} />
         <InteractionBadge {...service.interaction} />
       </Col>

@@ -18,4 +18,14 @@
 }
 @include Address;
 
+div.profile, div.service{
+    min-width: 5em;
+}
+
+div.badges{
+    display: flex;
+    flex-direction: row;
+    gap: 1em;
+}
+
 

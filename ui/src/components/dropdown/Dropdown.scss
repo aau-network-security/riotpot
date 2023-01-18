@@ -5,15 +5,17 @@
         @include popup;
 
         a.dropdown-item{
-            gap: 10px;
+            gap: 1em;
             display: flex;
             flex-direction: row;
-            align-items: center;
-            gap: 10px;
 
             &:hover{
                 background: $border-dark;
                 color: $color;
+            }
+
+            > div.row{
+                width: -webkit-fill-available;
             }
         }
     }
