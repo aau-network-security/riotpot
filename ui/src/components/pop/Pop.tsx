@@ -1,4 +1,4 @@
-import { Overlay } from "react-bootstrap";
+import { Container, Overlay } from "react-bootstrap";
 import { Placement } from "react-bootstrap/esm/types";
 
 import "./Pop.scss";
@@ -18,7 +18,9 @@ export const Pop = ({
 }: PopProps) => {
   return (
     <Overlay target={target.current} show={show} placement={placement}>
-      <div className="component">{children}</div>
+      <div className="component">
+        <Container>{children}</Container>
+      </div>
     </Overlay>
   );
 };

@@ -22,7 +22,12 @@ const CreateButton = ({ icon, title, content }: CreateButtonProps) => {
 
   return (
     <>
-      <AiOutlinePlus onClick={() => setModalShow(true)}></AiOutlinePlus>
+      <AiOutlinePlus
+        onClick={() => setModalShow(true)}
+        style={{
+          cursor: "pointer",
+        }}
+      ></AiOutlinePlus>
       <CenteredModal props={props} />
     </>
   );
