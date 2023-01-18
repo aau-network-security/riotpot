@@ -48,7 +48,7 @@ export const servicesFilter = selectorFamily({
       const servs: any = get(services);
       const servInd = servs.findIndex((x: Service) => x.id === id);
 
-      var cp = [...servs];
+      let cp = [...servs];
       cp[servInd] = { ...cp[servInd], ...newValue };
 
       return set(services, cp);

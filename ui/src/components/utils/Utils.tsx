@@ -1,4 +1,4 @@
-import React from "react";
+import { useState } from "react";
 import { AiOutlinePlus } from "react-icons/ai";
 import { CenteredModal } from "../modal/Modal";
 import "./Utils.scss";
@@ -10,7 +10,7 @@ type CreateButtonProps = {
 };
 
 const CreateButton = ({ icon, title, content }: CreateButtonProps) => {
-  const [modalShow, setModalShow] = React.useState(false);
+  const [modalShow, setModalShow] = useState(false);
 
   const props = {
     title: "New " + title,

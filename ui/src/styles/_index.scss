@@ -15,7 +15,7 @@ $color-red: #FF8686;
 
 /* Globals */
 $radius: 3px;
-$padding: 10px;
+$padding: .5em;
 
 /* FONT */
 @import url('https://rsms.me/inter/inter.css');
@@ -84,26 +84,27 @@ html { font-family: 'Inter', sans-serif; }
         * {
             color: $text;
             font-family: 'Inter var', sans-serif;
-            
         }
 
         main{
-            gap: 20px;
+            gap: 1em;
             display: flex;
             flex-direction: column;
         }
 
         small{
             color: $color-dim;
-            gap: 10px;
+            gap: .5em;
         }
 
         div.component{
-            @include component()
+            @include component();
         }
 
         svg{
             fill: $color-dim;
         }
+
+        @include simple-form;
     }
 }

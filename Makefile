@@ -7,7 +7,7 @@ PLUGINS_DIR=pkg/plugin
 EXCLUDE_PLUGINS= modbusd coapd mqttd
 
 # docker cmd below
-.PHONY:  docker-build-doc docker-doc-up up down up-all build build-plugins build-all build-ui serve-ui
+.PHONY:  docker-build-doc docker-doc-up up down up-all build build-plugins build-all build-ui serve-ui statik
 docker-build-doc:
 	docker build -f $(DOCKER)Dockerfile.documentation . -t $(APPNAME)/v1
 docker-doc-up: docker-build-doc
@@ -41,3 +41,6 @@ build-all: \
 	build-plugins
 serve-ui:
 	@serve -s ./ui/build
+
+statik:
+	@statik -src=/api/swagger

@@ -12,7 +12,7 @@ export const alertTypes: alertType[] = [
 ];
 
 export const alert = atom({
-  key: "alet",
+  key: "alert",
   default: {
     message: "",
     type: "error",
