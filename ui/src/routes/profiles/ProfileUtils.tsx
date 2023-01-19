@@ -123,7 +123,7 @@ const ServiceDropdownItems = ({ id }: { id: string }) => {
 
   const removeService = useRecoilCallback(() => (service: Service) => {
     // Copy the original content
-    var cp = { ...profile };
+    let cp = { ...profile };
     cp.services = cp.services.filter((serv: Service) => serv.id !== service.id);
 
     // Place the profile with the updated values
@@ -143,6 +143,7 @@ const ServiceDropdownItems = ({ id }: { id: string }) => {
       <Dropdown.Menu as={ProfileAddServiceDropdownMenu}>
         {servs.map((serv: Service) => (
           <ServiceCheckRow
+            key={serv.id}
             service={serv}
             handler={handler}
             checked={!!profile.services.find((s: Service) => s.id === serv.id)}

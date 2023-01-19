@@ -32,7 +32,7 @@ import { InstanceFormFields } from "./InstanceForm";
 
 interface InstanceService {
   name: string;
-  proxy: Number;
+  proxy: number;
   interaction: InteractionOption;
   running: boolean;
 }
@@ -110,8 +110,8 @@ const InstanceRowInfoPop = ({ services }: { services: InstanceService[] }) => {
         {`${services.length} ${services.length === 1 ? "service" : "services"}`}
       </small>
       <Pop target={target} show={show} placement="right">
-        {services.map((service) => {
-          return <InstancePop service={service} />;
+        {services.map((service: InstanceService) => {
+          return <InstancePop key={service.name} service={service} />;
         })}
       </Pop>
     </>
@@ -221,9 +221,9 @@ const InstanceRow = ({ id }: { id: number }) => {
   }, []);
 
   const cells = [
-    <InstanceRowInfo name={instance.name} services={state} />,
-    <InstanceRowAddress id={id} />,
-    <InstanceRowOptions instance={instance} />,
+    <InstanceRowInfo key="info" name={instance.name} services={state} />,
+    <InstanceRowAddress key="address" id={id} />,
+    <InstanceRowOptions key="options" instance={instance} />,
   ];
 
   return <Row cells={cells} />;
@@ -231,8 +231,8 @@ const InstanceRow = ({ id }: { id: number }) => {
 
 export const InstancesTable = () => {
   const insts = useRecoilValue(instanceIds);
-  const rows = insts.map((instance, index) => (
-    <InstanceRow key={index} id={instance} />
+  const rows = insts.map((instance: number) => (
+    <InstanceRow key={instance} id={instance} />
   ));
 
   const data = {

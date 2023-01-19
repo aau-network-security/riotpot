@@ -1,18 +1,18 @@
 import { useState } from "react";
 import { Button, Form, InputGroup, Row, Stack } from "react-bootstrap";
 import { useRecoilState } from "recoil";
-import { backend } from "../../recoil/atoms/settings";
+import { instance } from "../../recoil/atoms/instances";
 
 export const SettingsAPIAddress = () => {
-  // Get the current values of the backend address
-  const [bk, setBk] = useRecoilState(backend);
+  // Get the current values of the instance address
+  const [ins, setIns] = useRecoilState(instance);
 
   // Create a dummy that can hold the values until the submit button is clicked
-  const [dummy, setDummy] = useState(bk);
+  const [dummy, setDummy] = useState(ins);
 
   // Create a setter for the submit button
   const editAddress = () => {
-    setBk({ ...bk, ...dummy });
+    setIns({ ...ins, ...dummy });
   };
 
   // Updates a field on the dummy
@@ -24,7 +24,7 @@ export const SettingsAPIAddress = () => {
     <Stack gap={5}>
       <Row>
         <h1>API Address</h1>
-        <small>Change the location of the backend API address</small>
+        <small>Change the location of the instance API address</small>
       </Row>
 
       <Row>
@@ -34,14 +34,14 @@ export const SettingsAPIAddress = () => {
             <Form.Control
               placeholder="host"
               aria-label="host"
-              defaultValue={bk.host}
+              defaultValue={ins.host}
               onChange={(e) => updateDummyField("host", e.target.value)}
             />
             <Form.Control
               type="number"
               placeholder="port"
               aria-label="port"
-              defaultValue={bk.port}
+              defaultValue={ins.port}
               onChange={(e) => updateDummyField("port", e.target.value)}
             />
             <Button variant="primary" onClick={editAddress}>

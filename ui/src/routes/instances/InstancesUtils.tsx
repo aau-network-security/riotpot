@@ -168,7 +168,7 @@ export const ProfileRowInfoPop = ({ services }: { services: Service[] }) => {
       {!!services.length && (
         <Pop target={target} show={show} placement="left">
           {services.map((service) => {
-            return <ProfilePop service={service} />;
+            return <ProfilePop key={service.id} service={service} />;
           })}
         </Pop>
       )}
@@ -228,6 +228,6 @@ const AddButton = () => {
 };
 
 export const InstancesUtils = () => {
-  const buttons = [<AddButton />];
+  const buttons = [<AddButton key="addButton" />];
   return <UtilsBar buttons={buttons} />;
 };

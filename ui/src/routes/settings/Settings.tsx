@@ -1,5 +1,5 @@
 import { Stack } from "react-bootstrap";
-import { SettingsAPIAddress } from "./SettingsBackend";
+import { SettingsAPIAddress } from "./SettingsInstance";
 import { SettingsState } from "./SettingsState";
 
 export const Settings = () => {

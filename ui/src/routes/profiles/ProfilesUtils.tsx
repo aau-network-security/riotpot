@@ -54,6 +54,6 @@ const CreateProfile = () => {
 
 export const ProfilesUtils = () => {
   // Utils buttons
-  const buttons = [<CreateProfile />];
+  const buttons = [<CreateProfile key={0} />];
   return <UtilsBar buttons={buttons} />;
 };

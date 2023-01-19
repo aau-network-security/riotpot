@@ -88,9 +88,13 @@ const AddButton = ({ host }: { host: string }) => {
 
   const handler = (service: Service) => {
     const response = addProxyService(host, service);
-    response.then((data) => {
-      addToList(data);
-    });
+    response
+      .then((data) => {
+        addToList(data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
   return (
@@ -114,7 +118,7 @@ const AddButton = ({ host }: { host: string }) => {
 };
 
 export const InstanceUtils = ({ host }: { host: string }) => {
-  const buttons = [<AddButton host={host} />];
+  const buttons = [<AddButton key={0} host={host} />];
   return <UtilsBar buttons={buttons} />;
 };
 

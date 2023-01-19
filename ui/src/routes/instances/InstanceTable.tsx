@@ -31,6 +31,7 @@ import {
   deleteProxyService,
   fetchProxy,
 } from "./InstanceAPI";
+import InstanceUtils from "./InstanceUtils";
 
 const ProxyServicceRowOptions = ({
   host,
@@ -47,11 +48,15 @@ const ProxyServicceRowOptions = ({
 
   const deleteCallback = (id: string) => {
     const deleted = deleteProxyService(host, id);
-    deleted.then((data) => {
-      if ("success" in data) {
-        removeService(id);
-      }
-    });
+    deleted
+      .then((data) => {
+        if ("success" in data) {
+          removeService(id);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
   const page = getPage("Services");
@@ -200,11 +205,20 @@ const InstanceServiceRow = ({
   proxy: InstanceProxyService;
 }) => {
   const cells = [
-    <InstanceServiceInfo service={proxy.service} />,
-    <InstanceServiceProxy host={instance.host} proxyID={proxy.id} />,
-    <InstanceServiceToggle host={instance.host} proxy={proxy} />,
+    <InstanceServiceInfo key={0} service={proxy.service} />,
+    <InstanceServiceProxy
+      key={1}
+      host={instance.host + ":" + instance.port}
+      proxyID={proxy.id}
+    />,
+    <InstanceServiceToggle
+      key={2}
+      host={instance.host + ":" + instance.port}
+      proxy={proxy}
+    />,
     <ProxyServicceRowOptions
-      host={instance.host}
+      key={proxy.id}
+      host={instance.host + ":" + instance.port}
       proxyID={proxy.id}
       serviceName={proxy.service.name}
     />,
@@ -218,6 +232,9 @@ const InstanceServicesTable = ({ instance }: { instance: Instance }) => {
   const proxyServices = useRecoilValue(instanceProxyServiceSelector);
   // Get the list of proxy service ids
   let ids = useRecoilValue(instanceServiceIDs);
+
+  // If this variable receives a value, the table will not load
+  let [error, setErr] = useState(Error);
 
   // Callback to add a service to the list.
   // This is used to track and update the state of the proxies
@@ -237,19 +254,48 @@ const InstanceServicesTable = ({ instance }: { instance: Instance }) => {
   // Fetch the list of proxy services only once
   useEffect(() => {
     // Populate the list of services
-    const proxyList = fetchProxy(instance.host);
+    const proxyList = fetchProxy(instance.host + ":" + instance.port);
+
     // For each of the proxy received add it to the state
-    proxyList.then((proxies: InstanceProxyService[]) => {
-      proxies.forEach((x) => {
-        addProxyService(x);
+    proxyList
+      .then((proxies: InstanceProxyService[]) => {
+        // Check if there was no response. This may happen
+        if (proxies instanceof Error) {
+          setErr(proxies);
+          return;
+        }
+
+        proxies.forEach((x) => {
+          addProxyService(x);
+        });
+      })
+      .catch((err) => {
+        setErr(err);
       });
-    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  if (error) {
+    return (
+      <>
+        <h4>Oooops! something went wrong...</h4>
+        <p>
+          We could not reach the address of the instance. Check the console
+          (F12) to see if you can find a clue of the issue. At the very least,
+          you should see an empty table here instead of this message. Once you
+          have troubleshooted the issue, reload the page.
+        </p>
+        <small>
+          No luck? Perhaps riotpot is not running. Maybe not in the given
+          address; check your <a href="/settings">settings</a>!
+        </small>
+      </>
+    );
+  }
+
   // Map the rows into a proxy service
-  const rows = proxyServices.map((proxy: any, index: number) => (
-    <InstanceServiceRow key={index} instance={instance} proxy={proxy} />
+  const rows = proxyServices.map((proxy: any) => (
+    <InstanceServiceRow key={proxy.id} instance={instance} proxy={proxy} />
   ));
 
   // Send the data
@@ -258,7 +304,12 @@ const InstanceServicesTable = ({ instance }: { instance: Instance }) => {
     rows: [],
   };
 
-  return <Table data={data} rows={rows}></Table>;
+  return (
+    <>
+      <InstanceUtils host={instance.host + ":" + instance.port} />
+      <Table data={data} rows={rows}></Table>
+    </>
+  );
 };
 
 export default InstanceServicesTable;

@@ -41,7 +41,7 @@ var (
 	debug        = flag.Bool("debug", true, "Set log level to debug")
 	runApi       = flag.Bool("api", true, "Whether to start the API")
 	loadPlugins  = flag.Bool("plugins", true, "Whether to load the low-interaction honeypot plugins")
-	allowedHosts = flag.String("whitelist", "http://127.0.0.1:2022", "List of allowed hosts to contact the API")
+	allowedHosts = flag.String("whitelist", "http://::", "List of allowed hosts to contact the API")
 	loadUi       = flag.Bool("ui", true, "Whether to start the UI")
 )
 
@@ -56,7 +56,7 @@ func setupApi(allowedHosts []string) *gin.Engine {
 	router.Use(cors.New(cors.Config{
 		AllowOrigins:     allowedHosts,
 		AllowMethods:     []string{"OPTIONS", "PUT", "PATCH", "GET", "DELETE"},
-		AllowHeaders:     []string{"Origin", "Content-Type"},
+		AllowHeaders:     []string{"Content-Type", "Content-Length", "Origin"},
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,

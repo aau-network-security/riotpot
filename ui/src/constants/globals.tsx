@@ -14,7 +14,7 @@ export type Page = {
 
 export const Pages: Page[] = [
   //{ page: "Home", icon: VscHome, verbose: "Home" },
-  { page: "Instances", icon: BiChip, verbose: "Instance" },
+  { page: "Instance", icon: BiChip, verbose: "Instance" },
   { page: "Profiles", icon: RiProfileLine, verbose: "Profile" },
   { page: "Services", icon: BiServer, verbose: "Service" },
   { page: "Settings", icon: BiCog, verbose: "Setting" },
