@@ -275,7 +275,7 @@ const InstanceServicesTable = ({ instance }: { instance: Instance }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  if (error) {
+  if (error.message) {
     return (
       <>
         <h4>Oooops! something went wrong...</h4>
@@ -285,6 +285,7 @@ const InstanceServicesTable = ({ instance }: { instance: Instance }) => {
           you should see an empty table here instead of this message. Once you
           have troubleshooted the issue, reload the page.
         </p>
+        <p>{error.message}</p>
         <small>
           No luck? Perhaps riotpot is not running. Maybe not in the given
           address; check your <a href="/settings">settings</a>!
