@@ -26,7 +26,7 @@ function App() {
           </Col>
 
           {/* Content */}
-          <Col xs={7}>
+          <Col xs={9}>
             <SimpleBreadcrumb />
             <Routes>
               <Route path="instance" element={<Instance />}></Route>

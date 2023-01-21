@@ -21,7 +21,7 @@ const Headers = ({ headers }: { headers: any }) => {
   );
 };
 
-export const Row = ({ cells }: { cells: any }) => {
+export const TableRow = ({ cells }: { cells: any }) => {
   return (
     <tr className="tableRow">
       {cells.map((content: any, ind: number) => {
@@ -37,7 +37,7 @@ const Body = ({ rows, children }: { rows: any[]; children: any[] }) => {
     <tbody>
       {rows.map((cells: any[], ind: number) => {
         const key = `tablerow-${ind}`;
-        return <Row cells={cells} key={key} />;
+        return <TableRow cells={cells} key={key} />;
       })}
       {children}
     </tbody>

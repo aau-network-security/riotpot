@@ -6,6 +6,7 @@ import reportWebVitals from "./reportWebVitals";
 import { BrowserRouter } from "react-router-dom";
 import { RecoilRoot } from "recoil";
 import { initState } from "./routes/settings/SettingsState";
+import { CustomToast } from "./components/toast/Toast";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
@@ -15,6 +16,7 @@ root.render(
     <RecoilRoot initializeState={initState}>
       <BrowserRouter>
         <App />
+        <CustomToast />
       </BrowserRouter>
     </RecoilRoot>
   </React.StrictMode>
