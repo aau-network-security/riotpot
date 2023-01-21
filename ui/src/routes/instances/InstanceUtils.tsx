@@ -1,8 +1,9 @@
 import React, { Children, useState } from "react";
-import { Dropdown, FormControl } from "react-bootstrap";
+import { Col, Dropdown, FormControl } from "react-bootstrap";
 import { AiOutlinePlus } from "react-icons/ai";
 import { useRecoilCallback, useRecoilValue } from "recoil";
 import { CustomToggle } from "../../components/dropdown/Dropdown";
+import { useToast } from "../../components/toast/Toast";
 import { InteractionBadge, NetworkBadge } from "../../components/utils/Common";
 import { UtilsBar } from "../../components/utils/Utils";
 import {
@@ -11,6 +12,7 @@ import {
   instanceServiceIDs,
 } from "../../recoil/atoms/instances";
 import { Service, services } from "../../recoil/atoms/services";
+import { ErrorToastVariant } from "../../recoil/atoms/toast";
 import { addProxyService } from "./InstanceAPI";
 
 type CustomMenuProps = {
@@ -37,6 +39,7 @@ const InstanceAddServiceDropdownMenu = React.forwardRef(
           onChange={(e) => setValue(e.target.value)}
           value={value}
         />
+        <Dropdown.Divider />
         <ul className="list-unstyled">
           {Children.toArray(props.children).filter(
             (child: any) =>
@@ -58,14 +61,18 @@ const ServiceDropdownRow = ({
 }) => {
   return (
     <Dropdown.Item onClick={() => handler(service)}>
-      {service.name}
-      <NetworkBadge {...service.network} />
-      <InteractionBadge {...service.interaction} />
+      <Col>{service.name}</Col>
+      <Col className="badges">
+        <NetworkBadge {...service.network} />
+        <InteractionBadge {...service.interaction} />
+      </Col>
     </Dropdown.Item>
   );
 };
 
 const AddButton = ({ host }: { host: string }) => {
+  const { showToast } = useToast();
+
   // Get the ids and the services
   const servs = useRecoilValue(services);
 
@@ -88,9 +95,18 @@ const AddButton = ({ host }: { host: string }) => {
 
   const handler = (service: Service) => {
     const response = addProxyService(host, service);
-    response.then((data) => {
-      addToList(data);
-    });
+
+    response
+      .then((data) => {
+        if ("error" in data) {
+          showToast(data["error"], ErrorToastVariant);
+          return;
+        }
+        addToList(data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
   return (
@@ -114,7 +130,7 @@ const AddButton = ({ host }: { host: string }) => {
 };
 
 export const InstanceUtils = ({ host }: { host: string }) => {
-  const buttons = [<AddButton host={host} />];
+  const buttons = [<AddButton key={0} host={host} />];
   return <UtilsBar buttons={buttons} />;
 };
 

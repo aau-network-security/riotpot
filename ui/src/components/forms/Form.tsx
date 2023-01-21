@@ -30,10 +30,10 @@ export const FormField = ({
   // once the form is submitted!
   const fieldError: any = useRecoilValue(error(fieldProps.name));
 
-  var name = fieldProps.name;
+  let name = fieldProps.name;
   name = (name.charAt(0).toUpperCase() + name.slice(1)).replace("_", " ");
 
-  var field;
+  let field;
 
   switch (type) {
     case "select":
@@ -126,7 +126,9 @@ export const SimpleForm = ({
 
   return (
     <Form onSubmit={onsubmit}>
-      {fields.map((field) => {
+      {fields.map((field, ind) => {
+        const key = `form-${ind}`;
+
         return (
           <FormField
             type={field.type}
@@ -134,6 +136,7 @@ export const SimpleForm = ({
             fieldProps={field}
             defaultValue={defaultValues && defaultValues[field.name]}
             error={errors}
+            key={key}
           />
         );
       })}

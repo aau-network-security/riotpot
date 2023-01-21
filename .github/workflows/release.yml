@@ -55,7 +55,7 @@ jobs:
   release:
     permissions:
       contents: write
-    needs: ui
+    needs: riotpot
     runs-on: ubuntu-latest
     steps:
       - name: Download all workflow run artifacts

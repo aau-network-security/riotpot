@@ -17,7 +17,7 @@ import {
 import { ProfileRowInfoPop } from "../instances/InstancesUtils";
 import { SimpleForm } from "../../components/forms/Form";
 import { ProfileFormFields } from "./ProfileForm";
-import { Link } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { CgDetailsLess } from "react-icons/cg";
 import { Dropdown } from "react-bootstrap";
 
@@ -52,12 +52,13 @@ const EditProfile = ({ profile }: { profile: Profile }) => {
 };
 
 const ViewProfile = ({ profile }: { profile: Profile }) => {
+  const location = useLocation();
+  const link = `${location.pathname}/${profile.id}`;
+
   return (
-    <Dropdown.Item>
-      <Link to={profile.id}>
-        <CgDetailsLess />
-        Details
-      </Link>
+    <Dropdown.Item href={link}>
+      <CgDetailsLess />
+      Details
     </Dropdown.Item>
   );
 };
@@ -91,8 +92,8 @@ const ProfileRowOptions = ({ profile }: { profile: Profile }) => {
 const profileRow = (profile: Profile) => {
   return [
     profile.name,
-    <ProfileRowInfoPop services={profile.services} />,
-    <ProfileRowOptions profile={profile} />,
+    <ProfileRowInfoPop key={1} services={profile.services} />,
+    <ProfileRowOptions key={2} profile={profile} />,
   ];
 };
 

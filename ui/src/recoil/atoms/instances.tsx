@@ -10,47 +10,10 @@ export type Instance = {
   id: number;
   name: string;
   host: string;
+  port: number;
   description: string;
   profile: Profile | undefined;
 };
-
-export const instanceIds = atom<number[]>({
-  key: "instanceIds",
-  default: [],
-  effects_UNSTABLE: [persistAtom],
-});
-
-export const DefaultInstance = {
-  id: 0,
-  name: "",
-  host: "",
-  description: "",
-  profile: undefined,
-};
-
-export const instances = atomFamily<Instance, number>({
-  key: "instance",
-  default: DefaultInstance,
-  effects_UNSTABLE: [persistAtom],
-});
-
-export const intanceFormErrors = atom({
-  key: "intanceFormErrors",
-  default: {} as { [key: string]: string },
-});
-
-export const intanceFormFieldErrors = selectorFamily({
-  key: "profileFormFieldErrors",
-  get:
-    (field: string) =>
-    ({ get }) =>
-      get(intanceFormErrors)[field],
-});
-
-export const instanceFormFields = atom({
-  key: "instanceFormFields",
-  default: DefaultInstance as { [key: string]: any },
-});
 
 export type InstanceProxyService = {
   id: string;
@@ -59,6 +22,15 @@ export type InstanceProxyService = {
   service: Service;
 };
 
+export const DefaultInstance = {
+  id: 0,
+  name: "Default",
+  host: "localhost",
+  port: 2022,
+  description: "Default instance",
+  profile: undefined,
+} as Instance;
+
 export const DefaultInstanceProxyService = {
   id: "",
   port: 0,
@@ -66,6 +38,51 @@ export const DefaultInstanceProxyService = {
   service: DefaultService,
 };
 
+// Default instance that will be used when navigating to "home/instance" path
+export const instance = atom<Instance>({
+  key: "instance",
+  default: DefaultInstance,
+  effects_UNSTABLE: [persistAtom],
+});
+
+// Default instance to be used as dummy to pre-populate forms
+export const instanceFormFields = atom<Instance>({
+  key: "instanceFormFields",
+  default: DefaultInstance,
+});
+
+// MULTIPLE INSTANCES HANDLERS
+//
+
+// Array of registered instances IDs
+//    NOTE: Typically used together with `atomFamilies` to track IDs in the collection
+export const instanceIds = atom<number[]>({
+  key: "instanceIds",
+  default: [],
+  effects_UNSTABLE: [persistAtom],
+});
+
+// Array of registered services in an instance IDs
+//    NOTE: Typically used together with `atomFamilies` to track IDs in the collection
+export const instanceServiceIDs = atom<string[]>({
+  key: "instanceProxyServiceIDs",
+  default: [],
+});
+
+// Collection of instances registered
+export const instances = atomFamily<Instance, number>({
+  key: "instance",
+  default: DefaultInstance,
+  effects_UNSTABLE: [persistAtom],
+});
+
+// Collection of services registered
+export const instanceService = atomFamily<InstanceProxyService, string>({
+  key: "instanceProxyService",
+  default: DefaultInstanceProxyService,
+});
+
+// A selector that fetch the proxy and services details of an instance
 export const instanceProxySelector = selectorFamily({
   key: "getProxyAPI",
   get:
@@ -79,16 +96,7 @@ export const instanceProxySelector = selectorFamily({
     },
 });
 
-export const instanceServiceIDs = atom<string[]>({
-  key: "instanceProxyServiceIDs",
-  default: [],
-});
-
-export const instanceService = atomFamily<InstanceProxyService, string>({
-  key: "instanceProxyService",
-  default: DefaultInstanceProxyService,
-});
-
+// Selector that returns the list of registered services
 export const instanceProxyServiceSelector = selector({
   key: "getProxyServices",
   get: ({ get }) => {
@@ -100,4 +108,26 @@ export const instanceProxyServiceSelector = selector({
 
     return services;
   },
+});
+
+//
+// FORMS
+//
+type FormError = {
+  [key: string]: string;
+};
+
+export const DefaultFormError = {} as FormError;
+
+export const intanceFormErrors = atom<FormError>({
+  key: "intanceFormErrors",
+  default: DefaultFormError,
+});
+
+export const intanceFormFieldErrors = selectorFamily({
+  key: "profileFormFieldErrors",
+  get:
+    (field: string) =>
+    ({ get }) =>
+      get(intanceFormErrors)[field],
 });

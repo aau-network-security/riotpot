@@ -58,7 +58,7 @@ export const AddWithValidators = ({
   if (!!Object.keys(errorState.getter).length) return;
 
   // Add a new id
-  var element: any = {
+  let element: any = {
     ...newElement,
     id: uuid(),
   };

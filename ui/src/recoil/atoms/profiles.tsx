@@ -40,7 +40,7 @@ export const profilesFilter = selectorFamily({
       const profs: any = get(profiles);
       const profInd = profs.findIndex((x: Profile) => x.id === id);
 
-      var cp = [...profs];
+      let cp = [...profs];
       cp[profInd] = { ...cp[profInd], ...newValue };
 
       return set(profiles, cp);
@@ -93,7 +93,7 @@ export const AddProfileValidator = (
   errors: any
 ) => {
   const err = "Invalid value";
-  var errs = false;
+  let errs = false;
 
   // Validate the fields
   profileList.forEach((curr) => {
@@ -107,7 +107,7 @@ export const AddProfileValidator = (
   if (errs) return;
 
   // Add the profile and reset the values
-  var newprofile: Profile = {
+  let newprofile: Profile = {
     ...profile,
     id: uuid(),
   };

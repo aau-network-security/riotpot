@@ -1,6 +1,6 @@
 import "./Common.scss";
 
-import { Badge, Button, Dropdown } from "react-bootstrap";
+import { Badge, Button, Col, Dropdown, InputGroup } from "react-bootstrap";
 import { getPage, InteractionOption, Page } from "../../constants/globals";
 import { FiEdit2, FiMoreHorizontal } from "react-icons/fi";
 import { SimpleDropdown } from "../dropdown/Dropdown";
@@ -35,11 +35,14 @@ type AddressProps = {
 
 export const Address = ({ host, port }: AddressProps) => {
   const page = getPage("Services");
+  port = `${port}`;
 
   return (
-    <span className="address">
-      {page && <page.icon />} {`${host} : ${port}`}
-    </span>
+    <InputGroup className="address">
+      <InputGroup.Text>{page && <page.icon />}</InputGroup.Text>
+      <InputGroup.Text as={Col}>{host}</InputGroup.Text>
+      <InputGroup.Text as={Col}>{port}</InputGroup.Text>
+    </InputGroup>
   );
 };
 

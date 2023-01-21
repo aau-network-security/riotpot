@@ -7,7 +7,6 @@ import "./App.scss";
 /* Components */
 import Navbar from "./components/navbar/Navbar";
 import Services from "./routes/services/Services";
-import Instances from "./routes/instances/Instances";
 import Profiles from "./routes/profiles/Profiles";
 import Profile from "./routes/profiles/Profile";
 import Instance from "./routes/instances/Instance";
@@ -27,13 +26,10 @@ function App() {
           </Col>
 
           {/* Content */}
-          <Col xs={7}>
+          <Col xs={9}>
             <SimpleBreadcrumb />
             <Routes>
-              <Route path="instances">
-                <Route index element={<Instances />} />
-                <Route path=":id" element={<Instance />}></Route>
-              </Route>
+              <Route path="instance" element={<Instance />}></Route>
               <Route path="services">
                 <Route index element={<Services />} />
                 <Route path=":id"></Route>

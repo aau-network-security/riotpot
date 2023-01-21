@@ -1,5 +1,5 @@
 import React, { Children, useRef, useState } from "react";
-import { Col, Dropdown, FormControl } from "react-bootstrap";
+import { Col, Dropdown, FormControl, Row } from "react-bootstrap";
 import { AiOutlineInfoCircle, AiOutlinePlus } from "react-icons/ai";
 import { CustomToggle } from "../../components/dropdown/Dropdown";
 import { CenteredModal } from "../../components/modal/Modal";
@@ -140,11 +140,13 @@ const InstancesAddProfileDropdownMenu = React.forwardRef(
 
 const ProfilePop = ({ service }: { service: Service }) => {
   return (
-    <Col>
-      {service.name}
-      <NetworkBadge {...service.network} />
-      <InteractionBadge {...service.interaction} />
-    </Col>
+    <Row>
+      <Col className="profile">{service.name}</Col>
+      <Col className="badges">
+        <NetworkBadge {...service.network} />
+        <InteractionBadge {...service.interaction} />
+      </Col>
+    </Row>
   );
 };
 
@@ -153,7 +155,7 @@ export const ProfileRowInfoPop = ({ services }: { services: Service[] }) => {
   const target = useRef(null);
 
   return (
-    <>
+    <Row>
       <small
         className="info"
         ref={target}
@@ -166,11 +168,11 @@ export const ProfileRowInfoPop = ({ services }: { services: Service[] }) => {
       {!!services.length && (
         <Pop target={target} show={show} placement="left">
           {services.map((service) => {
-            return <ProfilePop service={service} />;
+            return <ProfilePop key={service.id} service={service} />;
           })}
         </Pop>
       )}
-    </>
+    </Row>
   );
 };
 
@@ -226,6 +228,6 @@ const AddButton = () => {
 };
 
 export const InstancesUtils = () => {
-  const buttons = [<AddButton />];
+  const buttons = [<AddButton key="addButton" />];
   return <UtilsBar buttons={buttons} />;
 };
