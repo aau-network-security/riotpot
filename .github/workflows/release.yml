@@ -4,6 +4,8 @@ on:
   pull_request:
     paths-ignore:
       - "**.md"
+    branches:
+      - "staging"
 
 jobs:
   riotpot:
@@ -72,7 +74,6 @@ jobs:
         uses: softprops/action-gh-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        if: github.ref_name == 'staging'
         with:
           name: latest
           files: artifacts/riotpot.zip
