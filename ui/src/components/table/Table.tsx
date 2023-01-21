@@ -12,8 +12,9 @@ const Headers = ({ headers }: { headers: any }) => {
   return (
     <thead>
       <tr className="tableHeaders">
-        {headers.map((cell: any) => {
-          return <Header content={cell} />;
+        {headers.map((cell: any, ind: number) => {
+          const key = `header-${ind}`;
+          return <Header content={cell} key={key} />;
         })}
       </tr>
     </thead>
@@ -23,8 +24,9 @@ const Headers = ({ headers }: { headers: any }) => {
 export const Row = ({ cells }: { cells: any }) => {
   return (
     <tr className="tableRow">
-      {cells.map((content: any, ind: Number) => {
-        return <Cell content={content} />;
+      {cells.map((content: any, ind: number) => {
+        const key = `cell-${ind}`;
+        return <Cell content={content} key={key} />;
       })}
     </tr>
   );
@@ -33,8 +35,9 @@ export const Row = ({ cells }: { cells: any }) => {
 const Body = ({ rows, children }: { rows: any[]; children: any[] }) => {
   return (
     <tbody>
-      {rows.map((cells: any[], ind: Number) => {
-        return <Row cells={cells} />;
+      {rows.map((cells: any[], ind: number) => {
+        const key = `tablerow-${ind}`;
+        return <Row cells={cells} key={key} />;
       })}
       {children}
     </tbody>

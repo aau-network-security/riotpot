@@ -15,7 +15,7 @@ RUN npm install react-scripts -g --silent
 COPY ui/ .
 
 # Creates the build
-RUN npm run build --production
+RUN npm run build --omit=dev
 
 FROM golang:1.18 as builder
 

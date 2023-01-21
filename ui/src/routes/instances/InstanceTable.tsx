@@ -33,7 +33,7 @@ import {
 } from "./InstanceAPI";
 import InstanceUtils from "./InstanceUtils";
 
-const ProxyServicceRowOptions = ({
+const ProxyServiceRowOptions = ({
   host,
   proxyID,
   serviceName,
@@ -216,8 +216,8 @@ const InstanceServiceRow = ({
       host={instance.host + ":" + instance.port}
       proxy={proxy}
     />,
-    <ProxyServicceRowOptions
-      key={proxy.id}
+    <ProxyServiceRowOptions
+      key={3}
       host={instance.host + ":" + instance.port}
       proxyID={proxy.id}
       serviceName={proxy.service.name}
@@ -285,7 +285,6 @@ const InstanceServicesTable = ({ instance }: { instance: Instance }) => {
           you should see an empty table here instead of this message. Once you
           have troubleshooted the issue, reload the page.
         </p>
-        <p>{error.message}</p>
         <small>
           No luck? Perhaps riotpot is not running. Maybe not in the given
           address; check your <a href="/settings">settings</a>!
@@ -295,7 +294,7 @@ const InstanceServicesTable = ({ instance }: { instance: Instance }) => {
   }
 
   // Map the rows into a proxy service
-  const rows = proxyServices.map((proxy: any) => (
+  const rows = proxyServices.map((proxy: InstanceProxyService) => (
     <InstanceServiceRow key={proxy.id} instance={instance} proxy={proxy} />
   ));
 

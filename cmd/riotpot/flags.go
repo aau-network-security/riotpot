@@ -38,10 +38,11 @@ var (
 )
 
 var (
-	debug        = flag.Bool("debug", true, "Set log level to debug")
-	runApi       = flag.Bool("api", true, "Whether to start the API")
-	loadPlugins  = flag.Bool("plugins", true, "Whether to load the low-interaction honeypot plugins")
-	allowedHosts = flag.String("whitelist", "http://localhost", "List of allowed hosts to contact the API")
+	debug       = flag.Bool("debug", true, "Set log level to debug")
+	runApi      = flag.Bool("api", true, "Whether to start the API")
+	loadPlugins = flag.Bool("plugins", true, "Whether to load the low-interaction honeypot plugins")
+	//						  embeded ui ->  |---------------||--------------------| <- separated ui (debug)
+	allowedHosts = flag.String("whitelist", "http://localhost,http://localhost:3000", "List of allowed hosts to contact the API")
 	loadUi       = flag.Bool("ui", true, "Whether to start the UI")
 )
 

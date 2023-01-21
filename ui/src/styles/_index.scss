@@ -19,9 +19,15 @@ $padding: .5em;
 
 /* FONT */
 @import url('https://rsms.me/inter/inter.css');
-html { font-family: 'Inter', sans-serif; }
+
+html {
+    font-family: 'Inter', sans-serif;
+}
+
 @supports (font-variation-settings: normal) {
-  html { font-family: 'Inter var', sans-serif; }
+    html {
+        font-family: 'Inter var', sans-serif;
+    }
 }
 
 @mixin font($font-family, $font-file) {
@@ -33,12 +39,12 @@ html { font-family: 'Inter', sans-serif; }
     }
 }
 
-@mixin component($text: $color){
+@mixin component($text: $color) {
     border: 1px solid $border;
     border-radius: $radius;
 }
 
-@mixin popup{
+@mixin popup {
     background: $background-light;
     color: $color;
     border: 1px solid $border-dark;
@@ -46,27 +52,30 @@ html { font-family: 'Inter', sans-serif; }
     border-radius: $radius;
 }
 
-@mixin popup-element{
+@mixin popup-element {
     padding: $padding;
 }
 
-@mixin simple-form{
-    form{
-        font-family: 'Inter var', sans-serif!important;
+@mixin simple-form {
 
-        label{
+    form,
+    div.dropdown-menu {
+        font-family: 'Inter var', sans-serif !important;
+
+        label {
             font-weight: bold;
         }
 
-        input:not(.select__input), textarea{
-            background: $background-dark!important;
+        input:not(.select__input),
+        textarea {
+            background: $background-dark !important;
             color: $color;
             border-radius: $radius;
             border: 1px solid $border-dark;
         }
 
-        small{
-            color: $color-dim!important;
+        small {
+            color: $color-dim !important;
             font-size: .9em;
         }
     }
@@ -75,8 +84,8 @@ html { font-family: 'Inter', sans-serif; }
 /*
     Abstraction of the theme to be used on the application.
 */
-@mixin theme($theme-name, $background: $background, $text: $color, $border: $border){
-    .#{$theme-name}{
+@mixin theme($theme-name, $background: $background, $text: $color, $border: $border) {
+    .#{$theme-name} {
         background: $background;
         height: 100vh; // whole screen
         padding: 5%;
@@ -86,22 +95,22 @@ html { font-family: 'Inter', sans-serif; }
             font-family: 'Inter var', sans-serif;
         }
 
-        main{
+        main {
             gap: 1em;
             display: flex;
             flex-direction: column;
         }
 
-        small{
+        small {
             color: $color-dim;
             gap: .5em;
         }
 
-        div.component{
+        div.component {
             @include component();
         }
 
-        svg{
+        svg {
             fill: $color-dim;
         }
 

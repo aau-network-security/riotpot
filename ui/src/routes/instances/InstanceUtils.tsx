@@ -1,5 +1,5 @@
 import React, { Children, useState } from "react";
-import { Dropdown, FormControl } from "react-bootstrap";
+import { Col, Dropdown, FormControl } from "react-bootstrap";
 import { AiOutlinePlus } from "react-icons/ai";
 import { useRecoilCallback, useRecoilValue } from "recoil";
 import { CustomToggle } from "../../components/dropdown/Dropdown";
@@ -37,6 +37,7 @@ const InstanceAddServiceDropdownMenu = React.forwardRef(
           onChange={(e) => setValue(e.target.value)}
           value={value}
         />
+        <Dropdown.Divider />
         <ul className="list-unstyled">
           {Children.toArray(props.children).filter(
             (child: any) =>
@@ -58,9 +59,11 @@ const ServiceDropdownRow = ({
 }) => {
   return (
     <Dropdown.Item onClick={() => handler(service)}>
-      {service.name}
-      <NetworkBadge {...service.network} />
-      <InteractionBadge {...service.interaction} />
+      <Col>{service.name}</Col>
+      <Col className="badges">
+        <NetworkBadge {...service.network} />
+        <InteractionBadge {...service.interaction} />
+      </Col>
     </Dropdown.Item>
   );
 };
@@ -88,8 +91,12 @@ const AddButton = ({ host }: { host: string }) => {
 
   const handler = (service: Service) => {
     const response = addProxyService(host, service);
+
     response
       .then((data) => {
+        if ("error" in data) {
+          return;
+        }
         addToList(data);
       })
       .catch((err) => {
