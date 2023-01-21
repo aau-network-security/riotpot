@@ -3,6 +3,7 @@ import { Col, Dropdown, FormControl } from "react-bootstrap";
 import { AiOutlinePlus } from "react-icons/ai";
 import { useRecoilCallback, useRecoilValue } from "recoil";
 import { CustomToggle } from "../../components/dropdown/Dropdown";
+import { useToast } from "../../components/toast/Toast";
 import { InteractionBadge, NetworkBadge } from "../../components/utils/Common";
 import { UtilsBar } from "../../components/utils/Utils";
 import {
@@ -11,6 +12,7 @@ import {
   instanceServiceIDs,
 } from "../../recoil/atoms/instances";
 import { Service, services } from "../../recoil/atoms/services";
+import { ErrorToastVariant } from "../../recoil/atoms/toast";
 import { addProxyService } from "./InstanceAPI";
 
 type CustomMenuProps = {
@@ -69,6 +71,8 @@ const ServiceDropdownRow = ({
 };
 
 const AddButton = ({ host }: { host: string }) => {
+  const { showToast } = useToast();
+
   // Get the ids and the services
   const servs = useRecoilValue(services);
 
@@ -95,6 +99,7 @@ const AddButton = ({ host }: { host: string }) => {
     response
       .then((data) => {
         if ("error" in data) {
+          showToast(data["error"], ErrorToastVariant);
           return;
         }
         addToList(data);

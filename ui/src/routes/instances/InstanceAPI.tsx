@@ -91,8 +91,7 @@ export const changeProxyPort = async (
 export const changeProxyStatus = async (
   host: string,
   id: string,
-  status: string,
-  changeStatus: (status: string) => any
+  status: string
 ) => {
   return await fetch("http://" + host + "/api/proxies/" + id + "/status", {
     method: "POST",
@@ -104,10 +103,6 @@ export const changeProxyStatus = async (
     },
   })
     .then((response) => response.json())
-    .then((data) => {
-      if (["running", "stopped"].includes(data.status))
-        changeStatus(data.status);
-    })
     .catch((error) => {
       return error;
     });

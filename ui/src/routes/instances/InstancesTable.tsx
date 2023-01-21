@@ -12,7 +12,7 @@ import { Link } from "react-router-dom";
 import { useRecoilCallback, useRecoilState, useRecoilValue } from "recoil";
 import { SimpleForm } from "../../components/forms/Form";
 import { Pop } from "../../components/pop/Pop";
-import { Table, Row } from "../../components/table/Table";
+import { Table, TableRow } from "../../components/table/Table";
 import {
   DeleteDropdownItem,
   EditDropdownItem,
@@ -226,7 +226,7 @@ const InstanceRow = ({ id }: { id: number }) => {
     <InstanceRowOptions key="options" instance={instance} />,
   ];
 
-  return <Row cells={cells} />;
+  return <TableRow cells={cells} />;
 };
 
 export const InstancesTable = () => {

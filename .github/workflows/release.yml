@@ -1,7 +1,9 @@
 name: Releaser
 
 on:
-  pull_request:
+  push:
+    tags:
+      - "v*"
     paths-ignore:
       - "**.md"
 
@@ -17,9 +19,6 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
-
-      - name: Fetch all tags
-        run: git fetch --force --tags
 
       - name: Set up Node.js
         uses: actions/setup-node@v3
@@ -72,7 +71,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        if: startsWith(github.ref, 'refs/tags/') && github.ref_name == 'staging' && github.event_name == 'pull_request'
         with:
           name: latest
+          tag_name: ${{github.ref_name}}
           files: artifacts/riotpot.zip

@@ -8,6 +8,7 @@
             gap: 1em;
             display: flex;
             flex-direction: row;
+            align-items: center;
 
             &:hover{
                 background: $border-dark;
