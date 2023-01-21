@@ -49,6 +49,7 @@ The following table contains the list of services included in RIoTPot by defaul,
 > - [RIoTPoT](#riotpot)
 >   - [1. Architecture](#1-architecture)
 >   - [2. How to use RIoTPot](#2-how-to-use-riotpot)
+>   - [3. Commands](#3-commands)
 
 ## 1. Architecture
 
@@ -252,3 +253,15 @@ The container can be setup in three simple steps:
     ```
 
 </details>
+
+## 3. Commands
+
+RIoTPot comes with a few flag commands that affect how and what is started.
+
+ | Flag        | Type    | Default                                | Description                                              |
+ | ----------- | ------- | -------------------------------------- | -------------------------------------------------------- |
+ | --debug     | Boolean | True                                   | Set log level to debug                                   |
+ | --api       | Boolean | True                                   | Whether to start the API                                 |
+ | --plugins   | Boolean | True                                   | Whether to load the low-interaction honeypot plugins     |
+ | --whitelist | String  | http://localhost,http://localhost:3000 | List of comma separated allowed hosts to contact the API |
+ | --ui        | Boolean | True                                   | Whether to start the UI                                  |
