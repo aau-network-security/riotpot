@@ -49,11 +49,8 @@ type Modbus struct {
 
 func (m *Modbus) Run() (err error) {
 
-	// convert the port number to a string that we can use it in the server
-	var port = fmt.Sprintf(":%d", m.GetPort())
-
 	// start a service in the `echo` port
-	listener, err := net.Listen("tcp", port)
+	listener, err := net.Listen(m.GetNetwork().String(), m.GetAddress())
 	logger.Log.Error().Err(err)
 
 	// build a channel stack to receive connections to the service

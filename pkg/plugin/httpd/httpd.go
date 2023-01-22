@@ -39,7 +39,7 @@ func (h *Http) Run() (err error) {
 	mux.Handle("/", http.HandlerFunc(h.valid))
 
 	srv := &http.Server{
-		Addr:    fmt.Sprintf(":%d", h.GetPort()),
+		Addr:    h.GetAddress(),
 		Handler: mux,
 	}
 

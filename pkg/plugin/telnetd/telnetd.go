@@ -2,13 +2,11 @@ package main
 
 import (
 	"bufio"
-	"fmt"
 	"io/ioutil"
 	"net"
 
 	"github.com/riotpot/internal/globals"
 	"github.com/riotpot/internal/logger"
-	lr "github.com/riotpot/internal/logger"
 	"github.com/riotpot/internal/services"
 	"github.com/riotpot/pkg/fake/shell"
 )
@@ -29,7 +27,7 @@ func Telnetd() services.Service {
 	mx := services.NewPluginService(name, port, network)
 	content, err := ioutil.ReadFile("banner.txt")
 	if err != nil {
-		lr.Log.Fatal().Err(err)
+		logger.Log.Fatal().Err(err)
 	}
 
 	return &Telnet{
@@ -44,12 +42,8 @@ type Telnet struct {
 }
 
 func (t *Telnet) Run() (err error) {
-
-	// convert the port number to a string that we can use it in the server
-	var port = fmt.Sprintf(":%d", t.GetPort())
-
 	// start a service in the `telnet` port
-	listener, err := net.Listen(t.GetNetwork().String(), port)
+	listener, err := net.Listen(t.GetNetwork().String(), t.GetAddress())
 	logger.Log.Error().Err(err)
 
 	// build a channel stack to receive connections to the service

@@ -2,7 +2,6 @@ package main
 
 import (
 	"bufio"
-	"fmt"
 	"net"
 
 	"github.com/riotpot/internal/globals"
@@ -36,11 +35,8 @@ type Echo struct {
 }
 
 func (e *Echo) Run() (err error) {
-	// convert the port number to a string that we can use it in the server
-	var port = fmt.Sprintf(":%d", e.GetPort())
-
 	// start a service in the `echo` port
-	listener, err := net.Listen(e.GetNetwork().String(), port)
+	listener, err := net.Listen(e.GetNetwork().String(), e.GetAddress())
 	logger.Log.Error().Err(err)
 
 	// build a channel stack to receive connections to the service

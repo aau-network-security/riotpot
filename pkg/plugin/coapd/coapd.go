@@ -67,7 +67,7 @@ func (c *Coap) Run() (err error) {
 
 	// Run the server listening on the given port and using the defined
 	// lvl4 layer protocol.
-	err = coap.ListenAndServe(c.GetNetwork().String(), fmt.Sprintf(":%d", c.GetPort()), r)
+	err = coap.ListenAndServe(c.GetNetwork().String(), c.GetAddress(), r)
 
 	return
 }
