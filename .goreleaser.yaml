@@ -35,14 +35,16 @@ release:
   draft: true
   replace_existing_draft: true
   mode: append
-  extra_files:
-    - glob: ./bin/plugins
 
 archives:
   - format: zip
+    strip_parent_binary_folder: true
     files:
       - LICENSE*
       - CHANGELOG*
+      - src: bin/plugins/*.go
+        dst: plugins
+        strip_parent: true
 
 checksum:
   name_template: "checksums.txt"
