@@ -159,7 +159,12 @@ It is important to keep the internal folder structure for RIoTPot to work as int
     git clone git@github.com:aau-network-security/riotpot.git
     ```
 
-2. Navigate to the folder in where you have downloaded the RIoTPot source.
+2. Navigate to the folder in where you have downloaded the RIoTPot source and install the required node packages.
+
+    ```bash
+    npm install
+    ```
+
 3. If you have installed [Make](https://www.gnu.org/software/make/), we have included multiple command helpers to assist you building the project. To put it simple, you can run two simple commands that will build the RIoTPot binary and the plugins (and place them in the right folder).
 
     ```bash
@@ -168,6 +173,8 @@ It is important to keep the internal folder structure for RIoTPot to work as int
     # Builds RIoTPot and the plugins
     make riotpot-build
     ```
+
+> **__NOTE__:** The UI uses [Vite](https://vitejs.dev/) to build the project. If you prefer to use another builder, you may need to make a few changes first on your own.
 
 </details>
 
@@ -256,12 +263,17 @@ The container can be setup in three simple steps:
 
 ## 3. Commands
 
-RIoTPot comes with a few flag commands that affect how and what is started.
+RIoTPot comes with flag commands that affect how and what is started.
+Example:
+```bash
+# Run RIoTPot without the ui
+./riotpot --ui false
+```
 
- | Flag        | Type    | Default                                | Description                                              |
- | ----------- | ------- | -------------------------------------- | -------------------------------------------------------- |
- | --debug     | Boolean | True                                   | Set log level to debug                                   |
- | --api       | Boolean | True                                   | Whether to start the API                                 |
- | --plugins   | Boolean | True                                   | Whether to load the low-interaction honeypot plugins     |
- | --whitelist | String  | http://localhost,http://localhost:3000 | List of comma separated allowed hosts to contact the API |
- | --ui        | Boolean | True                                   | Whether to start the UI                                  |
+ | Flag      | Type    | Default                                | Description                                              |
+ | --------- | ------- | -------------------------------------- | -------------------------------------------------------- |
+ | debug     | Boolean | false                                  | Set log level to debug                                   |
+ | api       | Boolean | true                                   | Whether to start the API                                 |
+ | plugins   | Boolean | true                                   | Whether to load the low-interaction honeypot plugins     |
+ | whitelist | String  | http://localhost,http://localhost:3000 | List of comma separated allowed hosts to contact the API |
+ | ui        | Boolean | true                                   | Whether to start the UI                                  |
