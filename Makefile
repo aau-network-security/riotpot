@@ -4,10 +4,10 @@ SHELL := /bin/bash
 APPNAME=riotpot
 DOCKER=build/docker/
 PLUGINS_DIR=pkg/plugin
-EXCLUDE_PLUGINS= modbusd coapd mqttd
+EXCLUDE_PLUGINS=
 
 # docker cmd below
-.PHONY:  docker-build-doc docker-doc-up up down up-all build build-plugins build-all build-ui serve-ui statik
+.PHONY:  docker-build-doc docker-doc-up up down up-all build build-plugins build-all build-ui statik
 docker-build-doc:
 	docker build -f $(DOCKER)Dockerfile.documentation . -t $(APPNAME)/v1
 docker-doc-up: docker-build-doc
@@ -39,8 +39,6 @@ build-ui:
 build-all: \
 	build \
 	build-plugins
-serve-ui:
-	@serve -s ./ui/build
 
 statik:
 	@statik -src=/api/swagger

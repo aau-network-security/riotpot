@@ -38,7 +38,7 @@ var (
 )
 
 var (
-	debug       = flag.Bool("debug", true, "Set log level to debug")
+	debug       = flag.Bool("debug", false, "Set log level to debug")
 	runApi      = flag.Bool("api", true, "Whether to start the API")
 	loadPlugins = flag.Bool("plugins", true, "Whether to load the low-interaction honeypot plugins")
 	//						  embeded ui ->  |---------------||--------------------| <- separated ui (debug)

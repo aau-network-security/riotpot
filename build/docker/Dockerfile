@@ -7,12 +7,9 @@ WORKDIR /app
 ENV PATH /app/node_modules/.bin:$PATH
 
 # install app dependencies
-COPY ui/package*.json ./
-RUN npm install --silent
-RUN npm install react-scripts -g --silent
-
 # add app
 COPY ui/ .
+RUN npm install --silent
 
 # Creates the build
 RUN npm run build --omit=dev
@@ -22,8 +19,9 @@ FROM golang:1.18 as builder
 # Set the working directory to golang working space
 WORKDIR /riotpot
 
-# Copy the files from the previous build into the ui folder
-COPY --from=ui app ui/
+# Copy the build and `embed.go` files from the ui folder
+COPY --from=ui app/build/ ui/build/
+COPY --from=ui app/embed.go ui/
 
 # Copy the dependencies into the image
 COPY go.mod ./

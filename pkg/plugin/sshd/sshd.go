@@ -59,10 +59,7 @@ func (s *SSH) Run() (err error) {
 	priv := s.PrivateKey()
 	config.AddHostKey(priv)
 
-	// convert the port number to a string that we can use it in the server
-	port := fmt.Sprintf(":%d", s.GetPort())
-
-	listener, err := net.Listen(s.GetNetwork().String(), port)
+	listener, err := net.Listen(s.GetNetwork().String(), s.GetAddress())
 	if err != nil {
 		return
 	}
