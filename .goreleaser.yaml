@@ -35,14 +35,13 @@ release:
   draft: true
   replace_existing_draft: true
   mode: append
-  target_commitish: "{{ .Commit }}"
 
 archives:
   - format: zip
     files:
       - LICENSE*
       - CHANGELOG*
-      - src: "./bin/plugins/*.go"
+      - src: "bin/plugins/*"
         dst: plugins
         strip_parent: true
 
