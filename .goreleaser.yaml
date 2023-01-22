@@ -11,7 +11,7 @@ builds:
     main: ./cmd/riotpot/.
 
     # Binary destination
-    binary: ./bin/
+    binary: riotpot
     env:
       - CGO_ENABLED=0
 
@@ -35,6 +35,8 @@ release:
   draft: true
   replace_existing_draft: true
   mode: append
+  extra_files:
+    - glob: ./bin/plugins
 
 archives:
   - format: zip
