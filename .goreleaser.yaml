@@ -35,6 +35,7 @@ release:
   draft: true
   replace_existing_draft: true
   mode: append
+  target_commitish: "{{ .Commit }}"
 
 archives:
   - format: zip
