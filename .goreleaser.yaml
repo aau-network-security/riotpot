@@ -1,0 +1,55 @@
+project_name: riotpot
+
+dist: .bin
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - # Folder with the package
+    main: ./cmd/riotpot/.
+
+    # Binary destination
+    binary: ./bin/
+    env:
+      - CGO_ENABLED=0
+
+    # List of systems to build for
+    goos:
+      - linux
+      - darwin
+    goarm:
+      - "7"
+    ignore:
+      - goos: darwin
+        goarch: arm
+
+    # Building flags
+    # We need this because we are using plugins
+    # The plugins are prebuilt in another action
+    gcflags:
+      - all=-N -l
+
+release:
+  draft: true
+  replace_existing_draft: true
+  mode: append
+
+archives:
+  - format: zip
+    files:
+      - LICENSE*
+      - CHANGELOG*
+
+checksum:
+  name_template: "checksums.txt"
+
+snapshot:
+  name_template: "{{ incpath .Version }}-next"
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^ui:"
