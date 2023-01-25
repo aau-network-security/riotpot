@@ -144,52 +144,5 @@
         }
       ]
     }
-  ],
-  "instances": [
-    {
-      "id": 0,
-      "name": "Lab-1",
-      "host": "localhost:2022",
-      "description": "Laboratory 1",
-      "profile": {
-        "id": "507ba0e-1ca3-0c20-ab57-a3565fa661ca",
-        "name": "Wi-Fi Router",
-        "description": "A standard and not very secure router",
-        "services": [
-          {
-            "id": "86c0e0a-f43d-8a42-10d-203206d14ec",
-            "name": "Telnet",
-            "network": { "value": "tcp", "label": "TCP" },
-            "interaction": { "value": "low", "label": "Low" },
-            "host": "localhost",
-            "port": "23"
-          },
-          {
-            "id": "10cb66b-f5ca-8803-6626-6267a3f116",
-            "name": "Echo",
-            "network": { "value": "tcp", "label": "TCP" },
-            "interaction": { "value": "low", "label": "Low" },
-            "host": "localhost",
-            "port": "7"
-          },
-          {
-            "id": "a27de5-e071-24d0-01b6-ff0a5dae7416",
-            "name": "SSH",
-            "network": { "value": "tcp", "label": "TCP" },
-            "interaction": { "value": "low", "label": "Low" },
-            "host": "cowrie",
-            "port": "22"
-          },
-          {
-            "id": "00231e-c1f-f8a-257a-0000f57af3a",
-            "name": "HTTP",
-            "network": { "value": "tcp", "label": "TCP" },
-            "interaction": { "value": "high", "label": "High" },
-            "host": "http",
-            "port": "80"
-          }
-        ]
-      }
-    }
   ]
 }

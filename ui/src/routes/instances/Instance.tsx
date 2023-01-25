@@ -13,7 +13,7 @@ const Instance = () => {
     <main>
       <Title title={ins.name} subTitle={ins.description} />
       <React.Suspense fallback="Loading...">
-        <InstanceServicesTable instance={ins} />
+        <InstanceServicesTable />
       </React.Suspense>
     </main>
   );
