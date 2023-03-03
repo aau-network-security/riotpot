@@ -4,6 +4,10 @@ RUN apt-get update && \
     apt-get install -y \
     python3 pip ssh telnet
 
-RUN pip install paho-mqtt
+RUN python3 -m venv ./venv
+ENV PATH="./venv/bin:$PATH"
+
+RUN . ./venv/bin/activate && \
+    pip install paho-mqtt
 
 CMD ["bash"]
