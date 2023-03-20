@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Button, Form, InputGroup, Row, Stack } from "react-bootstrap";
 import { MutableSnapshot, Snapshot, useRecoilCallback } from "recoil";
-import { instanceIds, instances } from "../../recoil/atoms/instances";
 import { profiles } from "../../recoil/atoms/profiles";
 import { services } from "../../recoil/atoms/services";
 import stateData from "../../data/riotpot-state.json";
@@ -11,31 +10,15 @@ export function initState(snapshot: MutableSnapshot) {
 
   snapshot.set(profiles, stateData.profiles);
   snapshot.set(services, stateData.services);
-
-  snapshot.set(
-    instanceIds,
-    stateData.instances.map((inst: any) => inst.id)
-  );
-
-  stateData.instances.forEach((inst: any) =>
-    snapshot.set(instances(inst.id), inst)
-  );
 }
 
 async function processSnapshot(snapshot: Snapshot) {
   const persistedServices = await snapshot.getPromise(services);
   const persistedProfiles = await snapshot.getPromise(profiles);
-  const persistedInstances = [];
-  const persistedInstancesIds = await snapshot.getPromise(instanceIds);
-  for (let instId of persistedInstancesIds) {
-    const inst = await snapshot.getPromise(instances(instId));
-    persistedInstances.push(inst);
-  }
 
   const data = JSON.stringify({
     services: persistedServices,
     profiles: persistedProfiles,
-    instances: persistedInstances,
   });
 
   localStorage.setItem("riotpot_storage", data);
@@ -48,13 +31,6 @@ const LoadStateButton = () => {
   const loadState = useRecoilCallback(({ set }) => (data: any) => {
     set(services, data.services);
     set(profiles, data.profiles);
-
-    const ids = data["instances"].map((inst: any) => inst.id);
-    set(instanceIds, ids);
-
-    for (let inst of data.instances) {
-      set(instances(inst.id), inst);
-    }
   });
 
   const handleChange = (event: any) => {

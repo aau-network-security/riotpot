@@ -46,8 +46,9 @@ export const servicesFilter = selectorFamily({
     (id: string) =>
     ({ get, set }, newValue) => {
       const servs: any = get(services);
-      const servInd = servs.findIndex((x: Service) => x.id === id);
 
+      // Replaces a service
+      const servInd = servs.findIndex((x: Service) => x.id === id);
       let cp = [...servs];
       cp[servInd] = { ...cp[servInd], ...newValue };
 
@@ -99,6 +100,7 @@ export const serviceFormFieldErrors = selectorFamily({
       get(serviceFormErrors)[field],
 });
 
+// Function that validates that two services do not have the same name
 export const ServiceNameValidator = (props: ValidatorProps) => {
   props.query.forEach((q) => {
     if (q.name === props.element.name) {

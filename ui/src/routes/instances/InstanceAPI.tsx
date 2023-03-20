@@ -7,22 +7,24 @@ export const fetchProxy = async (host: string) => {
     // Map the content of the response
     .then((data) =>
       data.map((element: any) => {
-        if ("service" in element) {
-          let service = element["service"];
-
-          // Parse the network and the interaction
-          if ("network" in service)
-            service["network"] = NetworkOptions.find(
-              (x) => x.value === service["network"]
-            );
-          if ("interaction" in service)
-            service["interaction"] = InteractionOptions.find(
-              (x) => x.value === service["interaction"]
-            );
-
-          // Re-assign the service
-          element["service"] = service;
+        if (!("service" in element)) {
+          return element;
         }
+
+        let service = element["service"];
+
+        // Parse the network and the interaction
+        if ("network" in service)
+          service["network"] = NetworkOptions.find(
+            (x) => x.value === service["network"]
+          );
+        if ("interaction" in service)
+          service["interaction"] = InteractionOptions.find(
+            (x) => x.value === service["interaction"]
+          );
+
+        // Re-assign the service
+        element["service"] = service;
 
         return element;
       })
@@ -110,9 +112,16 @@ export const changeProxyStatus = async (
 
 // Iterate trhough the services and add them to the host
 export const addFromProfile = async (host: string, services: Service[]) => {
+  let responses = [];
   for (const service of services) {
-    addProxyService(host, service);
+    const response = await addProxyService(host, service);
+
+    if (!response.error) {
+      responses.push(response);
+    }
   }
+
+  return responses;
 };
 
 export const deleteProxyService = async (host: string, proxyID: string) => {

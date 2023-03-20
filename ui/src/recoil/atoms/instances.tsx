@@ -1,8 +1,14 @@
-import { atom, atomFamily, selector, selectorFamily } from "recoil";
+import {
+  atom,
+  selectorFamily,
+  useRecoilCallback,
+  useRecoilValue,
+} from "recoil";
 import { Profile } from "./profiles";
 import { recoilPersist } from "recoil-persist";
 import { fetchProxy } from "../../routes/instances/InstanceAPI";
 import { DefaultService, Service } from "./services";
+import { pseudoRandomBytes } from "crypto";
 
 const { persistAtom } = recoilPersist();
 
@@ -15,7 +21,7 @@ export type Instance = {
   profile: Profile | undefined;
 };
 
-export type InstanceProxyService = {
+export type InstanceProxy = {
   id: string;
   port: number;
   status: string;
@@ -31,7 +37,7 @@ export const DefaultInstance = {
   profile: undefined,
 } as Instance;
 
-export const DefaultInstanceProxyService = {
+export const DefaultInstanceProxy = {
   id: "",
   port: 0,
   status: "stopped",
@@ -51,63 +57,85 @@ export const instanceFormFields = atom<Instance>({
   default: DefaultInstance,
 });
 
-// MULTIPLE INSTANCES HANDLERS
-//
+// Returns the address of the instance in the form of `<host>:<port>`
+// Example: localhost:2022
+export const GetInstanceAddress = () => {
+  const inst = useRecoilValue(instance);
+  return inst.host + ":" + inst.port;
+};
 
-// Array of registered instances IDs
-//    NOTE: Typically used together with `atomFamilies` to track IDs in the collection
-export const instanceIds = atom<number[]>({
-  key: "instanceIds",
-  default: [],
-  effects_UNSTABLE: [persistAtom],
-});
+// Callback selector that returns two functions. One to register and the other to remove
+// a service from the Instance
+export const useInstanceProxy = () => {
+  const pxs = useRecoilValue(proxies);
 
-// Array of registered services in an instance IDs
-//    NOTE: Typically used together with `atomFamilies` to track IDs in the collection
-export const instanceServiceIDs = atom<string[]>({
-  key: "instanceProxyServiceIDs",
-  default: [],
-});
+  // Callback to `register` a service in the Instance
+  const registerProxy = useRecoilCallback(({ set }) => (px: InstanceProxy) => {
+    const prev = pxs.find((p) => p.id === px.id);
 
-// Collection of instances registered
-export const instances = atomFamily<Instance, number>({
-  key: "instance",
-  default: DefaultInstance,
-  effects_UNSTABLE: [persistAtom],
-});
-
-// Collection of services registered
-export const instanceService = atomFamily<InstanceProxyService, string>({
-  key: "instanceProxyService",
-  default: DefaultInstanceProxyService,
-});
-
-// A selector that fetch the proxy and services details of an instance
-export const instanceProxySelector = selectorFamily({
-  key: "getProxyAPI",
-  get:
-    (id: number) =>
-    ({ get }) => {
-      // Get the instance we are looking for
-      const instance = get(instances(id));
-
-      // Return the proxy included in the instance from the API
-      return fetchProxy(instance.host);
-    },
-});
-
-// Selector that returns the list of registered services
-export const instanceProxyServiceSelector = selector({
-  key: "getProxyServices",
-  get: ({ get }) => {
-    const ids = get(instanceServiceIDs);
-    let services = [];
-    for (let id of ids) {
-      services.push(get(instanceService(id)));
+    if (!prev) {
+      set(proxies, [...pxs, px]);
     }
+  });
 
-    return services;
-  },
+  // Callback to `remove` a service from the Instance
+  const removeProxy = useRecoilCallback(({ set }) => (px: InstanceProxy) => {
+    set(proxies, (prev) => prev.filter((x) => x.id !== px.id));
+  });
+
+  const removeProxyFromService = useRecoilCallback(
+    ({ set }) =>
+      (id: string) => {
+        set(proxies, (prev) => prev.filter((p) => p.service.id !== id));
+      }
+  );
+
+  return {
+    registerProxy,
+    removeProxy,
+    removeProxyFromService,
+  };
+};
+
+const remoteProxiesEffect =
+  () =>
+  ({ setSelf }: { setSelf: any }) => {
+    setSelf(async () => {
+      const response = await fetchProxy("localhost:2022");
+
+      if (response.error) {
+        throw response.error;
+      }
+
+      return response.map((proxy: any) => {
+        return { ...DefaultInstanceProxy, ...proxy };
+      });
+    });
+  };
+
+export const proxies = atom<InstanceProxy[]>({
+  key: "proxies",
+  default: [],
+  effects: [remoteProxiesEffect()],
+});
+
+export const instanceProxySelector = selectorFamily({
+  key: "proxy/default",
+  get:
+    (id: string) =>
+    ({ get }) => {
+      const pxs = get(proxies);
+      return pxs.find((x) => x.id === id);
+    },
+  set:
+    (id: string) =>
+    ({ get, set }, newValue) => {
+      const pxs: any = get(proxies);
+      const pxInd = pxs.findIndex((x: InstanceProxy) => x.id === id);
+      let cp = [...pxs];
+      cp[pxInd] = { ...cp[pxInd], newValue };
+      return set(proxies, cp);
+    },
 });
 
 //

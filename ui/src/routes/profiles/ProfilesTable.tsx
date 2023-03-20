@@ -14,7 +14,7 @@ import {
   profilesFilter,
 } from "../../recoil/atoms/profiles";
 
-import { ProfileRowInfoPop } from "../instances/InstancesUtils";
+import { ProfileRowInfoPop } from "../instances/InstanceUtils";
 import { SimpleForm } from "../../components/forms/Form";
 import { ProfileFormFields } from "./ProfileForm";
 import { useLocation } from "react-router-dom";
