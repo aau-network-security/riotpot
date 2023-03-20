@@ -26,7 +26,7 @@ In essence, RIoTPot acts as a proxy service for other honeypots included in the 
 Therefore, you can run any honeypot and other services alongside RIoTPot.
 In addition, there is an UI web-application that you can use to manage your routing.
 
-RIoTPot comes with multiple low-interaction services ready to use.
+The honeypot comes with multiple low-interaction services ready to use.
 Since these services are written as [plugins](https://pkg.go.dev/plugin), they are only supported on Linux; however, you can start RIoTPot without them.
 The following table contains the list of services included in RIoTPot by defaul, their internal port, and proxy port.
 
