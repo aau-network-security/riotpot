@@ -1,3 +1,6 @@
+| :warning: WARNING: This branch is archived |
+| --- |
+
 <div align="center">
   <img src="docs/assets/aau_logo.png" height="100">
   <p align="center">
