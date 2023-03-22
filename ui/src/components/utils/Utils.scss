@@ -1,0 +1,31 @@
+@import "../../styles";
+
+@mixin utils {
+    div.utils{
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 10px;
+    }
+}
+@include utils;
+
+@mixin Address{
+    span.address{
+        width: fit-content;
+    }
+}
+@include Address;
+
+div.profile, div.service{
+    min-width: 5em;
+}
+
+div.badges{
+    display: flex;
+    flex-direction: row;
+    gap: 1em;
+}
+
+

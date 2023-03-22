@@ -1,49 +1,54 @@
-name: release
+name: Releaser
 
 on:
-  push:
-    paths-ignore:
-      - '**.md'
   pull_request:
     paths-ignore:
-      - '**.md'
+      - "**.md"
+    tags:
+      - "v*"
+  push:
+    paths-ignore:
+      - "**.md"
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
 
 jobs:
-  build:
-    strategy:
-      matrix:
-        go-version: [1.16]
-        os: [ubuntu-latest]
-    runs-on: ${{ matrix.os }}
+  riotpot:
+    runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
-    - name: Checkout
-      uses: actions/checkout@v2
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: latest
 
-    - name: Set up Go
-      uses: actions/setup-go@v2
-      with:
-        go-version: ${{ matrix.go-version }}
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.18
+          cache: true
 
-    - name: Cache Go modules
-      uses: actions/cache@v1
-      with:
-        path: ~/go/pkg/mod
-        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-        restore-keys: |
-          ${{ runner.os }}-go-
+      # The UI is not built with the code to reduce the size of the bundle.
+      # In addition, the Docker image builds the UI every time.
+      # Therefore, we need to build it whenever we create a new release
+      - name: Build UI
+        run: npm --prefix=./ui ci && npm --prefix=./ui run build
 
-    - name: Build
-      if:  github.event_name == 'push' && (matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest')
-      run: cd cmd/riotpot && go build -o bin/ -v
+      - name: Build Plugins
+        run: make build-plugins
 
-    # Autoreleaser https://goreleaser.com/ci/actions/
-    # it MAY need secrets! more: https://docs.github.com/en/actions/reference/encrypted-secrets
-    - name: Run GoReleaser
-      uses: goreleaser/goreleaser-action@v2
-      with:
-        version: latest
-        workdir: cmd/riotpot
-        args: release --rm-dist
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v4
+        with:
+          distribution: goreleaser
+          version: latest
+          args: release --rm-dist
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

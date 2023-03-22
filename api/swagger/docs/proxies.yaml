@@ -1,0 +1,179 @@
+/:
+  get:
+    operationId: getProxies
+    description: Get all the registered proxies
+    tags:
+      - Proxies
+    responses:
+      "200":
+        description: Returns all the proxies
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: Proxy.yaml
+  post:
+    operationId: createProxy
+    summary: Create a new proxy
+    tags:
+      - Proxies
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              port:
+                $ref: Px.yaml#/properties/port
+              network:
+                $ref: Px.yaml#/properties/network
+    responses:
+      "200":
+        description: Returns the structure of the proxy created
+        content:
+          application/json:
+            schema:
+              $ref: Proxy.yaml
+
+/{id}:
+  parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        $ref: Px.yaml#/properties/id
+  get:
+    operationId: getProxy
+    description: Get an instance of a registered proxy
+    tags:
+      - Proxies
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: Px.yaml#/properties/id
+    responses:
+      "200":
+        description: Returns the instance of the proxy
+        content:
+          application/json:
+            schema:
+              $ref: Proxy.yaml#
+        links:
+          status:
+            operationId: changeProxyStatus
+            parameters:
+              id: $request.path.id
+  patch:
+    operationId: updateProxy
+    summary: Changes the proxy service
+    tags:
+      - Proxies
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: Px.yaml#/properties/id
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              service:
+                type: object
+                properties:
+                  id:
+                    type: string
+    responses:
+      "200":
+        description: Returns the instance of the proxy updated
+        content:
+          application/json:
+            schema:
+              $ref: Proxy.yaml
+  delete:
+    operationId: deleteProxy
+    description: Stops and deletes a registered proxy
+    tags:
+      - Proxies
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: Px.yaml#/properties/id
+    responses:
+      "200":
+        description: OK
+
+/{id}/status:
+  description: Change the status of the proxy
+  parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        $ref: Px.yaml#/properties/id
+  post:
+    operationId: changeProxyStatus
+    description: Changes the status
+    tags:
+      - Proxies
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: Px.yaml#/properties/id
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                $ref: Proxy.yaml#/properties/status
+    responses:
+      "200":
+        description: Returns the current status of the proxy after the changes
+        content:
+          application/json:
+            schema:
+              $ref: Proxy.yaml#/properties/status
+
+/{id}/port:
+  description: Change the status of the proxy
+  post:
+    operationId: changeProxyPort
+    summary: Changes the port of the proxy
+    tags:
+      - Proxies
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: Px.yaml#/properties/id
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              port:
+                $ref: Px.yaml#/properties/port
+    responses:
+      "200":
+        description: Returns the current status of the proxy after the changes
+        content:
+          application/json:
+            schema:
+              $ref: Px.yaml#/properties/port

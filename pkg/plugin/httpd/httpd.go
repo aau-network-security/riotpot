@@ -1,74 +1,56 @@
 package main
 
 import (
-	"context"
 	"fmt"
-	"log"
 	"net/http"
-	"os"
-	"os/signal"
 
-	"github.com/riotpot/pkg/models"
-	"github.com/riotpot/pkg/services"
+	"github.com/riotpot/internal/globals"
+	lr "github.com/riotpot/internal/logger"
+	"github.com/riotpot/internal/services"
 )
 
-var Name string
+var Plugin string
+
+const (
+	name    = "HTTP"
+	network = globals.TCP
+	port    = 80
+)
 
 func init() {
-	Name = "Httpd"
+	Plugin = "Httpd"
 }
 
 func Httpd() services.Service {
-	mixin := services.MixinService{
-		Name:     Name,
-		Port:     8080,
-		Protocol: "tcp",
-		Running:  make(chan bool, 1),
-	}
+	mx := services.NewPluginService(name, port, network)
 
 	return &Http{
-		mixin,
+		mx,
 	}
 }
 
 type Http struct {
 	// Anonymous fields from the mixin
-	services.MixinService
+	services.Service
 }
 
 func (h *Http) Run() (err error) {
-	h.Migrate(&models.Connection{})
-
 	mux := http.NewServeMux()
 	mux.Handle("/", http.HandlerFunc(h.valid))
 
 	srv := &http.Server{
-		Addr:    fmt.Sprintf(":%d", h.Port),
+		Addr:    h.GetAddress(),
 		Handler: mux,
 	}
 
 	go h.serve(srv)
-	h.Running <- true
 
-	for {
-		// block until we get the stop signal
-		<-h.StopCh
-
-		// send an interrupt signal
-		sigint := make(chan os.Signal, 1)
-		signal.Notify(sigint, os.Interrupt)
-		<-sigint
-
-		// shut down the server
-		srv.Shutdown(context.Background())
-		return
-	}
+	return
 }
 
 func (h *Http) serve(srv *http.Server) {
-	fmt.Printf("[%s] Started listenning for connections in port %d\n", Name, h.Port)
 	if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-		log.Fatalf("listen:%+s\n", err)
+		lr.Log.Fatal().Err(err)
 	}
 }
 
@@ -122,37 +104,9 @@ func (h *Http) valid(w http.ResponseWriter, req *http.Request) {
 		</div>
 		`
 		body = errormessage + body
-
-		// save the request
-		h.save(req)
 	}
 
 	response := fmt.Sprintf("%s%s", head, body)
 
 	fmt.Fprint(w, response)
-}
-
-// This function handles connections made to an invalid path
-/* func (h *Http) invalid(w http.ResponseWriter, req *http.Request) { ...} */
-
-/*
-func (h *Http) loadHandler(path string, valid bool) {
-	if valid {
-		http.HandleFunc(path, h.valid)
-	} else {
-		http.HandleFunc(path, h.invalid)
-	}
-}
-*/
-
-func (h *Http) save(req *http.Request) {
-	connection := models.NewConnection()
-	connection.LocalAddress = "localhost"
-	connection.RemoteAddress = req.RemoteAddr
-	connection.Protocol = "TCP"
-	connection.Service = "HTTP"
-	connection.Incoming = true
-	connection.Payload = req.PostForm.Encode()
-
-	h.Store(connection)
 }

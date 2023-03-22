@@ -1,0 +1,22 @@
+@import "../../styles";
+
+
+@mixin Pop{
+    div.fade.component{
+        @include component;
+        background: $background;
+        border-color: $border-dark;
+        color: $color;
+        z-index: 10001;
+        box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
+
+        div.row{
+            padding: .5em;
+            &:not(:last-child){
+                border-bottom: 0.5px solid $border-dark;
+            }
+        }
+    }
+}
+
+@include Pop

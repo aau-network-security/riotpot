@@ -1,205 +1,293 @@
 
-<div align="center">
-  <img src="assets/aau_logo.png" height="100">
-  <p align="center">
-    <h2 align="center">RiotPot</h2>
-  </p>
-  <p align="center">
+# RIoTPot
+
+<!-- markdownlint-disable MD033 -->
+<div align="center" style="box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25); background-color: #EDF2F4; border-radius: 4px; margin: 2em 0;">
+  <img src="docs/assets/aau_logo.png" height="100px;" style="margin: 1em 0; padding: 1em;">
+  <div>
     <!-- Workflow status -->
-    <a href="https://github.com/aau-network-security/riotpot/actions"><img alt="GitHub Actions status" src="https://github.com/aau-network-security/riotpot/workflows/cyber/badge.svg"></a>
-    <a href="https://goreportcard.com/badge/github.com/aau-network-security/riotpot"><img src="https://goreportcard.com/badge/github.com/aau-network-security/riotpot?style=flat-square"></a>
-    <a href="https://pkg.go.dev/riopot"><img src="https://pkg.go.dev/badge/riopot.svg"></a>
-    <a href=""><img src="https://img.shields.io/github/release/riotpot/project-layout.svg?style=flat-square">
-  </p>
+    <a href="https://github.com/aau-network-security/RIoTPot/actions">
+        <img alt="GitHub Actions status" src="https://github.com/aau-network-security/RIoTPot/workflows/cyber/badge.svg">
+    </a>
+    <a href="https://pkg.go.dev/riopot">
+        <img src="https://pkg.go.dev/badge/riopot.svg">
+    </a>
+    <a href="https://goreportcard.com/badge/github.com/aau-network-security/RIoTPot">
+        <img src="https://goreportcard.com/badge/github.com/aau-network-security/RIoTPot?style=flat-square">
+    </a>
+    <a href="">
+        <img src="https://img.shields.io/github/release/RIoTPot/project-layout.svg?style=flat-square">
+    </a>
+  </div>
 </div>
-___
 
-- [1. Description](#1-description)
-  - [1.1 Architecture](#11-architecture)
-  - [1.2 Noise Filter](#12-Noise-Filter)
+<p align="justify">
+RIoTPot is a hybrid interaction honeypot, primarily focused on the emulation IoT and OT protocols, although, it is also capable of emulating other services.
+In essence, RIoTPot acts as a proxy service for other honeypots included in the system.
+Therefore, you can run any honeypot and other services alongside RIoTPot.
+In addition, there is an UI web-application that you can use to manage your routing.
+
+The honeypot comes with multiple low-interaction services ready to use.
+Since these services are written as [plugins](https://pkg.go.dev/plugin), they are only supported on Linux; however, you can start RIoTPot without them.
+The following table contains the list of services included in RIoTPot by defaul, their internal port, and proxy port.
+</p>
+
+<div align="center">
+
+| Service | Internal Port | Proxy Port |
+| ------- | ------------- | ---------- |
+| Echo    | 20007         | 7          |
+| SSH     | 20022         | 22         |
+| Telnet  | 20023         | 23         |
+| HTTP    | 28080         | 80         |
+| Modbus  | 20502         | 502        |
+| MQTT    | 21883         | 1883       |
+| CoAP    | 25683         | 5683       |
+
+</div>
+
+> ## Table of Contents
+>
+> - [RIoTPoT](#riotpot)
+>   - [1. Architecture](#1-architecture)
+>   - [2. How to use RIoTPot](#2-how-to-use-riotpot)
+>   - [3. Commands](#3-commands)
+
+## 1. Architecture
+
+<p align="justify">
+The RIoTPot architecture is based on proxy connections to internal and surrounding (or external) services (e.g., honeypots, full-services, containers, remote hosts, etc.).
+For this, the honeypot manages a number of user-defined `proxies` that relays connections between services and RIoTPot [^proxies].
+This way, RIoTPot can decide how and where to route incomming attacks.
+The logic used to determine how to handle the incomming attack is implemented in the form of `middlewares` [^middlewares].
+To manage services, middlewares and proxies, RIoTPot ships with a REST API [^api] and a webapp UI [^ui] out-of-the-box.
+The UI can be accessed through your browser at `localhost:2022` and you can fiddle with API endpoints at `localhost:2022/api/swagger` showing a [Swagger](https://swagger.io/) interface.
+</p>
+
+[^proxies]: Internal and surrounding services are not accessible through the Internet.
+    Internal services are integrated and only accessible to RIoTPot.
+    These services are loaded on-start and can not be deleted, but they can be stopped.
+    Surrounding services **must** be in the same network as RIoTPot.
+    External services **must** whitelist RIoTPot **only**.
+
+[^middlewares]: Middlewares are currently under development.
+
+[^api]: The RIoTPot API **must not** be exposed to the Internet.
+    Regardless, the API currently only accepts connections from the localhost.
+    This may be changed in the future, providing a whitelist of hosts and standard authentication.
+
+[^ui]: Although the Web interface can be used as a separate component, it is embeded with the RIoTPot binary.
+
+<p align="justify">
+**Figure 1** shows the RIoTPot architecture, including the two main applications that constitute RIoTPot (RIoTPot itself, and RIoTPot UI) and their components, and a section to enclose external (or adjacent) services.
+</p>
+
+<div align="center" style="margin: 2em 0">
+    <div style="max-width: 60%; text-align: justify; display: flex; flex-direction: column;">
+        <img src="docs/assets/architecture.png">
+        <div>
+        <b>Figure 1.</b> RIoTPot Architecture, including the main application, external services and the webapp UI to manage RIoTPot instances.
+        </div>
+    </div>
+</div>
+
+<p align="justify">
+RIoTPot is written in [Golang](https://go.dev/)[^os].
+Each RIoTPot instance exposes registered proxies (based on their port) on demand.
+To serve a proxy, it **must** have a binded service and the proxy port **must** be available (currently, RIoTPot does not accept multiple services running in the same port).
+When a proxy has been binded and served, attackers will be able to send messages to RIoTPot on that port, relying the messages to the binded service and back to the attacker[^reversed].
+<p>
+
+[^os]: While the base application is interoperable, internal services (plugins) can only be used in [Linux, FreeBSD and macOS environments](https://pkg.go.dev/plugin).
+    We plan to overcome this limitation by replacing plugins with micro-services communicating through [gRPC](https://grpc.io/).
+
+[^reversed]: For ethical and security reasons, RIoTPot does not allow unsolicited requests to the outside, i.e., reversed shells and the like are not allowed.
+
+<p align="justify">
+For ease of access, multiple instances of RIoTPot can be managed from the RIoTPot UI webapp.
+In addition to managing the proxies registered in each instance, the UI allows you to create, use and edit `profiles`.
+Each profile contains a number of proxies named after protocols or other services making a RIoTPot instance resemble a real-life devices (e.g. a home assistant).
+In few words, profiles speed up the process of setting up and provision a RIoTPot instance with specific configurations.
+The UI is written using the React fonrt-end JavaScript library (we use Typescript for this project) and [Recoil](https://recoiljs.org/) state management library.
+Since RIoTPot is rather small, for the moment, it does not use a database.
+</p>
+
+## 2. How to use RIoTPot
+
+<p align="justify">
+Running RIoTPot is relatively simple.
+Overall, you have three options.
+**The first** is to download a RIoTPot release; you can either choose to download the latest release, or previous one.
+**The second option** is to build the project yourself.
+**The last option** is to use the source code to create a Docker container with RIoTPot and some additional applications to enhance the honeypot.
+</p>
+
+<details open>
+    <summary><b>Using a Release Version</b></summary>
+
+> **_Info_:** This guide is meant for users with no special needs, who want a simple out-of-the-box experience.
+
+Each release comes in a folder named `riotpot` with an executable binary (also) named `riotpot` and a `plugins` folder filled with multiple services (or low-interaction honeypots).
+It is important to keep the internal folder structure for RIoTPot to work as intended.
+
+    📁 riotpot
+        ┕ riotpot
+        ┕ 📁 plugins
+
+---
+
+1. First, download the release of your choice from the [releases](https://github.com/aau-network-security/riotpot/releases) page. Choose the one you need for your Operative System (OS).
+2. Extact the `riotpot` folder.
+3. Run the `riotpot` binary. This will start RIoTPot with the API enabled, all the plugins ready to use, and the UI server.
+    - The API and UI are accessible through the address `localhost:2022`
+
+</details>
+
+<details>
+    <summary><b>Build it yourself</b></summary>
+
+> **_Info_:** This guide is meant for advanced users confortable in development environments.
+
+<blockquote>
+<details>
+<summary><b>Requirements</b></summary>
+
+- Golang - Required to build the project
+- Node - Required to build the UI
+
+**Optional**:
+
+- Git - Used to download the source code
+- Make - To run already-prepared commands
+
+</details>
+</blockquote>
+
+---
+
+1. Download the RIoTPot source code from GitHub. Open a console and introduce the following line.
+
+    ```bash
+    git clone git@github.com:aau-network-security/riotpot.git
+    ```
+
+2. Navigate to the folder in where you have downloaded the RIoTPot source and install the required node packages.
+
+    ```bash
+    npm install
+    ```
+
+3. If you have installed [Make](https://www.gnu.org/software/make/), we have included multiple command helpers to assist you building the project. To put it simple, you can run two simple commands that will build the RIoTPot binary and the plugins (and place them in the right folder).
+
+    ```bash
+    # Build the server
+    make build-ui
+    # Builds RIoTPot and the plugins
+    make riotpot-build
+    ```
+
+> **__NOTE__:** The UI uses [Vite](https://vitejs.dev/) to build the project. If you prefer to use another builder, you may need to make a few changes first on your own.
+
+</details>
+
+<details>
+    <summary><b>Docker (Virtualisation)</b></summary>
+
+> **_Info_:** This guide is meant for advanced users who prefer to use RIoTPot in a virtual environment.
+
+<blockquote>
+<details>
+<summary><b>Requirements</b></summary>
+
+- Docker - Used to build an image of a RIoTPot instance and UI server.
+- Docker-compose - Used to create a single container with a RIoTPot instance, the UI and other applications and services.
+
+</details>
+</blockquote>
+
+<p align="justify">
+The main advantages of using this setup are the additional security features with minimal changes to the container configuration and the containers themselves.
+For example, we can define separated virtual private networks and overlay networks to hide, sandbox and encapsule RIoTPot and other adjacent services.
+In addition, containers allow us to bind services using their docker addres name rather than their IP, which is very convenient.
+Lastly, we can spawn and stop separated containers on demand without affecting other services.
+
+On the other hand, virtualisation is arguably more demanding than usign applications on bare-metal.
+While a single instance of RIoTPot is relatively lightweight, it is important to consider the shortcomings introduced by virtualisation and hardware emulation (e.g., reponse delays).
+</p>
+
+> **_Warning_:** Technically speaking, a dedicated attacker may realize that RIoTPot is in fact a honeypot by analysing and comparing the response-time delays introduced by virtualisation to real servers (!!). While this type of honeypot fingerprinting has been studied before, the results for common Internet services are still inconclussive (e.g., HTTP, Telnet and SSH), due to the commoditization of cloud hosting services using virtual machines and detailed server configurations.
+
+The `docker-compose` file includes additional services to enhance the RIoTPot experience.
+The following table summarises the list of services and applications packed in this container.
+
+<blockquote>
+<details>
+<summary><b>Services</b></summary>
+<div align="center">
+
+| Service | Image                  | Port | Details                                    |
+| ------- | ---------------------- | ---- | ------------------------------------------ |
+| MQTT    | eclipse-mosquitto      | 1883 | Mosquito  MQTT Server                      |
+| HTTP    | httpd                  | 80   | Regular HTTP Server                        |
+| Modbus  | oitc/modbus-server     | 502  | Modbus Server                              |
+| OCPP    | ocpp1.6-central-system | 443  | OCPP v1.6 (used in cars charging stations) |
+
+</div>
+</details>
+
+<details>
+<summary><b>Applications</b></summary>
+<div align="center">
+
+| Application | Image           | Details                                                   |
+| ----------- | --------------- | --------------------------------------------------------- |
+| TCPDump     | kaazing/tcpdump | Packet recorder. It stores network traffic in .pcap files |
+
+</div>
+</details>
+</blockquote>
+
+---
+
+The container can be setup in three simple steps:
+
+1. Download the RIoTPot source code from GitHub. Open a console and introduce the following line.
+
+    ```bash
+    git clone git@github.com:aau-network-security/riotpot.git
+    ```
+
+2. Navigate to the folder in where you have downloaded the RIoTPot source.
+3. With Docker running: if you have Make installed, run the following command. Otherwise run a docker-compose command using the docker-compose file included in the `build/docker` folder.
+    - With make
   
-  - [2. Installation](#2-installation)
-  - [2.1 Docker](#21-docker)
-    - [2.1.1 Docker Hub Image](#211-docker-hub-image)
-  - [2.2 Local](#22-local)
-- [3. Documentation](#3-documentation)
-- [3. Easy Access](#3-easy-access)
+    ```bash
+    # With make
+    make up
+    ```
 
-## 1. Description
+   - With Docker-compose
 
-RIoTPot is an interoperable medium interaction honeypot, primarily focused on the emulation IoT and OT protocols, although, it is also capable of emulating other services.
+    ```bash
+    # With docker-compose
+    docker-compose -p riotpot -f build/docker/docker-compose.yaml up -d --build
+    ```
 
-This services are loaded in the honeypot in the form of plugins, making RIoTPot a modular, and very transportable honeypot. The services are loaded at runtime, meaning that the weight of the honeypot will vary on premisses, and the services loaded e.g. HTTP, will only be used when required. As consequence, we highly recommend building your own binary customized to your own needs. Refer to the following section, Installation, for more information.
+</details>
 
-### 1.1 Architecture
+## 3. Commands
 
-RIoTPot has a modular architecture that facilitates extensability of the honeypot. The honeypot further offers a hybrid-interaction capability where users can choosed the desired interaction levels for the protocols simulated. The image below shows the high/level architecture of RIoTPot. 
-
-![alt text](architecture.jpg "Architecture")
-
-The architecture contains 6 components. 
-
-__RIoTPot core__
-The core of the honeypot consists of the required modules for configuration, administration and orchestration of the container network.
-
-__Configuration & Orchestration__
-The configuration module provides RIoTPot with all the required parameters at startup. This includes the user preferences for specific protocols and profile simulation and the desired interaction level. The orchestration module is responsible for the network management from the core to the high-interaction protocol services simulated on containers. The received attack traffic is forwarded to the respective container that hosts the protocol on which the attack was targeted. Furthermore, the orchestra tor also facilitates the communication to the containers if they are hosted on a cloud-based environment.  
-
-__Attack Capture and Noise Filter__
-The  attack capture and  noise filter  module filters out the suspicious traffic received from Internet-wide scanners like Shodan and Censys. This helps the administrator to concentrate on attacks that are not from benign sources.
-
-__Hybrid-Interaction (Low and High-Interaction modes)__
-RIoTPot is implemented in Go language \cite{go} and facilitates the modular architecture and development through packages. The packages act as plug-ins that can be added to the honeypot to extend the protocols simulated. RIoTPot offers a hybrid-interaction model with a preference of low- or high-interaction. 
-The low-interaction is achieved through independent packages, with each package simulating a specific protocol. The high-interaction model is realized with a containers with the protocols simulated as services installed. The containers act as high-interaction modules that offer a full implementation of the protocol. Additional protocol services can be added by integration of containers with desired protocol services. The hybrid-interaction model further allows the user to emulate selective protocols on low or high-interaction levels. For example, the user can choose to have SSH in low-interaction mode and MQTT in high-interaction mode thereby operating in a hybrid-interaction mode.
-
-__Attack Database__
-The attack database stores all the attack traffic received on the honeypot. The database is setup as an independent module to ensure data availability even if the honeypot crashes on potential large scale attacks. The database is accessible from the low-interaction and high-interaction modules for attack storage.
-
-### 1.2 Noise Filter
-The Noise filter module of RIoTPot filters the attacks from internet scanning engines to reduce alert fatigue.
-With this feature, attacks are labelled as __*benign*__ when they originate from sources like Shodan. The 
-list of scanning services filtered by RIoTPot is below:
- 1. Shodan (https://www.shodan.io/)
- 2. Censys (https://censys.io/)
- 3. Project Sonar (https://www.rapid7.com/research/project-sonar/)
- 4. LeakIX (https://leakix.net/)
- 5. ShadowServer (https://www.shadowserver.org/)
- 6. RWTH Aachen (http://researchscan.comsys.rwth-aachen.de/)
- 7. Quadmetrics (https://www.quadmetrics.com/)
- 8. BinaryEdge (https://www.binaryedge.io/})
- 9. ipip.net (https://en.ipip.net/)
- 10. Arbor Observatory (https://www.arbor-observatory.com/)
- 11. CriminalIP (https://security.criminalip.com/)
- 12. BitSight (https://www.bitsight.com/)
- 13. InterneTT (http://www.internettl.org/)
- 14. ONYPHE (https://www.onyphe.io/)
- 15. Natlas (https://github.com/natlas/natlas)
- 16. Net Systems Research (https://www.netsystemsresearch.com/)
- 17. Sharashka (https://sharashka.io/data-feeds)
- 18. Alpha Strike Labs (https://www.alphastrike.io)
- 19. Stretchoid (http://stretchoid.com/)
- 
- Note: the list will be updated on support for additional scanning sources. 
-
-> **Summary:** To summarize, the design of RIoTPot facilitates modularity  through packages and containers as plugins. Furthermore, the modular architecture helps in achieving a hybrid-interaction model.
-
-## 2. Installation
-
-Although one can download the binaries and configuration files containing the set of default running emulators, this guide is mainly focused to those looking for a customized experience.
-
-We thrive on the idea of making RIoTPot highly transportable, therefore, in this section one can find multiple methods of installation for diverse environments that fit a broad list of requirements and constrains.
-
-We highly recommend running RiotPot in a virtualized self-contained network using `Docker`, for which we included configuration files that run the honeypot as a closed environment for testing and playing around (similar to a testbed environment).
-
-> **NOTE:** The production image can be pulled from Docker Hub. If you choose this method you may directly jump to [2.1 Docker](#21-docker).
-<!-- Not implemented yet, include section for the Docker Image pulling and building -->
-
-RIoTPot is written in Golang, therefore, you will need to have [go](https://golang.org) installed first if you plan to make any changes, otherwise you can skip steps 1 and 2 if you rather not installing go. 
-
-Regardless, you will need to copy RIoTPot to local:
-
+RIoTPot comes with flag commands that affect how and what is started.
+Example:
 ```bash
-# 1. Make the folder in where the repository will be stored.
-$ mkdir -p $GOPATH/src/github.com
-
-# 2. Navigate to the folder in where you store your repositories
-$ mkdir -p $GOPATH/src/github.com
-
-# 3. Clone the repository
-$ git clone git@github.com:aau-network-security/riotpot.git
-
-# 4. Navigate to the newly created folder with the repository
-$ cd riotpot
+# Run RIoTPot without the ui
+./riotpot --ui false
 ```
 
-### 2.1 Docker
-
-We assume you have basic knowledge about the Docker ecosystem, otherwise please refer first to the Docker documentation [here](https://docs.docker.com).
-
-At the deployments folder of RToTPot there is one **docker-compose** files:
-```bash
-$ cd ~/riotpot/deployments | ls -al
-...
--rw-r--r--  docker-compose.yml
-...
-```
-
-This file correspond to the respective software development environment *development*.
-
-**Development.**
-`docker-compose.yml` builds the project in a private virtual network in which there are three hosts: *riotpot*, *postgres*,and *tcpdump*. **Postgres** contains a postgres database, **tcpdump** contains a packet capturer, and **riotpot** the app itself. They can only communicate with the each other. Use this setup for **development** and **testing locally** by typing in your a terminal:
-
-```bash
-$ docker-compose -f docker-compose.yml up -d --build
-```
-
-Once you are done with the honeypot, you can put down the containers using the *down* command. 
-
-```bash
-$ docker-compose down -v
-```
-
-> **NOTE:** Using the *-v* tag will remove all the mounted volumes, i.e. the database used by riotpot to store information and the volumes mounted to store logs and binaries collected by the honeypot. Remember to make copies before using the *-v* tag, or skip it altogether.
-
-#### 2.1.1 Docker Hub Image
-
-Build the latest release of RiotPot directly from the image provided in the Docker Hub:
-
-```bash
-# Grab and run the latest release of the riotpot consumer image
-# detached from the console with -d.
-$ docker run -d riotpot-docker:latest
-```
-
-### 2.2 Local
-
-To build your own binary from source, navigate to the folder where you have stored the repository and use the go CLI to generate it and store it in the *./bin/* folder:
-
-```bash
-# build the binary in the ./bin folder
-$ go build -o riotpot cmd/riotpot/main.go
-```
-
-Additionally, you could also install the application in the system:
-```bash
-# installs riotpot at $GOPATH/bin
-$ go install
-```
-
-Run the binary as any other application:
-```bash
-$ ./riotpot
-```
-
-## 3. Documentation
-
-The documentation for RiotPot can be found in [go.pkg.dev](https://pkg.go.dev/), however, sometimes you might be in need to visualize the documentation locally, either because you are developing a part of it, of for any other reason.
-
-The most common way of pre-visualizing documentation is by using `godoc`, however, this requires an initial setup of the go project. Find more information in the [godoc page](https://pkg.go.dev/golang.org/x/tools/cmd/godoc).
-
-For simplicity, the riotpot `godoc` documentation can be run as a separated local container from the dockerfile `Dockerfile.documentation`. To use the container simply type:
-
-```bash
-$ make riotpot-doc
-```
-This will run a container tagged with `riotpot/v1` at `http://localhost:6060/`. The documentation of the package can be accessed directly from [http://localhost:6060/pkg/riotpot/](http://localhost:6060/pkg/riotpot/).
-
-## 3. Easy Access
-
-We previously described how to set up the whole project, both installation and documentation, but some of the processes become routinely and lengthy when on the process of developing new features and testing. For this, in the root folder of the repository we have included a `Makefile` containing the most utilized routines with aliases.
-
-The following commands will be run using `make` plus the alias of the command. The `Makefile` contains more commands, but this are the most widely useful:
-
-Command|Container Name|Description
-:---|:---:|---:
-riotpot-up|riotpot:development| Puts up RIoTPot in **development** mode.
-riotpot-down|riotpot:development| Puts down RIoTPot.
-riotpot-doc|riotpot/v1| Puts up a container with the local documentation.
-riotpot-all|riotpot/v1, riotpot| Puts the documentation and RIoTPot **development** mode up.
-riotpot-builder|| Builds the binary and the plugins.
-
-**Example usage:**
-```bash
-# run a command given its alias from Makefile
-$ make riotpot-doc
-```
+ | Flag      | Type    | Default                                | Description                                              |
+ | --------- | ------- | -------------------------------------- | -------------------------------------------------------- |
+ | debug     | Boolean | false                                  | Set log level to debug                                   |
+ | api       | Boolean | true                                   | Whether to start the API                                 |
+ | plugins   | Boolean | true                                   | Whether to load the low-interaction honeypot plugins     |
+ | whitelist | String  | http://localhost,http://localhost:3000 | List of comma separated allowed hosts to contact the API |
+ | ui        | Boolean | true                                   | Whether to start the UI                                  |

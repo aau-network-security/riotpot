@@ -1,0 +1,25 @@
+@import "../../styles";
+
+@mixin Dropdown{
+    div.dropdown-menu{
+        @include popup;
+
+        a.dropdown-item{
+            gap: 1em;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+
+            &:hover{
+                background: $border-dark;
+                color: $color;
+            }
+
+            > div.row{
+                width: -webkit-fill-available;
+            }
+        }
+    }
+}
+
+@include Dropdown;

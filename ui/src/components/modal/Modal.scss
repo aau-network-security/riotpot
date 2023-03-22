@@ -1,0 +1,38 @@
+@import "../../styles";
+
+@mixin Modal{
+    div.modal-content{
+        @include popup;
+
+        div.modal-header{
+            @include popup-element;
+            
+            border-bottom: 1px solid $border-dark;
+            font-size: unset;
+
+            .modal-title{
+                gap: 10px;
+                flex-direction: row;
+                align-items: center;
+                display: flex;
+            }
+
+            button.btn-close{
+                height: .5em;
+                width: .5em;
+                margin: unset;
+            }
+        }
+
+        div.modal-body{
+            @include simple-form;
+        }
+
+        div.modal-footer{
+            border-top: unset
+        }
+    }
+    
+}
+
+@include Modal;

@@ -1,0 +1,119 @@
+/* Colors */
+$background: #3F3F3F;
+$background-dark: #3D3D3D;
+$background-light: #525252;
+$border: #BCBCBC;
+$border-dark: #6B6B6B;
+
+// Text color
+$color: #EBEBEB;
+$color-dim: #B9B9B9;
+$color-hover: #00A3FF;
+$color-graph: #A4E18F;
+$color-green: #6EA345;
+$color-red: #FF8686;
+
+/* Globals */
+$radius: 3px;
+$padding: .5em;
+
+/* FONT */
+@import url('https://rsms.me/inter/inter.css');
+
+html {
+    font-family: 'Inter', sans-serif;
+}
+
+@supports (font-variation-settings: normal) {
+    html {
+        font-family: 'Inter var', sans-serif;
+    }
+}
+
+@mixin font($font-family, $font-file) {
+    @font-face {
+        font-family: $font-family;
+        src: url($font-file+'.ttf') format('truetype');
+        font-weight: normal;
+        font-style: normal;
+    }
+}
+
+@mixin component($text: $color) {
+    border: 1px solid $border;
+    border-radius: $radius;
+}
+
+@mixin popup {
+    background: $background-light;
+    color: $color;
+    border: 1px solid $border-dark;
+    box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
+    border-radius: $radius;
+}
+
+@mixin popup-element {
+    padding: $padding;
+}
+
+@mixin simple-form {
+
+    form,
+    div.dropdown-menu {
+        font-family: 'Inter var', sans-serif !important;
+
+        label {
+            font-weight: bold;
+        }
+
+        input:not(.select__input),
+        textarea {
+            background: $background-dark !important;
+            color: $color;
+            border-radius: $radius;
+            border: 1px solid $border-dark;
+        }
+
+        small {
+            color: $color-dim !important;
+            font-size: .9em;
+        }
+    }
+}
+
+/*
+    Abstraction of the theme to be used on the application.
+*/
+@mixin theme($theme-name, $background: $background, $text: $color, $border: $border) {
+    .#{$theme-name} {
+        background: $background;
+        height: 100vh; // whole screen
+        padding: 5%;
+
+        * {
+            color: $text;
+            font-family: 'Inter var', sans-serif;
+        }
+
+        main {
+            gap: 1em;
+            display: flex;
+            flex-direction: column;
+        }
+
+        small {
+            color: $color-dim;
+            gap: .5em;
+        }
+
+        div.component {
+            @include component();
+        }
+
+        svg {
+            fill: $color-dim;
+        }
+
+        @include simple-form;
+    }
+}

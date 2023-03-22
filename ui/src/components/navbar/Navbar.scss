@@ -1,0 +1,52 @@
+@import "../../styles";
+
+
+@mixin nav-link {
+    a.nav-link{
+        color: $color-dim;
+
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        padding: 10px;
+        gap: 10px;
+        
+        flex: none;
+        order: 1;
+        align-self: stretch;
+        flex-grow: 0;
+
+        svg{
+            fill: $color-dim!important;
+        }
+
+        &.active{
+            @include component;
+            color: $color!important;
+
+            svg{
+                fill: $color!important;
+            }
+        }
+
+        &:hover:not(.active){
+            color: $color-hover!important;
+
+            svg{
+                fill: $color-hover!important;
+            }
+        }
+    }
+}
+
+@mixin navbar($container-name: "nav") {
+    div.#{$container-name}{
+        // Include the navigation link
+        @include nav-link;
+
+        padding: 1rem;
+    }
+    
+}
+
+@include navbar();

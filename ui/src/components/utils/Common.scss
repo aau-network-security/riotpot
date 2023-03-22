@@ -1,0 +1,38 @@
+@import "../../styles";
+
+@mixin Badge{
+    span.interaction.badge{
+        border: 1px solid;
+        background-color: transparent!important;
+
+        &.low{
+            border-color:  $color-graph;
+            color: $color-graph;
+        }
+
+        &.high{
+            border-color:  $color-red;
+            color: $color-red;
+        }
+    }
+
+    span.network.badge{
+        background-color: transparent!important;
+        border: 1px solid $border-dark;
+    }
+}
+
+@mixin Addrress {
+    span.address{
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        padding: 0px 10px;
+        border: 1px solid $border-dark;
+        border-radius: $radius;
+        gap: 10px;
+    }
+}
+
+@include Addrress;
+@include Badge;

@@ -1,0 +1,106 @@
+# This Docker Compose file is meant to be used on a development environment for testing.
+# This environment includes a fake local network, a local database and
+# a volume mounted with the code to see changes on the go.
+
+# Base configuration for any protocol container
+# Use this on each protocol so share a similar configuration to riotpot
+x-protocol:
+  &protocol
+  profiles:
+    - protocol
+  depends_on:
+    - riotpot
+  networks:
+    honeypot:
+
+services:
+
+  ##########################################
+  # REQUIRED
+  ##########################################
+
+  # Tcpdump host that stores all the stuff that happens
+  # in the network
+  tcpdump:
+    image: kaazing/tcpdump
+    container_name: tcpdump
+    network_mode: "host"
+    volumes:
+      - ${PWD:-../..}/tcpdump:/tcpdump
+    # Run tcdump in autorotating mode, with gzip compression
+    # The files will be rotated every 24h or 500MB and named
+    # after the timestamp when the file is created.
+    command: [
+      "-z", "gzip", # compress to gzip
+      "-G", "86400", # 24h in seconds
+      "-C", "500", # maximum file size
+      "-W", "10", # ignored, only affects the name
+      "-v", # verbose
+      "-i", "any", # any interface
+      "-w", "tcpdump/trace_%Y_%m_%d_%H_%M_%S.pcap" # trace_<timestamp>.pcap
+    ]
+
+
+  # RIoTPot application
+  riotpot:
+    container_name: riotpot
+    build:
+      context: ${PWD:-../..}/
+      dockerfile: build/docker/Dockerfile
+    restart: always # restart riotpot when it crashes
+    ports:
+      # Ports under 60 might see errors when unquoted
+      # https://stackoverflow.com/questions/58810789/quotes-on-docker-compose-yml-ports-make-any-difference
+      - "7:7"       # Echo
+      - "22:22"     # SSH
+      - "23:23"     # Telnet
+      - "80:80"     # HTTP
+      - "502:502"   # Modbus
+      - "1883:1883" # MQTT
+      - "5683:5683" # CoAP
+
+      # Required for the REST API
+      # Note: only available to localhost
+      - "2022:2022"
+    environment:
+      - API_HOST=0.0.0.0
+    networks:
+      honeypot:
+      default:
+
+  ##########################################
+  # PROTOCOLS
+  ##########################################
+  # Use the profile `protocol` to mount the image but do not start it
+  # riotpot will deetermine which containers to start at a later time
+    
+  mqtt:
+    image: eclipse-mosquitto
+    container_name: mqtt
+    ports:
+      - "1883:1883"
+    <<: *protocol
+
+  http:
+    image: httpd
+    container_name: http
+    ports:
+      - "80:80"
+    <<: *protocol
+
+  modbus:
+    image: oitc/modbus-server
+    container_name: modbus
+    ports:
+      - "502:502"
+    <<: *protocol
+
+  ocpp:
+    image: ldonini/ocpp1.6-central-system # v1.6
+    container_name: ocpp
+    ports:
+      - "443:443"
+    <<: *protocol
+
+networks:
+  honeypot:

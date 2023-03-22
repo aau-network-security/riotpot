@@ -5,15 +5,20 @@ import (
 	"io"
 	"net"
 
-	"github.com/riotpot/pkg/models"
-	"github.com/riotpot/pkg/services"
-	"github.com/riotpot/tools/errors"
+	"github.com/riotpot/internal/globals"
+	"github.com/riotpot/internal/logger"
+	"github.com/riotpot/internal/services"
 	"github.com/xiegeo/modbusone"
 )
 
-var Name string
+var Plugin string
 
-const size = 0x10000
+const (
+	name    = "Modbus"
+	network = globals.TCP
+	port    = 502
+	size    = 0x10000
+)
 
 var (
 	discretes        [size]bool
@@ -23,16 +28,11 @@ var (
 )
 
 func init() {
-	Name = "Modbusd"
+	Plugin = "Modbusd"
 }
 
 func Modbusd() services.Service {
-	mx := services.MixinService{
-		Name:     Name,
-		Port:     502, // Also 1502 in some cases
-		Running:  make(chan bool, 1),
-		Protocol: "tcp",
-	}
+	mx := services.NewPluginService(name, port, network)
 
 	handler := handler()
 
@@ -43,37 +43,19 @@ func Modbusd() services.Service {
 }
 
 type Modbus struct {
-	services.MixinService
+	services.Service
 	handler modbusone.ProtocolHandler
 }
 
 func (m *Modbus) Run() (err error) {
-	// before running, migrate the model that we want to store
-	m.Migrate(&models.Connection{})
-
-	// convert the port number to a string that we can use it in the server
-	var port = fmt.Sprintf(":%d", m.Port)
 
 	// start a service in the `echo` port
-	listener, err := net.Listen("tcp", port)
-	errors.Raise(err)
-
-	// create the channel for stopping the service
-	m.StopCh = make(chan int, 1)
+	listener, err := net.Listen(m.GetNetwork().String(), m.GetAddress())
+	logger.Log.Error().Err(err)
 
 	// build a channel stack to receive connections to the service
 	conn := make(chan net.Conn)
 	m.serve(conn, listener)
-
-	// update the status of the service
-	m.Running <- true
-
-	// block here until we receive an stopping signal in the channel
-	<-m.StopCh
-
-	// Close the channel for stopping the service
-	fmt.Print("[x] Service stopped...\n")
-	close(m.StopCh)
 
 	return
 }
@@ -82,7 +64,6 @@ func (m *Modbus) Run() (err error) {
 // inspired on https://gist.github.com/paulsmith/775764#file-echo-go
 func (m *Modbus) serve(ch chan net.Conn, listener net.Listener) {
 	// open an infinite loop to receive connections
-	fmt.Printf("[%s] Started listenning for connections in port %d\n", Name, m.Port)
 	for {
 		// Accept the client connection
 		client, err := listener.Accept()
@@ -92,27 +73,7 @@ func (m *Modbus) serve(ch chan net.Conn, listener net.Listener) {
 		defer client.Close()
 
 		// push the client connection to the channel
-		ch <- client
-	}
-}
-
-// Handle the pool of connections to the service
-func (m *Modbus) handlePool(ch chan net.Conn) {
-	// open an infinite loop to handle the connections
-	for {
-		// while the `stop` channel remains empty, continue handling
-		// new connections.
-		select {
-		case <-m.StopCh:
-			// stop the pool
-			fmt.Printf("[x] Stopping %s service...\n", m.Name)
-			// update the status of the service
-			m.Running <- false
-			return
-		case conn := <-ch:
-			// use one goroutine per connection.
-			go m.handleSession(conn)
-		}
+		go m.handleSession(client)
 	}
 }
 
@@ -147,14 +108,10 @@ func (m *Modbus) handleSession(conn net.Conn) {
 			// load the payload from the packet i.e. everything after the header
 			p := modbusone.PDU(rb[modbusone.MBAPHeaderLength:n])
 
-			// save the request connection with the request payload in it.
-			m.save(conn, p)
-
 			// validate the request, checks for errors on the code and the
 			// length of the payload
 			err = p.ValidateRequest()
 			if err != nil {
-				m.save(conn, p)
 				return
 			}
 
@@ -255,7 +212,7 @@ func handler() modbusone.ProtocolHandler {
 		// It might be that an "slave" wants to report an error
 		// we want to gather that information as well.
 		OnErrorImp: func(req modbusone.PDU, errRep modbusone.PDU) {
-			fmt.Printf("error received: %v from req: %v\n", errRep, req)
+			logger.Log.Error().Msgf("error received: %v from req: %v\n", errRep, req)
 		},
 	}
 }
@@ -290,16 +247,4 @@ func writeTCP(w io.Writer, bs []byte, pdu modbusone.PDU) (int, error) {
 	bs[5] = byte(l)
 	copy(bs[modbusone.MBAPHeaderLength:], pdu)
 	return w.Write(bs[:len(pdu)+modbusone.MBAPHeaderLength])
-}
-
-func (m *Modbus) save(conn net.Conn, payload []byte) {
-	connection := models.NewConnection()
-	connection.LocalAddress = conn.LocalAddr().String()
-	connection.RemoteAddress = conn.RemoteAddr().String()
-	connection.Protocol = "TCP"
-	connection.Service = Name
-	connection.Incoming = true
-	connection.Payload = string(payload)
-
-	m.Store(connection)
 }

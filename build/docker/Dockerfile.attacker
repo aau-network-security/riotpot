@@ -1,9 +1,0 @@
-FROM kalilinux/kali-bleeding-edge
-
-RUN apt-get update && \
-    apt-get install -y \
-    python3 pip ssh telnet
-
-RUN pip install paho-mqtt
-
-CMD ["bash"]

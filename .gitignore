@@ -1,15 +1,5 @@
-# Binaries for programs and plugins
-*.exe
-*.exe~
-*.dll
-*.so
-*.dylib
-
 # Test binary, built with `go test -c`
 *.test
-
-# Production binary folder
-bin/
 
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
@@ -21,23 +11,18 @@ bin/
 .idea/
 .vscode/
 .DS_Store
+.dccache
+.iac-data
 ## VSCode workspace file
 workspace*.code-*
 
-# Vendor folder
+# Transit folders
 /vendor/
-
-# Plugins
-*.so
-
-# TCPdump
+/bin/
 /tcpdump/
-
-# Keys for the SSH connections
-configs/keys/*
 
 # whatever the rules are, include all the `.md` files
 !*.md
 
-# Remove the riotpot binary
-riotpot
+# Remove the local samples
+local

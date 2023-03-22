@@ -1,0 +1,75 @@
+name: Nightly
+on:
+  schedule:
+    - cron: "0 0 * * *"
+
+jobs:
+  riotpot:
+    strategy:
+      matrix:
+        go-version: [1.18]
+        os: [ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: latest
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: ${{ matrix.go-version }}
+
+      - name: Cache Go modules
+        uses: actions/cache@v3
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+
+      - name: Build UI
+        run: npm --prefix=./ui ci && npm --prefix=./ui run build
+
+      - name: Build application
+        run: make build-all
+
+      - name: Archive production artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: riotpot
+          path: bin
+          if-no-files-found: error
+
+  release:
+    permissions:
+      contents: write
+    needs: riotpot
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all workflow run artifacts
+        uses: actions/download-artifact@v3
+        id: download
+        with:
+          path: artifacts
+
+      - name: Zip content
+        working-directory: artifacts
+        run: zip -r riotpot.zip riotpot
+
+      # Nightly
+      - name: Release Nightly
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          name: nightly
+          tag_name: nightly
+          files: artifacts/riotpot.zip
+          prerelease: true

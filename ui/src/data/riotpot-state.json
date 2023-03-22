@@ -1,0 +1,148 @@
+{
+  "services": [
+    {
+      "id": "00231e-c1f-f8a-257a-0000f57af3a",
+      "name": "HTTP",
+      "network": { "value": "tcp", "label": "TCP" },
+      "interaction": { "value": "high", "label": "High" },
+      "host": "http",
+      "port": "80"
+    },
+    {
+      "id": "a27de5-e071-24d0-01b6-ff0a5dae7416",
+      "name": "SSH",
+      "network": { "value": "tcp", "label": "TCP" },
+      "interaction": { "value": "low", "label": "Low" },
+      "host": "cowrie",
+      "port": "22"
+    },
+    {
+      "id": "af18d0-5de6-07b-7162-dd5156786ca8",
+      "name": "CoAP",
+      "network": { "value": "udp", "label": "UDP" },
+      "interaction": { "value": "high", "label": "High" },
+      "host": "coap",
+      "port": "5684"
+    },
+    {
+      "id": "e37a82-7674-6e0-04d5-6ca5aa1f2c",
+      "name": "OCPP 1.6",
+      "network": { "value": "tcp", "label": "TCP" },
+      "interaction": { "value": "high", "label": "High" },
+      "host": "ocpp",
+      "port": "443"
+    },
+    {
+      "id": "10cb66b-f5ca-8803-6626-6267a3f116",
+      "name": "Echo",
+      "network": { "value": "tcp", "label": "TCP" },
+      "interaction": { "value": "low", "label": "Low" },
+      "host": "localhost",
+      "port": "7"
+    },
+    {
+      "id": "86c0e0a-f43d-8a42-10d-203206d14ec",
+      "name": "Telnet",
+      "network": { "value": "tcp", "label": "TCP" },
+      "interaction": { "value": "low", "label": "Low" },
+      "host": "localhost",
+      "port": "23"
+    },
+    {
+      "id": "223c1dd-c74-87f2-cf3a-60ac4eb3be",
+      "name": "MQTT",
+      "network": { "value": "tcp", "label": "TCP" },
+      "interaction": { "value": "low", "label": "Low" },
+      "host": "localhost",
+      "port": "1883"
+    },
+    {
+      "id": "180582-5da3-052e-d318-36cb3786a11b",
+      "name": "Modbus",
+      "network": { "value": "tcp", "label": "TCP" },
+      "interaction": { "value": "low", "label": "Low" },
+      "host": "localhost",
+      "port": "502"
+    },
+    {
+      "id": "c7ba78-b1b2-a7fa-3c1-bc68ac76dcc",
+      "name": "CoAP",
+      "network": { "value": "udp", "label": "UDP" },
+      "interaction": { "value": "low", "label": "Low" },
+      "host": "localhost",
+      "port": "5683"
+    }
+  ],
+  "profiles": [
+    {
+      "id": "307b48a-00fd-4ff5-b8ce-e5d1381d1bf",
+      "name": "EV Charge Station",
+      "description": "A charging station, also known as a charge point or electric vehicle supply equipment, is a piece of equipment that supplies electrical power for charging plug-in electric vehicles.",
+      "services": [
+        {
+          "id": "e37a82-7674-6e0-04d5-6ca5aa1f2c",
+          "name": "OCPP 1.6",
+          "network": { "value": "tcp", "label": "TCP" },
+          "interaction": { "value": "high", "label": "High" },
+          "host": "ocpp",
+          "port": "443"
+        },
+        {
+          "id": "a27de5-e071-24d0-01b6-ff0a5dae7416",
+          "name": "SSH",
+          "network": { "value": "tcp", "label": "TCP" },
+          "interaction": { "value": "low", "label": "Low" },
+          "host": "cowrie",
+          "port": "22"
+        },
+        {
+          "id": "00231e-c1f-f8a-257a-0000f57af3a",
+          "name": "HTTP",
+          "network": { "value": "tcp", "label": "TCP" },
+          "interaction": { "value": "high", "label": "High" },
+          "host": "http",
+          "port": "80"
+        }
+      ]
+    },
+    {
+      "id": "507ba0e-1ca3-0c20-ab57-a3565fa661ca",
+      "name": "Wi-Fi Router",
+      "description": "A standard and not very secure router",
+      "services": [
+        {
+          "id": "86c0e0a-f43d-8a42-10d-203206d14ec",
+          "name": "Telnet",
+          "network": { "value": "tcp", "label": "TCP" },
+          "interaction": { "value": "low", "label": "Low" },
+          "host": "localhost",
+          "port": "23"
+        },
+        {
+          "id": "10cb66b-f5ca-8803-6626-6267a3f116",
+          "name": "Echo",
+          "network": { "value": "tcp", "label": "TCP" },
+          "interaction": { "value": "low", "label": "Low" },
+          "host": "localhost",
+          "port": "7"
+        },
+        {
+          "id": "a27de5-e071-24d0-01b6-ff0a5dae7416",
+          "name": "SSH",
+          "network": { "value": "tcp", "label": "TCP" },
+          "interaction": { "value": "low", "label": "Low" },
+          "host": "cowrie",
+          "port": "22"
+        },
+        {
+          "id": "00231e-c1f-f8a-257a-0000f57af3a",
+          "name": "HTTP",
+          "network": { "value": "tcp", "label": "TCP" },
+          "interaction": { "value": "high", "label": "High" },
+          "host": "http",
+          "port": "80"
+        }
+      ]
+    }
+  ]
+}

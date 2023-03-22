@@ -11,9 +11,10 @@ package main
 
 import (
 	"bytes"
-	"fmt"
 	"io"
 	"net"
+
+	"github.com/riotpot/internal/logger"
 )
 
 func NewSession(conn net.Conn) *Session {
@@ -84,7 +85,7 @@ func (s *Session) Answer(p Packet, conn *net.Conn) {
 	// copy the fixed header from the packet
 	msg, err := p.EncodeAnswer()
 	if err != nil {
-		fmt.Printf("[!] Error: %v\n", err)
+		logger.Log.Error().Err(err)
 		return
 	}
 

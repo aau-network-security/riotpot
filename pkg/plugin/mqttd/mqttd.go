@@ -2,29 +2,28 @@
 package main
 
 import (
-	"fmt"
 	"net"
-	"strings"
 	"sync"
 
-	"github.com/riotpot/pkg/models"
-	"github.com/riotpot/pkg/services"
-	"github.com/riotpot/tools/errors"
+	"github.com/riotpot/internal/globals"
+	"github.com/riotpot/internal/logger"
+	"github.com/riotpot/internal/services"
 )
 
-var Name string
+var Plugin string
+
+const (
+	name    = "MQTT"
+	network = globals.TCP
+	port    = 1883
+)
 
 func init() {
-	Name = "Mqttd"
+	Plugin = "Mqttd"
 }
 
 func Mqttd() services.Service {
-	mx := services.MixinService{
-		Name:     Name,
-		Port:     1883,
-		Running:  make(chan bool, 1),
-		Protocol: "tcp",
-	}
+	mx := services.NewPluginService(name, port, network)
 
 	return &Mqtt{
 		mx,
@@ -33,23 +32,14 @@ func Mqttd() services.Service {
 }
 
 type Mqtt struct {
-	services.MixinService
+	services.Service
 	wg sync.WaitGroup
 }
 
 func (m *Mqtt) Run() (err error) {
-	// before running, migrate the model that we want to store
-	m.Migrate(&models.Connection{})
-
-	// convert the port number to a string that we can use it in the server
-	var port = fmt.Sprintf(":%d", m.Port)
-
 	// start a service in the `mqtt` port
-	listener, err := net.Listen(m.Protocol, port)
-	errors.Raise(err)
-
-	// create the channel for stopping the service
-	m.StopCh = make(chan int, 1)
+	listener, err := net.Listen(m.GetNetwork().String(), m.GetAddress())
+	logger.Log.Error().Err(err)
 
 	// build a channel stack to receive connections to the service
 	conn := make(chan net.Conn)
@@ -58,15 +48,9 @@ func (m *Mqtt) Run() (err error) {
 	m.wg.Add(1)
 	go m.serve(conn, listener)
 
-	// update the status of the service
-	m.Running <- true
-
 	// handle the connections from the channel
 	m.handlePool(conn)
-
-	// Close the channel for stopping the service
-	fmt.Print("[x] Service stopped...\n")
-	close(m.StopCh)
+	m.wg.Wait()
 
 	return
 }
@@ -77,7 +61,6 @@ func (m *Mqtt) serve(ch chan net.Conn, listener net.Listener) {
 	defer m.wg.Done()
 
 	// open an infinite loop to receive connections
-	fmt.Printf("[%s] Started listenning for connections in port %d\n", Name, m.Port)
 	for {
 		// Accept the client connection
 		client, err := listener.Accept()
@@ -97,12 +80,6 @@ func (m *Mqtt) handlePool(ch chan net.Conn) {
 		// while the `stop` channel remains empty, continue handling
 		// new connections.
 		select {
-		case <-m.StopCh:
-			// stop the pool
-			fmt.Printf("[x] Stopping %s service...\n", m.Name)
-			// update the status of the service
-			m.Running <- false
-			return
 		case conn := <-ch:
 			// use one goroutine per connection.
 			go m.handleConn(conn)
@@ -127,33 +104,8 @@ func (m *Mqtt) handleConn(conn net.Conn) {
 			return
 		}
 
-		// store the content of the packet
-		m.save(packet, conn)
-
 		// respond to the message
 		s.Answer(*packet, &conn)
 	}
 
-}
-
-// Save method used to store an incomming connection
-// packet. The packet is stored using the `Connection` model.
-// NOTE: this should be expanded and further develop
-// to better capture the packet specs.
-func (m *Mqtt) save(packet *Packet, conn net.Conn) {
-	data := fmt.Sprintf(
-		"msg: %v\ntopics: %v",
-		string(packet.Data),
-		strings.Join(packet.Topics, ","),
-	)
-
-	connection := &models.Connection{
-		LocalAddress:  "localhost",
-		RemoteAddress: conn.RemoteAddr().String(),
-		Payload:       data,
-		Protocol:      "TCP",
-		Service:       Name,
-		Incoming:      true,
-	}
-	m.Store(connection)
 }
