@@ -1,3 +1,7 @@
+| :loudspeaker: ATTENTION!!! |
+|:---------------------------|
+| This repository has been moved to [the Honeynet Project](https://github.com/honeynet/riotpot) :) |
+
 # RIoTPot
 
 <!-- markdownlint-disable MD033 -->
